@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小學數學 3-4 角度的計算 - 互動探索樂園</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #2e1065 70%, #3b0764 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            background-attachment: fixed;
+        }
+
+        /* 新海誠風半透明玻璃面板 */
+        .shinkai-card {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .shinkai-card-light {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            color: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        /* 自訂滑桿 */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            height: 8px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #ec4899;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
+            border: 2px solid white;
+        }
+
+        /* 擬真量角器專用黑色畫布底座 */
+        .protractor-canvas-container {
+            background: #282e4e;
+            border-radius: 1.5rem;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 8px 25px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 動態浮動效果 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-8">
+
+    <!-- 閒雲數學小棧 Logo 與標題 (最上方左上角) -->
+    <div class="w-full max-w-6xl mx-auto flex items-center justify-start mb-4 px-2 fade-in">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <!-- 頂部標頭 -->
+    <header class="max-w-6xl mx-auto mb-6 text-center floating">
+        <div class="shinkai-card rounded-3xl p-6 relative overflow-hidden border border-white/20">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl"></div>
+            
+            <span class="px-4 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-bold tracking-widest uppercase border border-cyan-400/30 mb-2 inline-block">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> 3-4 角度的計算 教學互動輔具
+            </span>
+            <h1 class="text-3xl md:text-5xl font-black bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent tracking-wide drop-shadow-md my-2">
+                單元 3-4 角度的計算
+            </h1>
+            <p class="text-slate-300 text-sm md:text-base font-medium max-w-2xl mx-auto">
+                擬真高對比量角器！動手拉動滑桿，觀察兩角的「合成拼接」、「重疊比較」與「旋轉變化」。
+            </p>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- 導覽分頁切換 -->
+        <div class="lg:col-span-12 flex flex-wrap justify-center gap-2 md:gap-4">
+            <button onclick="switchTab('combine')" id="tab-combine" class="tab-btn active px-5 py-3 rounded-2xl transition-all duration-300 flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-object-group"></i> 1. 角的合成與相差
+            </button>
+            <button onclick="switchTab('straight')" id="tab-straight" class="tab-btn px-5 py-3 rounded-2xl transition-all duration-300 flex items-center gap-2 text-sm md:text-base bg-white/10 text-white hover:bg-white/20">
+                <i class="fa-solid fa-shapes"></i> 2. 直角與平角拼角
+            </button>
+            <button onclick="switchTab('rotate')" id="tab-rotate" class="tab-btn px-5 py-3 rounded-2xl transition-all duration-300 flex items-center gap-2 text-sm md:text-base bg-white/10 text-white hover:bg-white/20">
+                <i class="fa-solid fa-arrows-spin"></i> 3. 旋轉角模擬器
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-5 py-3 rounded-2xl transition-all duration-300 flex items-center gap-2 text-sm md:text-base bg-white/10 text-white hover:bg-white/20">
+                <i class="fa-solid fa-clipboard-question"></i> 4. 歷程挑戰測驗
+            </button>
+        </div>
+
+        <!-- 模式一：角的合成與相差 -->
+        <section id="sec-combine" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 控制面板 -->
+            <div class="lg:col-span-5 shinkai-card-light rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-indigo-950 mb-3 flex items-center">
+                        <span class="w-3 h-8 bg-blue-600 rounded-full mr-3 inline-block"></span>
+                        角的合成與相差操作
+                    </h2>
+                    <p class="text-slate-600 text-sm mb-5">拖動滑桿觀察擬真量角器上的扇形區域變化。</p>
+
+                    <!-- Slider A -->
+                    <div class="mb-5 bg-slate-100 p-4 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="font-bold text-indigo-900 flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded-full bg-blue-600 inline-block"></span>
+                                角度 ∠A (藍色扇形)：
+                            </label>
+                            <span class="text-xl font-black text-blue-600"><span id="valA">78</span>°</span>
+                        </div>
+                        <input type="range" id="sliderA" min="5" max="175" value="78" class="w-full" oninput="updateCombine('A')">
+                    </div>
+
+                    <!-- Slider B -->
+                    <div class="mb-5 bg-slate-100 p-4 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="font-bold text-indigo-900 flex items-center gap-2">
+                                <span class="w-3.5 h-3.5 rounded-full bg-fuchsia-600 inline-block"></span>
+                                角度 ∠B (粉紫扇形)：
+                            </label>
+                            <span class="text-xl font-black text-fuchsia-600"><span id="valB">55</span>°</span>
+                        </div>
+                        <input type="range" id="sliderB" min="5" max="175" value="55" class="w-full" oninput="updateCombine('B')">
+                    </div>
+
+                    <!-- 模式切換鈕 -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <button onclick="setCombineMode('add')" id="btn-mode-add" class="py-3 px-4 rounded-xl font-bold border-2 border-blue-600 bg-blue-600 text-white shadow-md transition-all text-center">
+                            <i class="fa-solid fa-plus-circle mr-1"></i> 角的合併 (相加)
+                        </button>
+                        <button onclick="setCombineMode('sub')" id="btn-mode-sub" class="py-3 px-4 rounded-xl font-bold border-2 border-slate-300 text-slate-700 hover:bg-slate-200 transition-all text-center">
+                            <i class="fa-solid fa-minus-circle mr-1"></i> 角的相差 (相減)
+                        </button>
+                    </div>
+
+                    <!-- 顯示結果按鈕 (僅相減模式顯示) -->
+                    <div id="result-btn-container" class="mb-4 hidden">
+                        <button onclick="toggleShowResult()" id="btn-toggle-result" class="w-full py-2.5 px-4 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all text-center flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-eye"></i> 顯示結果 (綠色扇形)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 算式顯示卡片 -->
+                <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-5 rounded-2xl shadow-lg border border-indigo-500/30">
+                    <div class="text-xs text-indigo-300 mb-1" id="combine-formula-title">算式紀錄（角的合併）：</div>
+                    <div class="text-2xl font-black tracking-wide font-mono text-amber-300" id="combine-formula">
+                        78 + 55 = 133°
+                    </div>
+                    <div class="text-xs text-slate-300 mt-2 leading-relaxed" id="combine-explanation">
+                        把 78 個 1° 和 55 個 1° 合起來，一共是 133 個 1°。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 高對比擬真 SVG 畫布區域 -->
+            <div class="lg:col-span-7 shinkai-card rounded-3xl p-6 flex flex-col items-center justify-center min-h-[440px]">
+                <div class="w-full max-w-[500px] protractor-canvas-container p-4">
+                    <svg id="svg-combine" viewBox="0 0 400 280" class="w-full h-auto">
+                        <!-- 動態畫布內容由 JS 渲染 -->
+                    </svg>
+                </div>
+                <div class="mt-4 text-center text-xs text-cyan-200 bg-black/40 px-5 py-2 rounded-full border border-white/10">
+                    <i class="fa-solid fa-circle-info text-cyan-400 mr-1.5"></i> 擬真量角器刻度：從左側 0° 延伸至右側 180°
+                </div>
+            </div>
+        </section>
+
+        <!-- 模式二：直角與平角拼角 -->
+        <section id="sec-straight" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
+            <!-- 控制區 -->
+            <div class="lg:col-span-5 shinkai-card-light rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-indigo-950 mb-3 flex items-center">
+                        <span class="w-3 h-8 bg-cyan-500 rounded-full mr-3 inline-block"></span>
+                        特殊角拼貼與拆解
+                    </h2>
+                    
+                    <!-- 選擇情境 -->
+                    <div class="flex gap-2 mb-6">
+                        <button onclick="setStraightPreset('supplement')" id="btn-preset-supp" class="flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-indigo-500 bg-indigo-600 text-white shadow-sm">
+                            平角分割 (180°)
+                        </button>
+                        <button onclick="setStraightPreset('right3')" id="btn-preset-right3" class="flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-700">
+                            3個直角拼在一起
+                        </button>
+                    </div>
+
+                    <div id="straight-control-panel">
+                        <!-- 平角動態調整 -->
+                        <div class="mb-6 bg-slate-100 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-bold text-indigo-900">已知角 ∠C：</label>
+                                <span class="text-xl font-black text-indigo-600"><span id="valC">72</span>°</span>
+                            </div>
+                            <input type="range" id="sliderC" min="1" max="179" value="72" class="w-full" oninput="updateStraight()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white p-5 rounded-2xl border border-cyan-500/30">
+                    <div class="text-xs text-cyan-300 mb-1" id="straight-title">算式紀錄：</div>
+                    <div class="text-2xl font-black font-mono text-amber-300 mb-2" id="straight-formula">
+                        180 - 72 = 108°
+                    </div>
+                    <div class="text-xs text-slate-300 leading-relaxed" id="straight-desc">
+                        平角是 180°，已知其中一個角是 72°，另一個角 ∠D = 180° - 72° = 108°。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 視覺展示區 -->
+            <div class="lg:col-span-7 shinkai-card rounded-3xl p-6 flex flex-col items-center justify-center min-h-[440px]">
+                <div class="w-full max-w-[500px] protractor-canvas-container p-4">
+                    <svg id="svg-straight" viewBox="0 0 400 280" class="w-full h-auto">
+                        <!-- Dynamic SVG -->
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模式三：旋轉角模擬器 -->
+        <section id="sec-rotate" class="lg:col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6 hidden">
+            <div class="lg:col-span-5 shinkai-card-light rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-indigo-950 mb-3 flex items-center">
+                        <span class="w-3 h-8 bg-amber-500 rounded-full mr-3 inline-block"></span>
+                        旋轉角合成與分解
+                    </h2>
+                    <p class="text-slate-600 text-sm mb-4">觀察量角器指針隨順時針/逆時針旋轉的累積刻度。</p>
+
+                    <!-- 起始角度 -->
+                    <div class="mb-4 bg-slate-100 p-3.5 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">第1次旋轉 (順時針)：</label>
+                            <span class="text-lg font-black text-blue-600"><span id="valR1">70</span>°</span>
+                        </div>
+                        <input type="range" id="sliderR1" min="0" max="180" value="70" class="w-full" oninput="updateRotate()">
+                    </div>
+
+                    <!-- 第二次旋轉方向與角度 -->
+                    <div class="mb-4 bg-slate-100 p-3.5 rounded-2xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-slate-700">第2次旋轉方向：</label>
+                            <div class="flex gap-2">
+                                <button onclick="setRotateDir('cw')" id="btn-dir-cw" class="px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm">
+                                    順時針 (+)
+                                </button>
+                                <button onclick="setRotateDir('ccw')" id="btn-dir-ccw" class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-300 text-slate-700">
+                                    逆時針 (-)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">第2次旋轉角度：</label>
+                            <span class="text-lg font-black text-amber-600"><span id="valR2">80</span>°</span>
+                        </div>
+                        <input type="range" id="sliderR2" min="0" max="180" value="80" class="w-full" oninput="updateRotate()">
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-slate-900 via-amber-950 to-slate-900 text-white p-5 rounded-2xl border border-amber-500/30">
+                    <div class="text-xs text-amber-300 mb-1">最終停止位置算式：</div>
+                    <div class="text-2xl font-black font-mono text-yellow-300 mb-1" id="rotate-formula">
+                        70 + 80 = 150°
+                    </div>
+                    <div class="text-xs text-slate-300 leading-relaxed" id="rotate-desc">
+                        藍線最後停在外圈刻度 150 度的位置。
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG 畫布區 -->
+            <div class="lg:col-span-7 shinkai-card rounded-3xl p-6 flex flex-col items-center justify-center min-h-[440px]">
+                <div class="w-full max-w-[500px] protractor-canvas-container p-4">
+                    <svg id="svg-rotate" viewBox="0 0 400 280" class="w-full h-auto">
+                        <!-- Dynamic SVG -->
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模式四：歷程性評量測驗 -->
+        <section id="sec-quiz" class="lg:col-span-12 hidden">
+            <div class="shinkai-card-light rounded-3xl p-6 md:p-8 max-w-3xl mx-auto">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-2xl font-black text-indigo-950 flex items-center gap-2">
+                            <i class="fa-solid fa-award text-amber-500"></i> 角度計算探究挑戰
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">國小 3-4 角度計算 5 題即時評量測驗</p>
+                    </div>
+                    <div class="bg-indigo-100 text-indigo-800 font-bold px-4 py-2 rounded-2xl text-sm border border-indigo-200">
+                        得分：<span id="quiz-score" class="text-xl text-indigo-600 font-black">0</span> / 100
+                    </div>
+                </div>
+
+                <!-- 測驗題容器 -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- 由 JS 動態生成題目 -->
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="resetQuiz()" class="px-8 py-3 rounded-2xl text-white font-bold text-lg shadow-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transition-all">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> 重新測驗
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="max-w-6xl mx-auto mt-8 text-center text-xs text-slate-400">
+    </footer>
+
+    <!-- JavaScript 邏輯與深色擬真量角器渲染器 -->
+    <script>
+        // --- 全域狀態 ---
+        let combineMode = 'add'; // 'add' or 'sub'
+        let showSubResult = false; // 相減模式下是否顯示結果
+        let straightPreset = 'supplement'; // 'supplement' or 'right3'
+        let rotateDir = 'cw'; // 'cw' or 'ccw'
+
+        // 測驗題庫
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 丹丹將 3 個直角拼在一起，合起來是多少度？",
+                options: ["180 度", "270 度", "360 度", "90 度"],
+                answer: 1,
+                explanation: "直角是 90°，3 個直角就是 90° × 3 = 270° 或 90° + 90° + 90° = 270°。"
+            },
+            {
+                id: 2,
+                question: "2. 美美將 78° 的 ∠A 和 55° 的 ∠B 拼起來，合起來是多少度？",
+                options: ["123 度", "133 度", "143 度", "23 度"],
+                answer: 1,
+                explanation: "78° + 55° = 133°。"
+            },
+            {
+                id: 3,
+                question: "3. ∠C 和 ∠D 能拼成一個平角。已知 ∠C = 72°，請問 ∠D 是幾度？",
+                options: ["108 度", "98 度", "118 度", "288 度"],
+                answer: 0,
+                explanation: "平角是 180°，所以 ∠D = 180° - 72° = 108°。"
+            },
+            {
+                id: 4,
+                question: "4. 皮皮將藍線順時針旋轉 110 度後，再「逆時針」旋轉 45 度，藍線會停在刻度幾度的位置？",
+                options: ["155 度", "75 度", "65 度", "55 度"],
+                answer: 2,
+                explanation: "順時針增加角度，逆時針減少角度：110° - 45° = 65°。"
+            },
+            {
+                id: 5,
+                question: "5. 【思考帽思考題】4 個相同的白色四邊形和 4 個相同的藍色四邊形拼成一個周角(360°)。已知白色角為 30°，請問藍色角是幾度？",
+                options: ["45 度", "50 度", "60 度", "90 度"],
+                answer: 2,
+                explanation: "1個白色角+1個藍色角 = 360° ÷ 4 = 90°。因此藍色角 = 90° - 30° = 60°。"
+            }
+        ];
+
+        let userAnswers = {};
+
+        // --- 初始化 ---
+        window.onload = function() {
+            updateCombine();
+            updateStraight();
+            updateRotate();
+            renderQuiz();
+        };
+
+        // --- 分頁切換 ---
+        function switchTab(tab) {
+            ['combine', 'straight', 'rotate', 'quiz'].forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`tab-${t}`).classList.add('bg-white/10', 'text-white');
+            });
+
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-white/10', 'text-white');
+        }
+
+        /**
+         * 繪製高質感深色擬真量角器底圖 (根據使用者提供的參考圖片風格)
+         * 中心點: (cx, cy), 半徑: radius
+         * 0° 位於左側水平基線，180° 位於右側水平基線
+         */
+        function getDarkProtractorSVG(cx = 200, cy = 230, radius = 170) {
+            let ticksSVG = '';
+
+            // 繪製 0° 到 180° 的刻度線與數字標籤
+            for (let deg = 0; deg <= 180; deg += 1) {
+                const rad = Math.PI - (deg * Math.PI / 180); // 左邊為 0°，右邊為 180°
+                const is10 = deg % 10 === 0;
+                const is5 = deg % 5 === 0;
+
+                const tickLen = is10 ? 14 : (is5 ? 9 : 5);
+                const strokeW = is10 ? 1.5 : 0.8;
+                const strokeColor = is10 ? "rgba(255, 255, 255, 0.85)" : "rgba(200, 210, 230, 0.4)";
+
+                const x1 = cx + radius * Math.cos(rad);
+                const y1 = cy - radius * Math.sin(rad);
+                const x2 = cx + (radius - tickLen) * Math.cos(rad);
+                const y2 = cy - (radius - tickLen) * Math.sin(rad);
+
+                ticksSVG += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${strokeColor}" stroke-width="${strokeW}"/>`;
+
+                // 每 10 度繪製數字文字
+                if (is10) {
+                    const textRadius = radius - 24;
+                    const tx = cx + textRadius * Math.cos(rad);
+                    const ty = cy - textRadius * Math.sin(rad) + 4; // 微調垂直置中
+                    ticksSVG += `<text x="${tx}" y="${ty}" fill="#cbd5e1" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">${deg}</text>`;
+                }
+            }
+
+            return `
+                <!-- 半透明深灰色量角器外型拱罩 -->
+                <path d="M ${cx - radius - 15} ${cy} A ${radius + 15} ${radius + 15} 0 0 1 ${cx + radius + 15} ${cy} Z" fill="#353c5e" fill-opacity="0.5" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2"/>
+                
+                <!-- 內圈圓弧線 -->
+                <path d="M ${cx - radius + 35} ${cy} A ${radius - 35} ${radius - 35} 0 0 1 ${cx + radius - 35} ${cy} Z" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1.5"/>
+
+                <!-- 刻度與數字 -->
+                ${ticksSVG}
+
+                <!-- 底部 0-180 基準白線 -->
+                <line x1="${cx - radius - 20}" y1="${cy}" x2="${cx + radius + 20}" y2="${cy}" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+                
+                <!-- 中心點亮白圓點 -->
+                <circle cx="${cx}" cy="${cy}" r="4" fill="#ffffff" stroke="#38bdf8" stroke-width="2"/>
+            `;
+        }
+
+        // 角度轉直角座標 (0°在左側，180°在右側)
+        function angleToCartesian(deg, radius, cx = 200, cy = 230) {
+            // 限制角度範圍 0~360
+            const rad = Math.PI - (deg * Math.PI / 180);
+            return {
+                x: cx + radius * Math.cos(rad),
+                y: cy - radius * Math.sin(rad)
+            };
+        }
+
+        // 繪製扇形 Path (從 startDeg 到 endDeg)
+        function getSectorPath(startDeg, endDeg, radius, cx = 200, cy = 230) {
+            const p1 = angleToCartesian(startDeg, radius, cx, cy);
+            const p2 = angleToCartesian(endDeg, radius, cx, cy);
+            const angleDiff = Math.abs(endDeg - startDeg);
+            const largeArcFlag = angleDiff > 180 ? 1 : 0;
+            // 在 SVG 座標系中，0° 在 9 點鐘方向，角度增加時順時針旋轉 (sweepFlag = 1)
+            const sweepFlag = endDeg >= startDeg ? 1 : 0;
+
+            return `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${p2.x} ${p2.y} Z`;
+        }
+
+        // --- 1. 角的合成與相差邏輯 ---
+        function setCombineMode(mode) {
+            combineMode = mode;
+            document.getElementById('btn-mode-add').className = mode === 'add' 
+                ? 'py-3 px-4 rounded-xl font-bold border-2 border-blue-600 bg-blue-600 text-white shadow-md transition-all text-center'
+                : 'py-3 px-4 rounded-xl font-bold border-2 border-slate-300 text-slate-700 hover:bg-slate-200 transition-all text-center';
+            document.getElementById('btn-mode-sub').className = mode === 'sub' 
+                ? 'py-3 px-4 rounded-xl font-bold border-2 border-fuchsia-600 bg-fuchsia-600 text-white shadow-md transition-all text-center'
+                : 'py-3 px-4 rounded-xl font-bold border-2 border-slate-300 text-slate-700 hover:bg-slate-200 transition-all text-center';
+            
+            const resultBtnContainer = document.getElementById('result-btn-container');
+            if (mode === 'sub') {
+                resultBtnContainer.classList.remove('hidden');
+            } else {
+                resultBtnContainer.classList.add('hidden');
+            }
+
+            updateCombine('A');
+        }
+
+        function toggleShowResult() {
+            showSubResult = !showSubResult;
+            const btn = document.getElementById('btn-toggle-result');
+            if (showSubResult) {
+                btn.className = "w-full py-2.5 px-4 rounded-xl font-bold border-2 border-emerald-400 bg-emerald-500 text-white shadow-md transition-all text-center flex items-center justify-center gap-2 ring-2 ring-emerald-300";
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash"></i> 隱藏結果`;
+            } else {
+                btn.className = "w-full py-2.5 px-4 rounded-xl font-bold border-2 border-emerald-500 bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all text-center flex items-center justify-center gap-2";
+                btn.innerHTML = `<i class="fa-solid fa-eye"></i> 顯示結果 (綠色扇形)`;
+            }
+            updateCombine('A');
+        }
+
+        function updateCombine(source = 'A') {
+            let a = parseInt(document.getElementById('sliderA').value);
+            let b = parseInt(document.getElementById('sliderB').value);
+
+            // 當模式為「相加 (合成)」時，限制總合不可超過 180 度
+            if (combineMode === 'add') {
+                if (a + b > 180) {
+                    if (source === 'A') {
+                        b = 180 - a;
+                        document.getElementById('sliderB').value = b;
+                    } else {
+                        a = 180 - b;
+                        document.getElementById('sliderA').value = a;
+                    }
+                }
+            } else if (combineMode === 'sub') {
+                // 確保大數減小數：∠A 必須大於等於 ∠B
+                if (b > a) {
+                    if (source === 'B') {
+                        a = b;
+                        document.getElementById('sliderA').value = a;
+                    } else {
+                        b = a;
+                        document.getElementById('sliderB').value = b;
+                    }
+                }
+            }
+
+            document.getElementById('valA').innerText = a;
+            document.getElementById('valB').innerText = b;
+
+            const svg = document.getElementById('svg-combine');
+            const cx = 200, cy = 230, radius = 170;
+            let content = getDarkProtractorSVG(cx, cy, radius);
+
+            if (combineMode === 'add') {
+                const total = a + b;
+                document.getElementById('combine-formula-title').innerText = '算式紀錄（角的合併，上限 180°）：';
+                document.getElementById('combine-formula').innerText = `${a} + ${b} = ${total}°`;
+                document.getElementById('combine-explanation').innerText = `將 ${a}° 的藍色扇形與 ${b}° 的粉紫扇形拼接起來，合成後的總角度為 ${total}° ${total === 180 ? '（已達平角 180° 上限）' : ''}。`;
+
+                // 扇形 A (0 -> a) - 顏色刷淡 opacity 0.45 方便看清量角器數字
+                const pathA = getSectorPath(0, a, radius, cx, cy);
+                // 扇形 B (a -> a+b)
+                const pathB = getSectorPath(a, a + b, radius, cx, cy);
+
+                const ray0 = angleToCartesian(0, radius, cx, cy);
+                const rayA = angleToCartesian(a, radius, cx, cy);
+                const rayTotal = angleToCartesian(a + b, radius, cx, cy);
+
+                // 扇形中央標記文字位置
+                const posTextA = angleToCartesian(a / 2, radius * 0.55, cx, cy);
+                const posTextB = angleToCartesian(a + (b / 2), radius * 0.55, cx, cy);
+
+                content += `
+                    <!-- 角 A 藍色扇形區域 (刷淡半透明) -->
+                    <path d="${pathA}" fill="rgba(37, 99, 235, 0.42)" stroke="rgba(96, 165, 250, 0.6)" stroke-width="1.5"/>
+                    
+                    <!-- 角 B 粉紫扇形區域 (刷淡半透明) -->
+                    <path d="${pathB}" fill="rgba(192, 38, 211, 0.42)" stroke="rgba(244, 114, 182, 0.6)" stroke-width="1.5"/>
+
+                    <!-- 邊界線與中間分界線 -->
+                    <line x1="${cx}" y1="${cy}" x2="${ray0.x}" y2="${ray0.y}" stroke="#ffffff" stroke-width="2"/>
+                    <line x1="${cx}" y1="${cy}" x2="${rayA.x}" y2="${rayA.y}" stroke="#60a5fa" stroke-width="2.5"/>
+                    <line x1="${cx}" y1="${cy}" x2="${rayTotal.x}" y2="${rayTotal.y}" stroke="#f472b6" stroke-width="2.5"/>
+
+                    <!-- 扇形角度標籤 -->
+                    ${a >= 10 ? `<text x="${posTextA.x}" y="${posTextA.y}" fill="#ffffff" font-weight="900" font-size="12" text-anchor="middle">∠A (${a}°)</text>` : ''}
+                    ${b >= 10 ? `<text x="${posTextB.x}" y="${posTextB.y}" fill="#ffffff" font-weight="900" font-size="12" text-anchor="middle">∠B (${b}°)</text>` : ''}
+                `;
+            } else {
+                // 相差 (大數減小數比較)
+                const diff = a - b;
+                document.getElementById('combine-formula-title').innerText = '算式紀錄（角的相差，大數減小數）：';
+                document.getElementById('combine-formula').innerText = `${a} - ${b} = ${diff}°`;
+                document.getElementById('combine-explanation').innerText = `藍色扇形 ∠A (${a}°) 比粉紫扇形 ∠B (${b}°) 多出了 ${diff}° 的範圍。${showSubResult ? '（淺綠色區域為剩餘差值角度）' : ''}`;
+
+                // 角 A (藍色) 半徑拉至最外圈 (170)，角 B (粉紫) 半徑延伸至刻度線上 (146)，角 A 半徑 > 角 B 半徑
+                const radiusA = 170;
+                const radiusB = 146;
+
+                const pathA = getSectorPath(0, a, radiusA, cx, cy);
+                const pathB = getSectorPath(0, b, radiusB, cx, cy);
+
+                const rayA = angleToCartesian(a, radiusA, cx, cy);
+                const rayB = angleToCartesian(b, radiusB, cx, cy);
+
+                content += `
+                    <!-- 角 A 扇形 (外圈藍色，刷淡) -->
+                    <path d="${pathA}" fill="rgba(37, 99, 235, 0.35)" stroke="#38bdf8" stroke-width="1.5"/>
+                    
+                    <!-- 角 B 扇形 (刻度線上粉紫色，刷淡) -->
+                    <path d="${pathB}" fill="rgba(192, 38, 211, 0.45)" stroke="#f472b6" stroke-width="1.5"/>
+                `;
+
+                // 若點擊「顯示結果」，在 b -> a 剩餘角度區域繪製淺綠色扇形
+                if (showSubResult && diff > 0) {
+                    const pathDiff = getSectorPath(b, a, radiusA, cx, cy);
+                    const posTextDiff = angleToCartesian(b + (diff / 2), radiusA * 0.65, cx, cy);
+
+                    content += `
+                        <!-- 相減結果：淺綠色扇形 -->
+                        <path d="${pathDiff}" fill="rgba(34, 197, 94, 0.5)" stroke="#4ade80" stroke-width="2"/>
+                        <text x="${posTextDiff.x}" y="${posTextDiff.y}" fill="#ffffff" font-weight="900" font-size="13" text-anchor="middle" drop-shadow="0 1px 2px rgba(0,0,0,0.8)">結果 ${diff}°</text>
+                    `;
+                }
+
+                content += `
+                    <!-- 射線 -->
+                    <line x1="${cx}" y1="${cy}" x2="${rayA.x}" y2="${rayA.y}" stroke="#60a5fa" stroke-width="2.5"/>
+                    <line x1="${cx}" y1="${cy}" x2="${rayB.x}" y2="${rayB.y}" stroke="#f472b6" stroke-width="2.5"/>
+
+                    <!-- 扇形標籤 -->
+                    <text x="${angleToCartesian(a, radiusA * 0.85, cx, cy).x}" y="${angleToCartesian(a, radiusA * 0.85, cx, cy).y}" fill="#93c5fd" font-weight="bold" font-size="12">∠A (${a}°)</text>
+                    <text x="${angleToCartesian(b / 2, radiusB * 0.5, cx, cy).x}" y="${angleToCartesian(b / 2, radiusB * 0.5, cx, cy).y}" fill="#f472b6" font-weight="bold" font-size="12">∠B (${b}°)</text>
+                `;
+            }
+
+            svg.innerHTML = content;
+        }
+
+        // --- 2. 直角與平角拼角邏輯 ---
+        function setStraightPreset(preset) {
+            straightPreset = preset;
+            const ctrl = document.getElementById('straight-control-panel');
+            const btnR = document.getElementById('btn-preset-right3');
+            const btnS = document.getElementById('btn-preset-supp');
+
+            if (preset === 'right3') {
+                ctrl.classList.add('hidden');
+                btnR.className = "flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-indigo-500 bg-indigo-600 text-white shadow-sm";
+                btnS.className = "flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-700";
+                document.getElementById('straight-title').innerText = "情境：3 個直角拼在一起";
+                document.getElementById('straight-formula').innerText = "90 + 90 + 90 = 270°";
+                document.getElementById('straight-desc').innerText = "直角是 90°，3 個直角合起來：90° × 3 = 270°。";
+            } else {
+                ctrl.classList.remove('hidden');
+                btnS.className = "flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-indigo-500 bg-indigo-600 text-white shadow-sm";
+                btnR.className = "flex-1 py-2.5 px-3 text-xs font-bold rounded-xl border border-slate-300 bg-white text-slate-700";
+                document.getElementById('straight-title').innerText = "情境：平角與補角計算";
+                updateStraight();
+                return;
+            }
+            renderStraightSVG();
+        }
+
+        function updateStraight() {
+            if (straightPreset !== 'supplement') return;
+            const c = parseInt(document.getElementById('sliderC').value);
+            const d = 180 - c;
+            document.getElementById('valC').innerText = c;
+            document.getElementById('straight-formula').innerText = `180 - ${c} = ${d}°`;
+            document.getElementById('straight-desc').innerText = `平角是 180°，已知角 ∠C = ${c}°，因此未知角 ∠D = 180° - ${c}° = ${d}°。`;
+            renderStraightSVG();
+        }
+
+        function renderStraightSVG() {
+            const svg = document.getElementById('svg-straight');
+
+            if (straightPreset === 'right3') {
+                // 3個直角 270度 - 縮小半徑與調整中心點 (cx=200, cy=135, radius=105)，確保整個圖形完全收納在畫布中
+                const cx = 200, cy = 135, radius = 105;
+
+                svg.innerHTML = `
+                    <!-- 底座背景圓圈 -->
+                    <circle cx="${cx}" cy="${cy}" r="${radius + 12}" fill="#353c5e" fill-opacity="0.4" stroke="rgba(255,255,255,0.2)"/>
+                    <line x1="${cx - radius - 15}" y1="${cy}" x2="${cx + radius + 15}" y2="${cy}" stroke="#ffffff" stroke-width="2"/>
+                    <line x1="${cx}" y1="${cy - radius - 15}" x2="${cx}" y2="${cy + radius + 15}" stroke="#ffffff" stroke-width="2"/>
+
+                    <!-- 直角1 (0->90) 刷淡顏色 -->
+                    <path d="${getSectorPath(0, 90, radius, cx, cy)}" fill="rgba(37, 99, 235, 0.45)" stroke="#60a5fa" stroke-width="1.5"/>
+                    <!-- 直角2 (90->180) -->
+                    <path d="${getSectorPath(90, 180, radius, cx, cy)}" fill="rgba(16, 185, 129, 0.45)" stroke="#34d399" stroke-width="1.5"/>
+                    <!-- 直角3 (180->270) -->
+                    <path d="M ${cx} ${cy} L ${cx - radius} ${cy} A ${radius} ${radius} 0 0 0 ${cx} ${cy + radius} Z" fill="rgba(245, 158, 11, 0.45)" stroke="#fbbf24" stroke-width="1.5"/>
+
+                    <text x="${cx + 45}" y="${cy - 45}" fill="#ffffff" font-weight="bold" font-size="13">90°</text>
+                    <text x="${cx - 55}" y="${cy - 45}" fill="#ffffff" font-weight="bold" font-size="13">90°</text>
+                    <text x="${cx - 55}" y="${cy + 55}" fill="#ffffff" font-weight="bold" font-size="13">90°</text>
+
+                    <circle cx="${cx}" cy="${cy}" r="4" fill="#ffffff"/>
+                    <text x="${cx}" y="${cy + radius + 25}" fill="#f87171" font-weight="900" font-size="14" text-anchor="middle">3個直角合起來 = 270°</text>
+                `;
+            } else {
+                // 平角切割 (刷淡顏色)
+                const cx = 200, cy = 230, radius = 170;
+                let content = getDarkProtractorSVG(cx, cy, radius);
+                const c = parseInt(document.getElementById('sliderC').value);
+                const d = 180 - c;
+
+                const pathC = getSectorPath(0, c, radius, cx, cy);
+                const pathD = getSectorPath(c, 180, radius, cx, cy);
+                const rayC = angleToCartesian(c, radius, cx, cy);
+
+                content += `
+                    <path d="${pathC}" fill="rgba(14, 165, 233, 0.42)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <path d="${pathD}" fill="rgba(168, 85, 247, 0.42)" stroke="#c084fc" stroke-width="1.5"/>
+                    <line x1="${cx}" y1="${cy}" x2="${rayC.x}" y2="${rayC.y}" stroke="#ffffff" stroke-width="2.5"/>
+
+                    <text x="${angleToCartesian(c/2, 100, cx, cy).x}" y="${angleToCartesian(c/2, 100, cx, cy).y}" fill="#ffffff" font-weight="900" font-size="13" text-anchor="middle">∠C (${c}°)</text>
+                    <text x="${angleToCartesian(c + d/2, 100, cx, cy).x}" y="${angleToCartesian(c + d/2, 100, cx, cy).y}" fill="#ffffff" font-weight="900" font-size="13" text-anchor="middle">∠D (${d}°)</text>
+                `;
+                svg.innerHTML = content;
+            }
+        }
+
+        // --- 3. 旋轉角模擬邏輯 ---
+        function setRotateDir(dir) {
+            rotateDir = dir;
+            document.getElementById('btn-dir-cw').className = dir === 'cw' 
+                ? 'px-3 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white shadow-sm' 
+                : 'px-3 py-1 text-xs font-bold rounded-lg bg-slate-300 text-slate-700';
+            document.getElementById('btn-dir-ccw').className = dir === 'ccw' 
+                ? 'px-3 py-1 text-xs font-bold rounded-lg bg-rose-600 text-white shadow-sm' 
+                : 'px-3 py-1 text-xs font-bold rounded-lg bg-slate-300 text-slate-700';
+            updateRotate();
+        }
+
+        function updateRotate() {
+            const r1 = parseInt(document.getElementById('sliderR1').value);
+            const r2 = parseInt(document.getElementById('sliderR2').value);
+            document.getElementById('valR1').innerText = r1;
+            document.getElementById('valR2').innerText = r2;
+
+            let finalAngle = rotateDir === 'cw' ? r1 + r2 : r1 - r2;
+            let formulaStr = rotateDir === 'cw' ? `${r1} + ${r2} = ${finalAngle}°` : `${r1} - ${r2} = ${finalAngle}°`;
+
+            document.getElementById('rotate-formula').innerText = formulaStr;
+            document.getElementById('rotate-desc').innerText = `藍色扇形代表第1次旋轉 (${r1}°)，紫色扇形代表第2次${rotateDir==='cw'?'順時針':'逆時針'}旋轉 (${r2}°)，指針停在 ${Math.max(0, Math.min(180, finalAngle))}° 位置。`;
+
+            const svg = document.getElementById('svg-rotate');
+            const cx = 200, cy = 230, radius = 170;
+            let content = getDarkProtractorSVG(cx, cy, radius);
+
+            const clampedFinal = Math.max(0, Math.min(180, finalAngle));
+            
+            // 兩次旋轉皆採用相同的扇形半徑 (145px)
+            const sectorRadius = 145;
+
+            // 第 1 次旋轉藍色扇形 (0 -> r1)
+            const pathSector1 = r1 > 0 ? getSectorPath(0, r1, sectorRadius, cx, cy) : '';
+
+            // 第 2 次旋轉紫色扇形 (r1 -> clampedFinal)
+            const startAngle2 = r1;
+            const endAngle2 = clampedFinal;
+            const minAngle2 = Math.min(startAngle2, endAngle2);
+            const maxAngle2 = Math.max(startAngle2, endAngle2);
+            const pathSector2 = (Math.abs(endAngle2 - startAngle2) > 0) ? getSectorPath(minAngle2, maxAngle2, sectorRadius, cx, cy) : '';
+
+            const p1 = angleToCartesian(r1, sectorRadius, cx, cy);
+            const pFinal = angleToCartesian(clampedFinal, radius, cx, cy);
+
+            content += `
+                <!-- 第 1 次旋轉：藍色扇形 -->
+                ${r1 > 0 ? `<path d="${pathSector1}" fill="rgba(37, 99, 235, 0.42)" stroke="#38bdf8" stroke-width="1.5"/>` : ''}
+
+                <!-- 第 2 次旋轉：紫色扇形 (與藍色扇形等半徑) -->
+                ${Math.abs(endAngle2 - startAngle2) > 0 ? `<path d="${pathSector2}" fill="rgba(192, 38, 211, 0.42)" stroke="#c084fc" stroke-width="1.5"/>` : ''}
+
+                <!-- 第 1 次旋轉分界虛線 -->
+                <line x1="${cx}" y1="${cy}" x2="${p1.x}" y2="${p1.y}" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-dasharray="4,4"/>
+
+                <!-- 最終位置藍色主指針 -->
+                <line x1="${cx}" y1="${cy}" x2="${pFinal.x}" y2="${pFinal.y}" stroke="#38bdf8" stroke-width="4.5"/>
+                <circle cx="${pFinal.x}" cy="${pFinal.y}" r="6" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+
+                <!-- 扇形標籤文字 -->
+                ${r1 >= 15 ? `<text x="${angleToCartesian(r1/2, sectorRadius * 0.55, cx, cy).x}" y="${angleToCartesian(r1/2, sectorRadius * 0.55, cx, cy).y}" fill="#ffffff" font-weight="900" font-size="12" text-anchor="middle">第1次 (${r1}°)</text>` : ''}
+                ${(maxAngle2 - minAngle2) >= 15 ? `<text x="${angleToCartesian((startAngle2 + endAngle2)/2, sectorRadius * 0.55, cx, cy).x}" y="${angleToCartesian((startAngle2 + endAngle2)/2, sectorRadius * 0.55, cx, cy).y}" fill="#ffffff" font-weight="900" font-size="12" text-anchor="middle">第2次 (${r2}°)</text>` : ''}
+            `;
+
+            svg.innerHTML = content;
+        }
+
+        // --- 4. 歷程性評量測驗邏輯 ---
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map((q, idx) => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                    <p class="font-bold text-slate-800 text-base mb-3">${q.question}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+                        ${q.options.map((opt, optIdx) => `
+                            <button onclick="selectAnswer(${q.id}, ${optIdx})" id="btn-q${q.id}-opt${optIdx}" 
+                                class="text-left px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-q${q.id}" class="hidden p-3 rounded-xl text-xs leading-relaxed"></div>
+                </div>
+            `).join('');
+        }
+
+        function selectAnswer(qId, optIdx) {
+            const q = quizData.find(item => item.id === qId);
+            userAnswers[qId] = optIdx;
+
+            q.options.forEach((_, i) => {
+                const btn = document.getElementById(`btn-q${qId}-opt${i}`);
+                btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-700";
+            });
+
+            const selectedBtn = document.getElementById(`btn-q${qId}-opt${optIdx}`);
+            const feedbackEl = document.getElementById(`feedback-q${qId}`);
+            feedbackEl.classList.remove('hidden');
+
+            if (optIdx === q.answer) {
+                selectedBtn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold";
+                feedbackEl.className = "p-3 rounded-xl text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 mt-2";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> <b>答對了！</b> ${q.explanation}`;
+            } else {
+                selectedBtn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold";
+                feedbackEl.className = "p-3 rounded-xl text-xs bg-rose-100 text-rose-800 border border-rose-300 mt-2";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i> <b>再想想看：</b> ${q.explanation}`;
+            }
+
+            calculateScore();
+        }
+
+        function calculateScore() {
+            let score = 0;
+            quizData.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    score += 20;
+                }
+            });
+            document.getElementById('quiz-score').innerText = score;
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            document.getElementById('quiz-score').innerText = '0';
+            renderQuiz();
+        }
+    </script>
+</body>
+</html>

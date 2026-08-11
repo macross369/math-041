@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認識公里 (km) 互動探索學習網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #312e81 70%, #1e293b 100%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* 新海誠風格天空背景與雲朵動畫 */
+        .shinkai-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.25) 0%, rgba(15, 23, 42, 0) 70%),
+                        linear-gradient(180deg, rgba(14, 165, 233, 0.15) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(15, 23, 42, 0.9) 100%);
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            filter: blur(20px);
+            animation: floatCloud 40s infinite linear;
+        }
+
+        @keyframes floatCloud {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        /* 玻璃擬物卡片風格 */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* 微浮動與發光效果 */
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .animate-float {
+            animation: subtleFloat 3s ease-in-out infinite;
+        }
+
+        /* 自訂滑桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 10px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            box-shadow: 0 0 15px #38bdf8;
+            transition: all 0.2s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #38bdf8;
+            box-shadow: 0 0 25px #38bdf8;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 min-h-screen flex flex-col items-center">
+    <!-- 動態背景裝飾 -->
+    <div class="shinkai-bg">
+        <div class="cloud w-96 h-32 top-10 -left-20"></div>
+        <div class="cloud w-80 h-28 top-1/3 left-1/4" style="animation-duration: 55s; animation-delay: -10s;"></div>
+        <div class="cloud w-[30rem] h-40 top-2/3 -left-40" style="animation-duration: 45s; animation-delay: -20s;"></div>
+    </div>
+
+    <!-- 主要容器 -->
+    <div class="w-full max-w-5xl space-y-6">
+
+        <!-- 閒雲數學小棧 頂部 Logo 區塊 -->
+        <div class="w-full max-w-5xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 頂部標題區塊 -->
+        <header class="glass-card rounded-3xl p-6 md:p-8 text-center relative overflow-hidden border border-cyan-500/30">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+            
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs md:text-sm font-semibold mb-3">
+                <i class="fa-solid fa-cloud-sun text-amber-300"></i> 國小數學「5-1 認識公里」互動體驗
+            </div>
+            <h1 class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-amber-200 mb-2">
+                認識公里 (km) 互動探索學習網
+            </h1>
+            <p class="text-xs md:text-base text-slate-300 max-w-2xl mx-auto">
+                透過國道駕駛體驗、1公里量感換算、鐵路里程計算與生活情境問答，輕鬆建立距離感與單位運用能力！
+            </p>
+        </header>
+
+        <!-- 頁籤選單 -->
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-3 p-1.5 glass-card rounded-2xl">
+            <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-car"></i> 1. 國道行車體驗
+            </button>
+            <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
+                <i class="fa-solid fa-ruler-horizontal"></i> 2. 1公里有多長
+            </button>
+            <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
+                <i class="fa-solid fa-train"></i> 3. 臺鐵里程加減
+            </button>
+            <button onclick="switchTab(4)" id="tab-btn-4" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
+                <i class="fa-solid fa-cubes"></i> 4. 長度單位選填
+            </button>
+            <button onclick="switchTab(5)" id="tab-btn-5" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
+                <i class="fa-solid fa-pen-to-square"></i> 5. 隨堂評量測驗
+            </button>
+        </nav>
+
+        <!-- TAB 1: 國道行車體驗 -->
+        <section id="tab1" class="tab-content space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-route text-amber-300"></i> 國道 1 號 (基隆 ➔ 苗栗) 駕駛體驗
+                    </h2>
+                    <span class="text-xs bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 px-3 py-1.5 rounded-full w-fit">
+                        概念：公里是測量較長路程的長度單位
+                    </span>
+                </div>
+
+                <p class="text-xs md:text-sm text-slate-200 mb-6">
+                    皮皮一家人開車從 <span class="text-amber-300 font-bold">基隆 (0 km 起點)</span> 出發，準備前往 <span class="text-emerald-300 font-bold">苗栗 (132 km)</span>。請拖動下方滑桿，模擬車輛行駛路程並觀察路標！
+                </p>
+
+                <!-- 車道與動態車輛區塊 -->
+                <div class="glass-card-light rounded-2xl p-6 border border-cyan-500/30">
+                    
+                    <!-- 車道軌道 -->
+                    <div class="relative w-full h-28 bg-slate-900/90 rounded-2xl border border-slate-700 px-6 pt-2 pb-2 mb-6 overflow-visible flex items-center">
+                        <!-- 車道中線 -->
+                        <div class="absolute left-0 w-full border-b-2 border-dashed border-amber-400/60 top-1/2 transform -translate-y-1/2"></div>
+                        
+                        <!-- 軌道里程標記區塊 (與車輛滑動軸線 100% 精準對齊) -->
+                        <div class="relative w-full h-full pointer-events-none">
+                            <!-- 0 km 基隆端標記 -->
+                            <div class="absolute left-[0%] top-0 transform -translate-x-1/2 flex flex-col items-center">
+                                <span class="bg-sky-500/90 text-white text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-sky-300 shadow font-bold whitespace-nowrap">
+                                    0 km 基隆端
+                                </span>
+                                <div class="w-0.5 h-6 bg-sky-400/70 my-0.5"></div>
+                            </div>
+
+                            <!-- 83 km 湖口服務區標記 (83 / 132 = 62.88%) -->
+                            <div class="absolute left-[62.88%] top-0 transform -translate-x-1/2 flex flex-col items-center">
+                                <span class="bg-blue-600/90 text-amber-200 text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-amber-400/60 shadow font-bold whitespace-nowrap flex items-center gap-1">
+                                    <i class="fa-solid fa-utensils text-[10px]"></i> 83 km 湖口服務區
+                                </span>
+                                <div class="w-0.5 h-6 bg-amber-400/80 my-0.5"></div>
+                            </div>
+
+                            <!-- 132 km 苗栗出口標記 (100%) -->
+                            <div class="absolute left-[100%] top-0 transform -translate-x-1/2 flex flex-col items-center">
+                                <span class="bg-emerald-600/90 text-white text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-emerald-300 shadow font-bold whitespace-nowrap flex items-center gap-1">
+                                    <i class="fa-solid fa-location-dot text-[10px]"></i> 132 km 苗栗出口
+                                </span>
+                                <div class="w-0.5 h-6 bg-emerald-400/70 my-0.5"></div>
+                            </div>
+
+                            <!-- 動態車輛圖示（文字標籤固定在車輛正下方） -->
+                            <div id="car-icon" class="absolute transition-all duration-150 transform -translate-x-1/2 bottom-0 flex flex-col items-center pointer-events-none z-20" style="left: 0%;">
+                                <!-- 車輛圖示 -->
+                                <div class="text-2xl md:text-3xl text-amber-300 drop-shadow-[0_4px_10px_rgba(251,191,36,0.6)] animate-float">
+                                    <i class="fa-solid fa-car-side"></i>
+                                </div>
+                                <!-- 車輛正下方的行駛里程標籤 -->
+                                <div class="bg-gradient-to-r from-rose-500 to-amber-500 text-white text-[10px] md:text-xs px-2.5 py-0.5 rounded-full shadow-lg font-bold whitespace-nowrap mt-1 border border-white/20">
+                                    行駛 <span id="car-km-text">0</span> km
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 車速/里程控制滑桿 -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-xs md:text-sm font-bold">
+                            <span class="text-sky-300">0 km (基隆端起點)</span>
+                            <span class="text-amber-300 bg-amber-400/20 px-3 py-1 rounded-full border border-amber-400/30">
+                                目前位置：<span id="slider-val-display" class="text-base font-black">0</span> km
+                            </span>
+                            <span class="text-emerald-300">132 km (苗栗出口)</span>
+                        </div>
+                        <input type="range" id="highway-slider" min="0" max="132" value="0" step="1" class="w-full cursor-pointer" oninput="updateHighwayState(this.value)">
+                    </div>
+                </div>
+
+                <!-- 國道標誌與實時訊息卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <!-- 湖口服務區標誌 -->
+                    <div id="sign-hukou" class="glass-card-light p-4 rounded-2xl border border-white/10 transition-all duration-300">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-blue-600/80 flex items-center justify-center text-xl text-white font-bold border border-blue-400/40">
+                                <i class="fa-solid fa-utensils"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-cyan-200">湖口服務區 (約 83 km 處)</h4>
+                                <p id="hukou-desc" class="text-xs text-slate-300 mt-1">國道標誌：再開 1 公里就可以到湖口服務區囉！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 苗栗出口標誌 -->
+                    <div id="sign-miaoli" class="glass-card-light p-4 rounded-2xl border border-white/10 transition-all duration-300">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-600/80 flex items-center justify-center text-xl text-white font-bold border border-emerald-400/40">
+                                132
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-emerald-200">苗栗出口標誌 (132 km)</h4>
+                                <p id="miaoli-desc" class="text-xs text-slate-300 mt-1">國道標誌：再開 2 公里就可以到苗栗囉！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 知識提煉卡片 -->
+                <div class="mt-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30 flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-300 text-xl mt-0.5"></i>
+                    <div class="text-xs md:text-sm text-slate-200 leading-relaxed">
+                        <span class="font-bold text-amber-300">重點小結：</span>
+                        「公里」是長度單位，常用於測量比較長的路程。1 公里也可以英文記作 <span class="bg-amber-400/20 px-2 py-0.5 rounded text-amber-200 font-mono font-bold">1 km</span>。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: 1公里有多長 -->
+        <section id="tab2" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-amber-300"></i> 1 公里 (km) 的量感與單位換算
+                    </h2>
+                    <span class="text-xs bg-indigo-400/20 text-indigo-300 border border-indigo-400/30 px-3 py-1.5 rounded-full w-fit">
+                        公式：1 公里 = 1000 公尺 (1 km = 1000 m)
+                    </span>
+                </div>
+
+                <!-- 動態試算工具 -->
+                <div class="glass-card-light rounded-2xl p-6 border border-indigo-500/30 mb-6">
+                    <label class="block text-xs md:text-sm font-bold text-cyan-200 mb-3">
+                        選擇或滑動公里數（觀察換算結果）：
+                    </label>
+                    <div class="flex items-center gap-4 mb-6">
+                        <input type="range" id="km-sense-slider" min="1" max="10" value="1" step="1" class="w-full cursor-pointer" oninput="updateKmSense(this.value)">
+                        <span class="text-xl font-black text-amber-300 w-24 text-right"><span id="km-sense-val">1</span> km</span>
+                    </div>
+
+                    <!-- 四大對應換算卡片 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-cyan-500/30 text-center">
+                            <i class="fa-solid fa-ruler text-2xl text-cyan-300 mb-2"></i>
+                            <p class="text-xs text-slate-400">換算公尺 (m)</p>
+                            <p id="calc-m" class="text-lg md:text-2xl font-black text-cyan-300 mt-1">1000 m</p>
+                        </div>
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-amber-500/30 text-center">
+                            <i class="fa-solid fa-person-running text-2xl text-amber-300 mb-2"></i>
+                            <p class="text-xs text-slate-400">100m 跑道圈數</p>
+                            <p id="calc-laps" class="text-lg md:text-2xl font-black text-amber-300 mt-1">10 圈</p>
+                        </div>
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-emerald-500/30 text-center">
+                            <i class="fa-solid fa-shoe-prints text-2xl text-emerald-300 mb-2"></i>
+                            <p class="text-xs text-slate-400">估計步行步數</p>
+                            <p id="calc-steps" class="text-lg md:text-2xl font-black text-emerald-300 mt-1">約 1600 步</p>
+                        </div>
+                        <div class="p-4 bg-slate-900/60 rounded-xl border border-purple-500/30 text-center">
+                            <i class="fa-solid fa-link text-2xl text-purple-300 mb-2"></i>
+                            <p class="text-xs text-slate-400">1m 繩子接起來</p>
+                            <p id="calc-ropes" class="text-lg md:text-2xl font-black text-purple-300 mt-1">1000 條</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 課本情境圖解 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card-light p-5 rounded-2xl border border-white/10">
+                        <h3 class="font-bold text-amber-300 text-sm md:text-base mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-school text-sky-300"></i> 生活生活經驗：走 1 公里要多遠？
+                        </h3>
+                        <ul class="text-xs md:text-sm text-slate-200 space-y-2 leading-relaxed">
+                            <li>• 皮皮走 <span class="text-cyan-300 font-bold">100 公尺</span> 大約需要走 <span class="text-cyan-300 font-bold">160 步</span>。</li>
+                            <li>• 因為 $1 \text{ km} = 1000 \text{ m}$，所以走 $1 \text{ km}$ 大約要走 <span class="text-amber-300 font-bold">1600 步</span>！</li>
+                            <li>• 沿著學校外圍走一圈若約 1 公里，實際體會距離長度感。</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card-light p-5 rounded-2xl border border-white/10">
+                        <h3 class="font-bold text-emerald-300 text-sm md:text-base mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-rotate text-emerald-300"></i> 單位雙向轉換口訣
+                        </h3>
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="p-2.5 bg-emerald-950/50 rounded-lg border border-emerald-500/30 flex justify-between items-center">
+                                <span>大單位轉小單位 (km ➔ m)</span>
+                                <span class="text-emerald-300 font-bold">乘以 1000 (增加 3 個 0)</span>
+                            </div>
+                            <div class="p-2.5 bg-sky-950/50 rounded-lg border border-sky-500/30 flex justify-between items-center">
+                                <span>小單位轉大單位 (m ➔ km)</span>
+                                <span class="text-sky-300 font-bold">除以 1000 (去掉 3 個 0)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: 臺鐵里程加減 -->
+        <section id="tab3" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-train-subway text-amber-300"></i> 臺鐵里程加減計算實戰
+                    </h2>
+                    <span class="text-xs bg-indigo-400/20 text-indigo-300 border border-indigo-400/30 px-3 py-1.5 rounded-full w-fit">
+                        探究：以公里為單位的加減運算與比較
+                    </span>
+                </div>
+
+                <p class="text-xs md:text-sm text-slate-200 mb-4">
+                    請點選下方不同的鐵路例題，觀察站與站之間的里程加法與減法運算，並透過動態路線圖即時觀察火車行駛路線：
+                </p>
+
+                <!-- 動態鐵路路線圖解視覺區 -->
+                <div class="glass-card-light rounded-2xl p-5 mb-6 border border-indigo-500/30 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-xs font-bold text-cyan-300 flex items-center gap-2">
+                            <i class="fa-solid fa-route text-amber-300"></i> 動態鐵路路線圖解
+                        </h4>
+                        <span id="rail-map-status" class="text-[11px] text-amber-300 bg-amber-400/10 border border-amber-400/20 px-2.5 py-0.5 rounded-full">
+                            顯示中：例題 1 路線 (台中 ➔ 台北 ➔ 蘇澳)
+                        </span>
+                    </div>
+                    <div id="railway-map-visual" class="relative w-full py-4 px-2 bg-slate-900/90 rounded-xl border border-slate-700/60 overflow-x-auto min-h-[130px] flex items-center justify-center">
+                        <!-- JS 動態繪製視覺路線 -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <!-- 選題按鈕 -->
+                    <div class="space-y-3">
+                        <button onclick="selectRailwayTask(1)" id="rail-btn-1" class="w-full text-left p-4 rounded-2xl glass-card-light border border-cyan-400/80 bg-white/10 hover:bg-white/20 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-cyan-300">【例題 1】台中 ➔ 台北 ➔ 蘇澳</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-1">求火車行駛兩段路程的總公里數 (加法)</p>
+                        </button>
+
+                        <button onclick="selectRailwayTask(2)" id="rail-btn-2" class="w-full text-left p-4 rounded-2xl glass-card-light border border-white/10 hover:bg-white/10 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-amber-300">【例題 2】臺東➔高雄 vs 臺東➔花蓮</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-1">比較哪一段路線較長？相差幾公里？(減法)</p>
+                        </button>
+
+                        <button onclick="selectRailwayTask(3)" id="rail-btn-3" class="w-full text-left p-4 rounded-2xl glass-card-light border border-white/10 hover:bg-white/10 transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-sm text-emerald-300">【例題 3 (類題)】臺南 ➔ 高雄 ➔ 臺東</span>
+                                <i class="fa-solid fa-chevron-right text-xs text-slate-400"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 mt-1">計算經過高雄到臺東的全程里程 (加法)</p>
+                        </button>
+                    </div>
+
+                    <!-- 計算解析結果卡片 -->
+                    <div id="rail-calc-result" class="glass-card-light p-6 rounded-2xl border border-cyan-500/30">
+                        <!-- JS 動態更新內容 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: 長度單位選填 -->
+        <section id="tab4" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes text-amber-300"></i> 生活中的長度單位配對選填
+                    </h2>
+                    <span class="text-xs bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-1.5 rounded-full w-fit">
+                        可選單位：毫米 (mm)、公分 (cm)、公尺 (m)、公里 (km)
+                    </span>
+                </div>
+
+                <p class="text-xs md:text-sm text-slate-200 mb-6">
+                    請為下列生活生活情境選擇最合適的長度單位，點選選項即可進行即時驗證！
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="unit-match-container">
+                    <!-- JS 動態填入配對題目 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: 隨堂評量測驗 -->
+        <section id="tab5" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
+                    <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-amber-300"></i> 「認識公里」歷程性評量 (5 題)
+                    </h2>
+                    <span id="quiz-score-badge" class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-3 py-1.5 rounded-full w-fit">
+                        答對 0 / 5 題
+                    </span>
+                </div>
+
+                <!-- 測驗題目容器 -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- JS 動態輸出 5 題 -->
+                </div>
+
+                <!-- 提交與結算 -->
+                <div class="pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-white/10">
+                    <button onclick="submitQuiz()" class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 font-bold text-white shadow-lg shadow-cyan-500/30 hover:scale-105 transition-all duration-200">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> 提交測驗並查看解答
+                    </button>
+                    <div id="quiz-result-msg" class="text-sm font-bold text-amber-300"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁尾資訊 -->
+        <footer class="text-center text-xs text-slate-400 py-4">
+        </footer>
+    </div>
+
+    <script>
+        // 1. 頁籤切換邏輯
+        function switchTab(tabIndex) {
+            for (let i = 1; i <= 5; i++) {
+                const tab = document.getElementById(`tab${i}`);
+                const btn = document.getElementById(`tab-btn-${i}`);
+                if (i === tabIndex) {
+                    tab.classList.remove('hidden');
+                    btn.className = "tab-btn active px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30";
+                } else {
+                    tab.classList.add('hidden');
+                    btn.className = "tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10";
+                }
+            }
+        }
+
+        // 2. 國道 1 號行車體驗邏輯
+        function updateHighwayState(val) {
+            val = parseInt(val);
+            document.getElementById('car-km-text').innerText = val;
+            document.getElementById('slider-val-display').innerText = val;
+
+            // 移動車輛 (0% ~ 100%)
+            const percent = (val / 132) * 100;
+            const carIcon = document.getElementById('car-icon');
+            carIcon.style.left = `${percent}%`;
+
+            // 湖口服務區卡片亮燈
+            const signHukou = document.getElementById('sign-hukou');
+            if (val >= 82 && val <= 85) {
+                signHukou.className = "glass-card-light p-4 rounded-2xl border border-amber-400/80 bg-amber-400/20 ring-2 ring-amber-400/50 transition-all duration-300";
+            } else {
+                signHukou.className = "glass-card-light p-4 rounded-2xl border border-white/10 transition-all duration-300";
+            }
+
+            // 苗栗出口卡片亮燈
+            const signMiaoli = document.getElementById('sign-miaoli');
+            if (val >= 130) {
+                signMiaoli.className = "glass-card-light p-4 rounded-2xl border border-emerald-400/80 bg-emerald-400/20 ring-2 ring-emerald-400/50 transition-all duration-300";
+            } else {
+                signMiaoli.className = "glass-card-light p-4 rounded-2xl border border-white/10 transition-all duration-300";
+            }
+        }
+
+        // 3. 1公里量感換算邏輯
+        function updateKmSense(kmVal) {
+            kmVal = parseInt(kmVal);
+            document.getElementById('km-sense-val').innerText = kmVal;
+            document.getElementById('calc-m').innerText = `${kmVal * 1000} m`;
+            document.getElementById('calc-laps').innerText = `${kmVal * 10} 圈`;
+            document.getElementById('calc-steps').innerText = `約 ${kmVal * 1600} 步`;
+            document.getElementById('calc-ropes').innerText = `${kmVal * 1000} 條`;
+        }
+
+        // 4. 鐵路路程計算邏輯
+        function selectRailwayTask(taskId) {
+            const btn1 = document.getElementById('rail-btn-1');
+            const btn2 = document.getElementById('rail-btn-2');
+            const btn3 = document.getElementById('rail-btn-3');
+            const resultBox = document.getElementById('rail-calc-result');
+            const mapVisual = document.getElementById('railway-map-visual');
+            const mapStatus = document.getElementById('rail-map-status');
+
+            btn1.className = "w-full text-left p-4 rounded-2xl glass-card-light border border-white/10 hover:bg-white/10 transition-all";
+            btn2.className = "w-full text-left p-4 rounded-2xl glass-card-light border border-white/10 hover:bg-white/10 transition-all";
+            btn3.className = "w-full text-left p-4 rounded-2xl glass-card-light border border-white/10 hover:bg-white/10 transition-all";
+
+            if (taskId === 1) {
+                btn1.classList.add('border-cyan-400/80', 'bg-white/10');
+                if (mapStatus) mapStatus.innerText = "顯示中：例題 1 路線 (台中 ➔ 台北 ➔ 蘇澳)";
+                if (mapVisual) {
+                    mapVisual.innerHTML = `
+                        <div class="flex items-center justify-between w-full max-w-xl px-4 py-2 relative">
+                            <div class="absolute left-10 right-10 top-1/2 h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-500 -translate-y-1/2 rounded-full"></div>
+                            <div class="absolute left-[30%] -top-1 transform -translate-x-1/2 text-xl text-amber-300 animate-bounce">
+                                <i class="fa-solid fa-train"></i>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-sky-500/30 shadow-lg">台中</div>
+                                <span class="text-[11px] text-sky-300 font-bold mt-1">起點</span>
+                            </div>
+                            <div class="relative z-10 px-2.5 py-1 bg-slate-800/90 border border-sky-400/50 rounded-lg text-center shadow-md">
+                                <span class="text-xs font-bold text-amber-300">165 km</span>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-indigo-500/30 shadow-lg">台北</div>
+                                <span class="text-[11px] text-indigo-300 font-bold mt-1">中途站</span>
+                            </div>
+                            <div class="relative z-10 px-2.5 py-1 bg-slate-800/90 border border-indigo-400/50 rounded-lg text-center shadow-md">
+                                <span class="text-xs font-bold text-amber-300">118 km</span>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-emerald-500/30 shadow-lg">蘇澳</div>
+                                <span class="text-[11px] text-emerald-300 font-bold mt-1">終點</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                resultBox.innerHTML = `
+                    <div class="space-y-3">
+                        <p class="text-xs md:text-sm text-slate-200"><span class="text-cyan-300 font-bold">【數學算式】：</span> 165 + 118 = 283</p>
+                        <div class="p-4 bg-cyan-950/60 rounded-xl border border-cyan-500/30 text-xs md:text-sm leading-relaxed text-slate-200">
+                            火車從台中到台北是 <span class="text-cyan-300 font-bold">165 公里</span>，台北到蘇澳是 <span class="text-cyan-300 font-bold">118 公里</span>。<br>
+                            求總里程把兩段長度相加：<br>
+                            <span class="text-amber-300 font-bold text-base mt-2 block">答：共行駛 283 公里 (km)</span>
+                        </div>
+                    </div>
+                `;
+            } else if (taskId === 2) {
+                btn2.classList.add('border-amber-400/80', 'bg-white/10');
+                if (mapStatus) mapStatus.innerText = "顯示中：例題 2 路線比較 (臺東 ➔ 高雄 vs 臺東 ➔ 花蓮)";
+                if (mapVisual) {
+                    mapVisual.innerHTML = `
+                        <div class="flex flex-col space-y-4 w-full max-w-xl px-2 py-1">
+                            <div class="flex items-center justify-between w-full relative">
+                                <div class="absolute left-10 right-10 top-1/2 h-1.5 bg-amber-500/60 -translate-y-1/2 rounded-full"></div>
+                                <div class="relative z-10 flex flex-col items-center">
+                                    <div class="w-9 h-9 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-xs shadow-md">高雄</div>
+                                </div>
+                                <div class="relative z-10 px-2.5 py-1 bg-slate-800 border border-amber-400/60 rounded-lg text-xs font-bold text-amber-300 shadow-md flex items-center gap-1">
+                                    <i class="fa-solid fa-train text-amber-300"></i> 159 km
+                                </div>
+                                <div class="relative z-10 flex flex-col items-center">
+                                    <div class="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-md ring-2 ring-amber-300">臺東</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between w-full relative">
+                                <div class="absolute left-10 right-10 top-1/2 h-1.5 bg-cyan-500/60 -translate-y-1/2 rounded-full"></div>
+                                <div class="relative z-10 flex flex-col items-center">
+                                    <div class="w-9 h-9 rounded-full bg-cyan-500 text-white flex items-center justify-center font-bold text-xs shadow-md">花蓮</div>
+                                </div>
+                                <div class="relative z-10 px-2.5 py-1 bg-slate-800 border border-cyan-400/60 rounded-lg text-xs font-bold text-cyan-300 shadow-md flex items-center gap-1">
+                                    <i class="fa-solid fa-train text-cyan-300"></i> 151 km
+                                </div>
+                                <div class="relative z-10 flex flex-col items-center">
+                                    <div class="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs shadow-md ring-2 ring-amber-300">臺東</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                resultBox.innerHTML = `
+                    <div class="space-y-3">
+                        <p class="text-xs md:text-sm text-slate-200"><span class="text-amber-300 font-bold">【數學算式】：</span> 159 > 151，159 - 151 = 8</p>
+                        <div class="p-4 bg-amber-950/60 rounded-xl border border-amber-500/30 text-xs md:text-sm leading-relaxed text-slate-200">
+                            臺東到高雄是 <span class="text-amber-300 font-bold">159 公里</span>，臺東到花蓮是 <span class="text-amber-300 font-bold">151 公里</span>。<br>
+                            159 公里 > 151 公里，所以「臺東到高雄」較長。<br>
+                            <span class="text-emerald-300 font-bold text-base mt-2 block">答：臺東到高雄較長，相差 8 公里</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                btn3.classList.add('border-emerald-400/80', 'bg-white/10');
+                if (mapStatus) mapStatus.innerText = "顯示中：例題 3 路線 (臺南 ➔ 高雄 ➔ 臺東)";
+                if (mapVisual) {
+                    mapVisual.innerHTML = `
+                        <div class="flex items-center justify-between w-full max-w-xl px-4 py-2 relative">
+                            <div class="absolute left-10 right-10 top-1/2 h-1.5 bg-gradient-to-r from-rose-500 via-purple-500 to-amber-500 -translate-y-1/2 rounded-full"></div>
+                            <div class="absolute left-[55%] -top-1 transform -translate-x-1/2 text-xl text-emerald-300 animate-bounce">
+                                <i class="fa-solid fa-train"></i>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-rose-500/30 shadow-lg">臺南</div>
+                                <span class="text-[11px] text-rose-300 font-bold mt-1">起點</span>
+                            </div>
+                            <div class="relative z-10 px-2.5 py-1 bg-slate-800/90 border border-rose-400/50 rounded-lg text-center shadow-md">
+                                <span class="text-xs font-bold text-amber-300">47 km</span>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-purple-500/30 shadow-lg">高雄</div>
+                                <span class="text-[11px] text-purple-300 font-bold mt-1">中途站</span>
+                            </div>
+                            <div class="relative z-10 px-2.5 py-1 bg-slate-800/90 border border-purple-400/50 rounded-lg text-center shadow-md">
+                                <span class="text-xs font-bold text-amber-300">159 km</span>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-xs ring-4 ring-amber-500/30 shadow-lg">臺東</div>
+                                <span class="text-[11px] text-amber-300 font-bold mt-1">終點</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                resultBox.innerHTML = `
+                    <div class="space-y-3">
+                        <p class="text-xs md:text-sm text-slate-200"><span class="text-emerald-300 font-bold">【數學算式】：</span> 47 + 159 = 206</p>
+                        <div class="p-4 bg-emerald-950/60 rounded-xl border border-emerald-500/30 text-xs md:text-sm leading-relaxed text-slate-200">
+                            臺南到高雄是 <span class="text-emerald-300 font-bold">47 公里</span>，高雄到臺東是 <span class="text-emerald-300 font-bold">159 公里</span>。<br>
+                            算式：47 + 159 = 206<br>
+                            <span class="text-amber-300 font-bold text-base mt-2 block">答：共行駛 206 公里 (km)</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 5. 生活單位配對資料與邏輯
+        const unitItems = [
+            { id: 1, name: "台灣本島南北長度約 394", ans: "km", options: ["mm", "cm", "m", "km"] },
+            { id: 2, name: "台北 101 大樓高度約 508", ans: "m", options: ["mm", "cm", "m", "km"] },
+            { id: 3, name: "教室一枝全新粉筆長度約 8", ans: "cm", options: ["mm", "cm", "m", "km"] },
+            { id: 4, name: "夏天一隻小蚊子身長約 7", ans: "mm", options: ["mm", "cm", "m", "km"] },
+            { id: 5, name: "媽媽的身高大約是 165", ans: "cm", options: ["mm", "cm", "m", "km"] },
+            { id: 6, name: "玉山主峰的高度的海拔約 3952", ans: "m", options: ["mm", "cm", "m", "km"] }
+        ];
+
+        function renderUnitMatching() {
+            const container = document.getElementById('unit-match-container');
+            container.innerHTML = unitItems.map(item => `
+                <div class="glass-card-light p-4 rounded-2xl border border-white/10 flex flex-col justify-between">
+                    <p class="font-bold text-xs md:text-sm text-slate-200 mb-3">${item.id}. ${item.name} ( ? )</p>
+                    <div class="flex gap-2">
+                        ${item.options.map(opt => `
+                            <button onclick="checkUnitMatch(${item.id}, '${opt}', '${item.ans}', this)" 
+                                class="flex-1 py-1.5 rounded-xl bg-slate-800/80 hover:bg-cyan-500/30 text-xs font-bold border border-white/10 text-slate-300 transition-all">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="match-fb-${item.id}" class="text-[11px] font-bold mt-2 h-4"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkUnitMatch(id, selected, correct, btnEl) {
+            const fbEl = document.getElementById(`match-fb-${id}`);
+            if (selected === correct) {
+                fbEl.className = "text-[11px] font-bold mt-2 text-emerald-400";
+                fbEl.innerText = `✓ 正確！用 ${correct} 最適合。`;
+                btnEl.parentElement.querySelectorAll('button').forEach(b => b.className = "flex-1 py-1.5 rounded-xl bg-slate-800/80 text-xs font-bold border border-white/10 text-slate-500");
+                btnEl.className = "flex-1 py-1.5 rounded-xl bg-emerald-500 text-xs font-bold text-white shadow-lg shadow-emerald-500/30";
+            } else {
+                fbEl.className = "text-[11px] font-bold mt-2 text-rose-400";
+                fbEl.innerText = `✕ 不太對喔，${selected} 單位大小不符合情境。`;
+            }
+        }
+
+        // 6. 5 題歷程性評量題目與評判
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 關於「公里」與「公尺」的換算，下列哪一個敘述是正確的？",
+                options: ["1 公里 = 10 公尺", "1 公里 = 100 公尺", "1 公里 = 1000 公尺", "1000 公里 = 1 公尺"],
+                ans: 2,
+                explain: "1 公里 (km) 等於 1000 公尺 (m)。"
+            },
+            {
+                id: 2,
+                question: "2. 皮皮走 100 公尺大約需要 160 步，請問他走 1 公里大約要走幾步？",
+                options: ["160 步", "750 步", "1600 步", "16000 步"],
+                ans: 2,
+                explain: "1 公里 = 1000 公尺，是 100 公尺的 10 倍，因此 160 步 × 10 = 1600 步。"
+            },
+            {
+                id: 3,
+                question: "3. 火車從台中開到台北是 165 公里，台北開到蘇澳是 118 公里，從台中經過台北開到蘇澳共行駛幾公里？",
+                options: ["273 公里", "283 公里", "293 公里", "47 公里"],
+                ans: 1,
+                explain: "算式為 165 + 118 = 283 公里。"
+            },
+            {
+                id: 4,
+                question: "4. 台東到高雄為 159 公里，台東到花蓮為 151 公里，請問哪一段路線比較長？相差幾公里？",
+                options: ["台東到高雄較長，相差 8 公里", "台東到花蓮較長，相差 8 公里", "台東到高雄較長，相差 10 公里", "兩段一樣長"],
+                ans: 0,
+                explain: "159 > 151，相差 159 - 151 = 8 公里。"
+            },
+            {
+                id: 5,
+                question: "5. 測量台灣本島從最北端到最南端的距離，使用哪一個單位最合適？",
+                options: ["毫米 (mm)", "公分 (cm)", "公尺 (m)", "公里 (km)"],
+                ans: 3,
+                explain: "遠距離的路程或地圖上的縣市距離，使用「公里 (km)」最合適。"
+            }
+        ];
+
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map(q => `
+                <div class="glass-card-light p-5 rounded-2xl border border-white/10 space-y-3">
+                    <p class="font-bold text-xs md:text-sm text-cyan-200">${q.question}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${q.options.map((opt, optIdx) => `
+                            <button onclick="selectQuizAns(${q.id}, ${optIdx}, this)"
+                                class="quiz-opt-${q.id} text-left p-3 rounded-xl bg-slate-800/80 hover:bg-cyan-500/20 text-xs text-slate-200 border border-white/10 transition-all">
+                                (${['A','B','C','D'][optIdx]}) ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-explain-${q.id}" class="hidden text-xs p-3 rounded-xl bg-cyan-950/80 border border-cyan-400/40 text-cyan-200"></div>
+                </div>
+            `).join('');
+        }
+
+        function selectQuizAns(qId, optIdx, btnEl) {
+            userAnswers[qId] = optIdx;
+            const btns = document.querySelectorAll(`.quiz-opt-${qId}`);
+            btns.forEach(b => b.className = "quiz-opt-" + qId + " text-left p-3 rounded-xl bg-slate-800/80 text-xs text-slate-400 border border-white/10");
+            btnEl.className = "quiz-opt-" + qId + " text-left p-3 rounded-xl bg-cyan-500 text-xs font-bold text-white shadow-lg shadow-cyan-500/30";
+        }
+
+        function submitQuiz() {
+            let correctCount = 0;
+            quizData.forEach(q => {
+                const userAns = userAnswers[q.id];
+                const expEl = document.getElementById(`quiz-explain-${q.id}`);
+                expEl.classList.remove('hidden');
+
+                if (userAns === q.ans) {
+                    correctCount++;
+                    expEl.innerHTML = `<span class="text-emerald-400 font-bold">✓ 答對了！</span> ${q.explain}`;
+                } else {
+                    expEl.innerHTML = `<span class="text-rose-400 font-bold">✕ 答錯囉！</span> 正確答案是 (${['A','B','C','D'][q.ans]})。${q.explain}`;
+                }
+            });
+
+            document.getElementById('quiz-score-badge').innerText = `答對 ${correctCount} / 5 題`;
+            document.getElementById('quiz-result-msg').innerText = `結算：獲得 ${correctCount * 20} 分！`;
+        }
+
+        // 7. 網頁初始化
+        window.onload = function() {
+            updateHighwayState(0);
+            updateKmSense(1);
+            selectRailwayTask(1);
+            renderUnitMatching();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

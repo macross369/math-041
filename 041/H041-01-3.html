@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大數的大小比較與加減法</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans TC & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        
+        /* 新海誠天空主題背景 Gradation */
+        body {
+            background: linear-gradient(165deg, #1e3c72 0%, #2a5298 35%, #686de0 65%, #ff7979 85%, #f6e58d 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* 雲朵光感與琉璃質感 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.18);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* 萬家族與一家族色彩區隔 */
+        .wan-family {
+            background-color: rgba(255, 234, 167, 0.6);
+            border: 2px solid #fdcb6e;
+        }
+        .yi-family {
+            background-color: rgba(129, 236, 236, 0.5);
+            border: 2px solid #00cec9;
+        }
+
+        /* 數位位值表格動畫 */
+        .digit-box {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .digit-box:hover {
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        /* 自訂動態滑桿 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #48dbfb, #ff9ff3);
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* 進退位標籤 */
+        .carry-badge {
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0) translateY(10px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12">
+
+    <!-- 頂部 Logo 與標題區塊 -->
+    <div class="max-w-6xl mx-auto flex items-center justify-start pt-4 pb-2 px-4 fade-in">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <!-- 頂部導覽頁首 -->
+    <header class="glass-nav sticky top-0 z-50 px-4 py-3 mb-6 shadow-sm">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid font-bold fa-chart-line text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-slate-800 tracking-wide">大數比較與加減法</h1>
+                    <p class="text-xs text-slate-500 font-medium">1-3 大數的大小比較、直式加減與簡記法</p>
+                </div>
+            </div>
+            
+            <!-- 模組分頁按鈕 -->
+            <div class="flex bg-slate-200/60 p-1 rounded-xl gap-1 text-sm font-bold">
+                <button id="tab1-btn" onclick="switchTab('tab1')" class="px-4 py-2 rounded-lg bg-white text-indigo-600 shadow-sm transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced"></i> 大數比較與家族
+                </button>
+                <button id="tab2-btn" onclick="switchTab('tab2')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> 直式加減與簡記
+                </button>
+                <button id="tab3-btn" onclick="switchTab('tab3')" class="px-4 py-2 rounded-lg text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> 互動隨堂測驗
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4">
+
+        <!-- 模組一：大數比較與家族拆解 -->
+        <section id="tab1" class="space-y-6">
+            <!-- 簡介卡片 -->
+            <div class="glass-card rounded-2xl p-6 text-slate-700">
+                <h2 class="text-lg font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i> 探究思考：位數不同時，如何比大小？家族拆解怎麼看？
+                </h2>
+                <p class="text-sm leading-relaxed">
+                    先比位數：位數多的數比較大！若位數相同，可以劃分為「<b>萬的家族</b>」與「<b>一的家族</b>」，先比較萬的家族，一樣大時再比較一的家族。
+                </p>
+            </div>
+
+            <!-- 動態控制與視覺化比較器 -->
+            <div class="glass-card rounded-2xl p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- 數字 A 控制器 -->
+                    <div class="bg-white/90 p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-sky-500"></span> 城市 A 人口/數值：
+                            </label>
+                            <span id="numA-label" class="font-mono text-xl font-black text-sky-600">2,506,788</span>
+                        </div>
+                        <input type="range" id="sliderA" min="100000" max="99999999" value="2506788" step="100" oninput="updateComparison()">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>十萬 (6位)</span>
+                            <span>千萬 (8位)</span>
+                        </div>
+                    </div>
+
+                    <!-- 數字 B 控制器 -->
+                    <div class="bg-white/90 p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-pink-500"></span> 城市 B 人口/數值：
+                            </label>
+                            <span id="numB-label" class="font-mono text-xl font-black text-pink-600">14,667,089</span>
+                        </div>
+                        <input type="range" id="sliderB" min="100000" max="99999999" value="14667089" step="100" oninput="updateComparison()">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>十萬 (6位)</span>
+                            <span>千萬 (8位)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 動態位值表展示區 -->
+                <div class="space-y-6">
+                    <!-- 數 A 位值拆解 -->
+                    <div>
+                        <div class="text-xs font-bold text-slate-500 mb-1 flex items-center justify-between">
+                            <span>數字 A 位值圖卡 (<span id="lenA" class="text-sky-600">7</span>位數)</span>
+                            <span id="familyA-text" class="text-sky-700 font-semibold">250萬 6788</span>
+                        </div>
+                        <div class="grid grid-cols-8 gap-1 md:gap-2 text-center" id="gridA">
+                            <!-- JS 動態生成 8 位數卡片 -->
+                        </div>
+                    </div>
+
+                    <!-- 比較結果標籤動畫 -->
+                    <div class="text-center my-2">
+                        <div id="cmp-badge" class="inline-flex items-center gap-3 px-6 py-2 rounded-full text-xl font-black bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg transform transition duration-300">
+                            <span id="cmpA">2506788</span>
+                            <span id="cmpOp" class="text-2xl text-amber-300">&lt;</span>
+                            <span id="cmpB">14667089</span>
+                        </div>
+                    </div>
+
+                    <!-- 數 B 位值拆解 -->
+                    <div>
+                        <div class="text-xs font-bold text-slate-500 mb-1 flex items-center justify-between">
+                            <span>數字 B 位值圖卡 (<span id="lenB" class="text-pink-600">8</span>位數)</span>
+                            <span id="familyB-text" class="text-pink-700 font-semibold">1466萬 7089</span>
+                        </div>
+                        <div class="grid grid-cols-8 gap-1 md:gap-2 text-center" id="gridB">
+                            <!-- JS 動態生成 8 位數卡片 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 探究觀念說明卡 -->
+                <div id="explanation-box" class="mt-6 p-4 rounded-xl bg-indigo-50 border border-indigo-100 text-sm text-indigo-900 font-medium">
+                    <!-- 動態比較說明 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 模組二：直式加減與簡記法 -->
+        <section id="tab2" class="space-y-6 hidden">
+            <!-- 觀念介紹 -->
+            <div class="glass-card rounded-2xl p-6 text-slate-700">
+                <h2 class="text-lg font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> 大數加減神器：直式計算與「萬」簡記法
+                </h2>
+                <p class="text-sm">
+                    當數字尾數有很多 0 時（例如 4,860,000 與 3,590,000），可以將其「簡記」成以<b>萬</b>為單位的計算（486萬 + 359萬），計算會變得更靈活高效！
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 計算設定輸入 -->
+                <div class="glass-card rounded-2xl p-6 space-y-4">
+                    <h3 class="font-bold text-slate-800 border-b pb-2">運算設定</h3>
+                    
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 block mb-1">選擇運算類型</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="op-add" onclick="setOp('+')" class="py-2 rounded-lg font-bold bg-indigo-600 text-white shadow-md">加法 (+)</button>
+                            <button id="op-sub" onclick="setOp('-')" class="py-2 rounded-lg font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">減法 (-)</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 block mb-1">被加數 / 被減數</label>
+                        <input type="number" id="calcNum1" value="4860000" step="1000" class="w-full px-3 py-2 border rounded-lg font-mono font-bold text-slate-700 focus:ring-2 focus:ring-indigo-400 outline-none" onchange="renderVerticalMath()">
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 block mb-1">加數 / 減數</label>
+                        <input type="number" id="calcNum2" value="3590000" step="1000" class="w-full px-3 py-2 border rounded-lg font-mono font-bold text-slate-700 focus:ring-2 focus:ring-indigo-400 outline-none" onchange="renderVerticalMath()">
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-bold text-indigo-900">
+                            <input type="checkbox" id="useWanUnit" checked onchange="renderVerticalMath()" class="w-4 h-4 text-indigo-600 rounded">
+                            開啟「萬」單位簡記模式
+                        </label>
+                    </div>
+
+                    <!-- 範例快速載入按鈕 -->
+                    <div class="pt-2">
+                        <span class="text-xs text-slate-400 block mb-2">課本情境一鍵載入：</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadExample(4860000, 3590000, '+')" class="text-xs bg-slate-100 hover:bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-md border border-slate-200">蝴蝶銷售總量</button>
+                            <button onclick="loadExample(46796, 45383, '+')" class="text-xs bg-slate-100 hover:bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-md border border-slate-200">父母總收入</button>
+                            <button onclick="loadExample(92179, 74850, '-')" class="text-xs bg-slate-100 hover:bg-indigo-50 text-indigo-700 px-2.5 py-1.5 rounded-md border border-slate-200">結餘計算(退位)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 直式計算過程動態呈現 -->
+                <div class="glass-card rounded-2xl p-6 lg:col-span-2 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800">直式計算過程與動態進退位</h3>
+                            <span id="unit-indicator" class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full">以萬為單位簡記</span>
+                        </div>
+
+                        <!-- 直式黑板看板 -->
+                        <div class="bg-slate-900 text-white p-6 rounded-xl font-mono shadow-inner overflow-x-auto min-h-[220px] flex items-center justify-center">
+                            <div id="vertical-board" class="inline-block text-right tracking-widest text-xl md:text-2xl font-bold leading-relaxed">
+                                <!-- JS 動態生成直式內容 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 計算解析與觀念引導 -->
+                    <div id="calc-explanation" class="mt-4 p-4 rounded-xl bg-white/80 border border-slate-200 text-sm text-slate-700">
+                        <!-- 動態解釋文字 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模組三：歷程性互動測驗 (5題) -->
+        <section id="tab3" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-6 text-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-indigo-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-square-check text-emerald-500"></i> 歷程性評量：大數觀念隨堂測驗
+                    </h2>
+                    <p class="text-sm text-slate-600">完成下方 5 題測驗，即時獲得反饋並驗收學習成果！</p>
+                </div>
+                <!-- 得分儀表板 -->
+                <div class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-center shadow-md">
+                    <span class="text-xs block text-indigo-200">目前總分</span>
+                    <span id="quiz-score" class="text-2xl font-black">0</span> / 100
+                </div>
+            </div>
+
+            <!-- 測驗題目列表卡片 -->
+            <div class="space-y-6">
+                <!-- Question 1 -->
+                <div class="glass-card rounded-2xl p-6 space-y-3" id="q1-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">第 1 題 / 大數比較</span>
+                        <span id="q1-feedback" class="text-sm font-bold"></span>
+                    </div>
+                    <p class="font-bold text-slate-800">1. 臺北市人口為 2,506,788 人，馬尼拉人口為 14,667,089 人。請問哪一個城市的人口比較多？</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkQ1('A')" class="q1-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (A) 臺北市 (7位數 &lt; 8位數)
+                        </button>
+                        <button onclick="checkQ1('B')" class="q1-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (B) 馬尼拉 (1466萬多人 &gt; 250萬多人)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="glass-card rounded-2xl p-6 space-y-3" id="q2-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">第 2 題 / 家族拆解</span>
+                        <span id="q2-feedback" class="text-sm font-bold"></span>
+                    </div>
+                    <p class="font-bold text-slate-800">2. 數字「8735100」拆分成萬的家族與一的家族後，分別是多少？</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkQ2('A')" class="q2-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (A) 873個萬 和 5100個一
+                        </button>
+                        <button onclick="checkQ2('B')" class="q2-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (B) 87個萬 和 35100個一
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="glass-card rounded-2xl p-6 space-y-3" id="q3-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">第 3 題 / 多個大數排序</span>
+                        <span id="q3-feedback" class="text-sm font-bold"></span>
+                    </div>
+                    <p class="font-bold text-slate-800">3. 四家公司營收：甲(9900009元)、乙(10900005元)、丙(10080090元)、丁(10089000元)，由大到小排序為何？</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkQ3('A')" class="q3-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (A) 乙 &gt; 丁 &gt; 丙 &gt; 甲
+                        </button>
+                        <button onclick="checkQ3('B')" class="q3-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (B) 乙 &gt; 丙 &gt; 丁 &gt; 甲
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="glass-card rounded-2xl p-6 space-y-3" id="q4-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">第 4 題 / 簡記法計算</span>
+                        <span id="q4-feedback" class="text-sm font-bold"></span>
+                    </div>
+                    <p class="font-bold text-slate-800">4. 蝴蝶上半年的銷售量為 4860000 隻，下半年為 3590000 隻。簡記成「萬」單位計算，一年共幾隻？</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkQ4('A')" class="q4-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (A) 845萬 隻 (486萬 + 359萬)
+                        </button>
+                        <button onclick="checkQ4('B')" class="q4-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (B) 745萬 隻
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="glass-card rounded-2xl p-6 space-y-3" id="q5-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">第 5 題 / 兩單位混合運算</span>
+                        <span id="q5-feedback" class="text-sm font-bold"></span>
+                    </div>
+                    <p class="font-bold text-slate-800">5. 71400 寫成兩單位「萬與個」是「7萬1400個」，若加上 80500（8萬500個），結果為何？</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkQ5('A')" class="q5-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (A) 15萬 1900個 (或 151900)
+                        </button>
+                        <button onclick="checkQ5('B')" class="q5-opt text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 font-medium transition-all">
+                            (B) 15萬 9000個
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 頁籤切換邏輯 ---
+        function switchTab(tabId) {
+            ['tab1', 'tab2', 'tab3'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id + '-btn').classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                document.getElementById(id + '-btn').classList.add('text-slate-600');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId + '-btn').classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            document.getElementById(tabId + '-btn').classList.remove('text-slate-600');
+        }
+
+        // --- 模組一：大數動態比較邏輯 ---
+        const placeNames = ['千萬位', '百萬位', '十萬位', '萬位', '千位', '百位', '十位', '個位'];
+
+        function formatNumberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function updateComparison() {
+            const valA = parseInt(document.getElementById('sliderA').value);
+            const valB = parseInt(document.getElementById('sliderB').value);
+
+            // 更新數字顯示
+            document.getElementById('numA-label').innerText = formatNumberWithCommas(valA);
+            document.getElementById('numB-label').innerText = formatNumberWithCommas(valB);
+
+            const strA = valA.toString().padStart(8, ' ');
+            const strB = valB.toString().padStart(8, ' ');
+
+            document.getElementById('lenA').innerText = valA.toString().length;
+            document.getElementById('lenB').innerText = valB.toString().length;
+
+            // 家族分解顯示
+            const wanA = Math.floor(valA / 10000);
+            const yiA = valA % 10000;
+            document.getElementById('familyA-text').innerText = `${wanA > 0 ? wanA + '萬 ' : ''}${yiA}`;
+
+            const wanB = Math.floor(valB / 10000);
+            const yiB = valB % 10000;
+            document.getElementById('familyB-text').innerText = `${wanB > 0 ? wanB + '萬 ' : ''}${yiB}`;
+
+            // 渲染位值表卡片
+            renderDigitGrid('gridA', strA);
+            renderDigitGrid('gridB', strB);
+
+            // 比較結果邏輯
+            document.getElementById('cmpA').innerText = formatNumberWithCommas(valA);
+            document.getElementById('cmpB').innerText = formatNumberWithCommas(valB);
+            
+            const cmpOp = document.getElementById('cmpOp');
+            const expBox = document.getElementById('explanation-box');
+
+            if (valA > valB) {
+                cmpOp.innerText = '>';
+            } else if (valA < valB) {
+                cmpOp.innerText = '<';
+            } else {
+                cmpOp.innerText = '=';
+            }
+
+            // 動態解釋說明
+            if (valA.toString().length !== valB.toString().length) {
+                expBox.innerHTML = `💡 <b>解題技巧 (比位數)：</b> 數字 A 為 <b>${valA.toString().length} 位數</b>，數字 B 為 <b>${valB.toString().length} 位數</b>。<br>因為位數不相同，<b>位數較多者數值較大</b>！`;
+            } else {
+                expBox.innerHTML = `💡 <b>解題技巧 (家族拆解)：</b> 兩數皆為 <b>${valA.toString().length} 位數</b>。<br>先比較「萬的家族」：數字 A 是 <b>${wanA} 萬</b>，數字 B 是 <b>${wanB} 萬</b>。${
+                    wanA !== wanB 
+                        ? `因為 ${wanA} ${wanA > wanB ? '>' : '<'} ${wanB}，所以直接判定大小！`
+                        : `萬的家族相同，接著比較「一的家族」：${yiA} ${yiA > yiB ? '>' : '<'} ${yiB}。`
+                }`;
+            }
+        }
+
+        function renderDigitGrid(elementId, str8) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+
+            for (let i = 0; i < 8; i++) {
+                const char = str8[i];
+                const isWan = i < 4; // 前四位為萬家族 (千萬, 百萬, 十萬, 萬)
+                
+                const card = document.createElement('div');
+                card.className = `p-2 rounded-xl text-center font-bold border ${isWan ? 'wan-family' : 'yi-family'} digit-box ${char === ' ' ? 'opacity-30 bg-slate-100 border-dashed border-slate-300' : 'bg-white shadow-sm'}`;
+
+                card.innerHTML = `
+                    <div class="text-[10px] text-slate-500 font-normal mb-1">${placeNames[i]}</div>
+                    <div class="text-base md:text-xl font-mono ${char === ' ' ? 'text-slate-300' : 'text-slate-800'}">${char === ' ' ? '-' : char}</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // --- 模組二：直式加減法計算機邏輯 ---
+        let currentOp = '+';
+
+        function setOp(op) {
+            currentOp = op;
+            if (op === '+') {
+                document.getElementById('op-add').className = 'py-2 rounded-lg font-bold bg-indigo-600 text-white shadow-md';
+                document.getElementById('op-sub').className = 'py-2 rounded-lg font-bold bg-slate-200 text-slate-700 hover:bg-slate-300';
+            } else {
+                document.getElementById('op-sub').className = 'py-2 rounded-lg font-bold bg-rose-600 text-white shadow-md';
+                document.getElementById('op-add').className = 'py-2 rounded-lg font-bold bg-slate-200 text-slate-700 hover:bg-slate-300';
+            }
+            renderVerticalMath();
+        }
+
+        function loadExample(n1, n2, op) {
+            document.getElementById('calcNum1').value = n1;
+            document.getElementById('calcNum2').value = n2;
+            setOp(op);
+        }
+
+        function renderVerticalMath() {
+            let num1 = parseInt(document.getElementById('calcNum1').value) || 0;
+            let num2 = parseInt(document.getElementById('calcNum2').value) || 0;
+            const useWan = document.getElementById('useWanUnit').checked;
+            const indicator = document.getElementById('unit-indicator');
+
+            // 確保減法時大數在前
+            if (currentOp === '-' && num1 < num2) {
+                const temp = num1;
+                num1 = num2;
+                num2 = temp;
+                document.getElementById('calcNum1').value = num1;
+                document.getElementById('calcNum2').value = num2;
+            }
+
+            let displayN1 = num1;
+            let displayN2 = num2;
+            let unitSuffix = "";
+
+            if (useWan && num1 >= 10000 && num2 >= 10000 && num1 % 10000 === 0 && num2 % 10000 === 0) {
+                displayN1 = num1 / 10000;
+                displayN2 = num2 / 10000;
+                unitSuffix = " 萬";
+                indicator.innerText = "已啟用「萬」簡記模式";
+                indicator.className = "text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full";
+            } else {
+                indicator.innerText = "完全數字直式模式";
+                indicator.className = "text-xs font-bold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full";
+            }
+
+            const result = currentOp === '+' ? displayN1 + displayN2 : displayN1 - displayN2;
+
+            // 格式化直式黑板內容
+            const sN1 = displayN1.toString();
+            const sN2 = displayN2.toString();
+            const sRes = result.toString();
+            const maxLen = Math.max(sN1.length, sN2.length, sRes.length);
+
+            const padN1 = sN1.padStart(maxLen, ' ');
+            const padN2 = sN2.padStart(maxLen, ' ');
+            const padRes = sRes.padStart(maxLen, ' ');
+
+            let boardHTML = `<div class="inline-block text-right">`;
+            boardHTML += `<div class="text-sky-300 font-mono tracking-widest">${padN1}${unitSuffix}</div>`;
+            boardHTML += `<div class="border-b-2 border-white pb-1 font-mono tracking-widest"><span class="float-left mr-4 text-amber-400">${currentOp}</span>${padN2}${unitSuffix}</div>`;
+            boardHTML += `<div class="text-emerald-400 pt-1 font-mono tracking-widest">${padRes}${unitSuffix}</div>`;
+            boardHTML += `</div>`;
+
+            document.getElementById('vertical-board').innerHTML = boardHTML;
+
+            // 計算說明
+            const exp = document.getElementById('calc-explanation');
+            if (unitSuffix !== "") {
+                exp.innerHTML = `📌 <b>簡記說明：</b> 因為兩數尾數都是 0，我們可以將 ${num1} 看成 <b>${displayN1}萬</b>，將 ${num2} 看成 <b>${displayN2}萬</b>。<br>
+                計算：<b>${displayN1}萬 ${currentOp} ${displayN2}萬 = ${result}萬</b> (${formatNumberWithCommas(result * 10000)})。這樣記更加簡潔！`;
+            } else {
+                exp.innerHTML = `📌 <b>標準直式說明：</b> 對齊個位數後進行直式計算。<br>
+                結果為：<b>${formatNumberWithCommas(result)}</b>。`;
+            }
+        }
+
+        // --- 模組三：互動測驗評量邏輯 ---
+        let scores = { q1: 0, q2: 0, q3: 0, q4: 0, q5: 0 };
+
+        function updateScore() {
+            const total = Object.values(scores).reduce((a, b) => a + b, 0);
+            document.getElementById('quiz-score').innerText = total;
+        }
+
+        function checkQ1(ans) {
+            const fb = document.getElementById('q1-feedback');
+            if (ans === 'B') {
+                fb.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 正確！馬尼拉(8位數) > 臺北(7位數)</span>';
+                scores.q1 = 20;
+            } else {
+                fb.innerHTML = '<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 答錯囉！8位數比7位數大。</span>';
+                scores.q1 = 0;
+            }
+            updateScore();
+        }
+
+        function checkQ2(ans) {
+            const fb = document.getElementById('q2-feedback');
+            if (ans === 'A') {
+                fb.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 正確！873萬與5100個一。</span>';
+                scores.q2 = 20;
+            } else {
+                fb.innerHTML = '<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 答錯囉！後四位是一家族，前面是萬家族。</span>';
+                scores.q2 = 0;
+            }
+            updateScore();
+        }
+
+        function checkQ3(ans) {
+            const fb = document.getElementById('q3-feedback');
+            if (ans === 'A') {
+                fb.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 正確！1090萬 > 1008萬9000 > 1008萬90 > 990萬。</span>';
+                scores.q3 = 20;
+            } else {
+                fb.innerHTML = '<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 答錯囉！比較千位：9000 > 0。</span>';
+                scores.q3 = 0;
+            }
+            updateScore();
+        }
+
+        function checkQ4(ans) {
+            const fb = document.getElementById('q4-feedback');
+            if (ans === 'A') {
+                fb.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 正確！486萬 + 359萬 = 845萬。</span>';
+                scores.q4 = 20;
+            } else {
+                fb.innerHTML = '<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 答錯囉！進位計算：486+359=845。</span>';
+                scores.q4 = 0;
+            }
+            updateScore();
+        }
+
+        function checkQ5(ans) {
+            const fb = document.getElementById('q5-feedback');
+            if (ans === 'A') {
+                fb.innerHTML = '<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 正確！7萬1400 + 8萬500 = 15萬1900。</span>';
+                scores.q5 = 20;
+            } else {
+                fb.innerHTML = '<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 答錯囉！1400+500 = 1900個。</span>';
+                scores.q5 = 0;
+            }
+            updateScore();
+        }
+
+        // 初始化執行
+        window.onload = function() {
+            updateComparison();
+            renderVerticalMath();
+        };
+    </script>
+</body>
+</html>

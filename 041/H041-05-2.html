@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長度的換算與比較 - 互動探究網頁</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #1A365D 0%, #2B6CB0 35%, #4299E1 65%, #90CDF4 85%, #EBF8FF 100%);
+            min-height: 100vh;
+            color: #2D3748;
+        }
+
+        /* 新海誠風格雲朵背景與光線特效 */
+        .shinkai-cloud-1 {
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            filter: blur(10px);
+        }
+
+        .shinkai-sunray {
+            background: linear-gradient(135deg, rgba(255,236,179,0.3) 0%, rgba(255,255,255,0) 60%);
+        }
+
+        /* 玻璃擬態卡片容器 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 31, 63, 0.12);
+        }
+
+        /* 動態亮彩滑桿軌道 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: #CBD5E0;
+            border-radius: 6px;
+            border: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #3182CE;
+            border: 3px solid #FFFFFF;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #2B6CB0;
+        }
+
+        /* 動態按鈕 hover 動畫 */
+        .btn-shinkai {
+            background: linear-gradient(135deg, #3182CE 0%, #2B6CB0 100%);
+            transition: all 0.25s ease;
+        }
+        .btn-shinkai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(49, 130, 206, 0.4);
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #2B6CB0;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+        .glow-effect {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 relative overflow-x-hidden">
+
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-10 left-10 w-96 h-96 shinkai-cloud-1 rounded-full opacity-60"></div>
+        <div class="absolute top-1/3 right-5 w-80 h-80 shinkai-cloud-1 rounded-full opacity-40"></div>
+        <div class="absolute -top-20 right-1/4 w-full h-96 shinkai-sunray transform -rotate-12"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto relative z-10 space-y-6">
+
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 頂部頁眉 Banner -->
+        <header class="glass-card rounded-2xl p-4 sm:p-6 text-center relative overflow-hidden">
+            <div class="inline-block px-3 py-1 bg-sky-100 text-sky-800 text-xs sm:text-sm rounded-full font-bold mb-2">
+                <i class="fa-solid fa-compass mr-1"></i> 國小數學 5-2 單元互動探索
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-black text-slate-800 tracking-wide">
+                長度的換算與比較 <span class="text-sky-600 text-xl sm:text-3xl">線上實驗室</span>
+            </h1>
+            <p class="text-slate-600 mt-1 text-sm sm:text-base">
+                動態操作滑桿、觀察單位拆解，掌握「公里（km）」與「公尺（m）」之間的變換秘密！
+            </p>
+
+            <!-- 功能分頁切換頁籤 -->
+            <div class="flex flex-wrap justify-center gap-2 mt-5 p-1 bg-sky-900/10 rounded-xl">
+                <button onclick="switchTab('converter')" id="tab-converter" class="tab-btn active px-4 py-2 rounded-lg text-sm sm:text-base transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-calculator"></i> 雙向換算器
+                </button>
+                <button onclick="switchTab('comparator')" id="tab-comparator" class="tab-btn px-4 py-2 rounded-lg text-sm sm:text-base transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-scale-balanced"></i> 路線長度比一比
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-4 py-2 rounded-lg text-sm sm:text-base transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> 探究挑戰測驗
+                </button>
+            </div>
+        </header>
+
+        <main id="section-converter" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <!-- 控制面板 Card -->
+                <div class="glass-card rounded-2xl p-5 md:col-span-5 space-y-5">
+                    <h2 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-600"></i> 長度參數設定
+                    </h2>
+
+                    <!-- 公里數滑桿 -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm font-semibold">
+                            <label for="km-slider" class="text-slate-700">公里數 (km):</label>
+                            <span id="km-val-display" class="text-sky-700 font-bold text-lg">2 公里</span>
+                        </div>
+                        <input type="range" id="km-slider" min="0" max="20" value="2" step="1" oninput="updateConverterFromComplex()">
+                    </div>
+
+                    <!-- 公尺數滑桿 -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm font-semibold">
+                            <label for="m-slider" class="text-slate-700">公尺數 (m):</label>
+                            <span id="m-val-display" class="text-sky-700 font-bold text-lg">45 公尺</span>
+                        </div>
+                        <input type="range" id="m-slider" min="0" max="999" value="45" step="5" oninput="updateConverterFromComplex()">
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200">
+                        <p class="text-xs text-slate-500 mb-2 font-medium"><i class="fa-solid fa-bookmark text-amber-500"></i> 課本情境快速載入：</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadPreset(2, 45)" class="px-2.5 py-1 text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold transition">
+                                道路工程 (2km 45m)
+                            </button>
+                            <button onclick="loadPreset(4, 0)" class="px-2.5 py-1 text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold transition">
+                                南州站路線 (4km)
+                            </button>
+                            <button onclick="loadPreset(3, 50)" class="px-2.5 py-1 text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold transition">
+                                西濱大橋 (3km 50m)
+                            </button>
+                            <button onclick="loadPreset(4, 30)" class="px-2.5 py-1 text-xs bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-md font-semibold transition">
+                                貓空纜車 (4030m)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 視覺化解析與即時結果 Card -->
+                <div class="glass-card rounded-2xl p-5 md:col-span-7 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-eye text-sky-600"></i> 即時雙向換算解析</span>
+                            <span class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">1 km = 1000 m</span>
+                        </h2>
+
+                        <!-- 複名數轉單一名數卡片 -->
+                        <div class="mt-4 p-4 bg-sky-50/80 rounded-xl border border-sky-100 text-center">
+                            <span class="text-xs font-bold text-sky-600 block uppercase tracking-wider mb-1">複名數 轉成 單一名數</span>
+                            <div class="text-2xl sm:text-3xl font-black text-slate-800">
+                                <span id="res-complex" class="text-sky-700">2 公里 45 公尺</span>
+                                <span class="mx-2 text-slate-400">=</span>
+                                <span id="res-single" class="text-emerald-600">2045 公尺</span>
+                            </div>
+                        </div>
+
+                        <!-- 計算步驟推導圖解 -->
+                        <div class="mt-4 p-4 bg-white/70 rounded-xl space-y-2 text-sm text-slate-700">
+                            <div class="font-bold text-slate-800 flex items-center gap-1">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> 思考思考推導歷程：
+                            </div>
+                            <ul class="list-disc list-inside space-y-1 pl-1 text-xs sm:text-sm">
+                                <li><span id="step-1-km">2</span> 公里是 <span id="step-1-m">2000</span> 公尺（因為 $1\text{km} = 1000\text{m}$）。</li>
+                                <li>再加原本的 <span id="step-2-m">45</span> 公尺。</li>
+                                <li>合起來：<span id="step-3-math">2000 + 45 = 2045</span> 公尺。</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 視覺長度動態比例棒 -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                            <span>0m</span>
+                            <span>長度視覺分佈比例 (全數值)</span>
+                            <span id="bar-max-label">10000m</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-6 rounded-full overflow-hidden p-1 flex">
+                            <div id="bar-km-fill" class="bg-sky-500 h-full rounded-l-full transition-all duration-300 flex items-center justify-center text-[10px] text-white font-bold" style="width: 20%;">
+                                km
+                            </div>
+                            <div id="bar-m-fill" class="bg-amber-400 h-full rounded-r-full transition-all duration-300 flex items-center justify-center text-[10px] text-slate-900 font-bold" style="width: 5%;">
+                                m
+                            </div>
+                        </div>
+                        <div class="flex gap-4 justify-center text-xs font-medium pt-1">
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-sky-500 rounded-sm inline-block"></span> 公里換算部分</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-400 rounded-sm inline-block"></span> 剩餘公尺部分</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <main id="section-comparator" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-5 space-y-6">
+                <div class="border-b pb-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                            <i class="fa-solid fa-code-compare text-sky-600"></i> 景點與路線長度比一比
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                            規則：先比較「公里數」，公里數相同時，再比較「公尺數」。
+                        </p>
+                    </div>
+                    <!-- 課本範例下拉選單 -->
+                    <div>
+                        <select id="compare-preset-select" onchange="loadComparePreset()" class="text-xs sm:text-sm px-3 py-2 bg-sky-50 border border-sky-200 rounded-xl text-sky-900 font-semibold focus:outline-none">
+                            <option value="custom">自訂長度比較</option>
+                            <option value="alishan" selected>阿里山線 (9km 200m) vs 祝山線 (6km 250m)</option>
+                            <option value="shenao">深澳鐵道 (1km 300m) vs 烏來台車 (1km 600m)</option>
+                            <option value="tunnel">南澳隧道 (5286m) vs 三紹嶺隧道 (2km 76m)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 兩條路線比較對比區 -->
+                <div class="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
+
+                    <!-- 路線 A -->
+                    <div class="md:col-span-5 bg-sky-50/70 p-4 rounded-xl border border-sky-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-sky-800 text-sm flex items-center gap-1">
+                                <i class="fa-solid fa-train"></i> 路線 A <span id="a-name-tag" class="text-xs font-normal text-slate-500">(阿里山支線)</span>
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-slate-500 font-semibold">公里 (km)</label>
+                                <input type="number" id="a-km" value="9" min="0" max="99" onchange="runComparison()" class="w-full mt-1 p-2 border rounded-lg font-bold text-slate-800 text-center">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500 font-semibold">公尺 (m)</label>
+                                <input type="number" id="a-m" value="200" min="0" max="999" onchange="runComparison()" class="w-full mt-1 p-2 border rounded-lg font-bold text-slate-800 text-center">
+                            </div>
+                        </div>
+                        <div class="text-center bg-white p-2 rounded-lg text-sm font-bold text-slate-700">
+                            換算總長：<span id="a-total-m" class="text-sky-600 font-black">9200</span> 公尺
+                        </div>
+                    </div>
+
+                    <!-- 比較符號展示 -->
+                    <div class="md:col-span-1 text-center my-2 md:my-0">
+                        <div id="cmp-symbol" class="inline-block text-3xl sm:text-4xl font-black text-amber-500 bg-amber-50 w-12 h-12 rounded-full flex items-center justify-center border border-amber-200 shadow-sm mx-auto">
+                            &gt;
+                        </div>
+                    </div>
+
+                    <!-- 路線 B -->
+                    <div class="md:col-span-5 bg-emerald-50/70 p-4 rounded-xl border border-emerald-100 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-emerald-800 text-sm flex items-center gap-1">
+                                <i class="fa-solid fa-route"></i> 路線 B <span id="b-name-tag" class="text-xs font-normal text-slate-500">(祝山線)</span>
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-slate-500 font-semibold">公里 (km)</label>
+                                <input type="number" id="b-km" value="6" min="0" max="99" onchange="runComparison()" class="w-full mt-1 p-2 border rounded-lg font-bold text-slate-800 text-center">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-500 font-semibold">公尺 (m)</label>
+                                <input type="number" id="b-m" value="250" min="0" max="999" onchange="runComparison()" class="w-full mt-1 p-2 border rounded-lg font-bold text-slate-800 text-center">
+                            </div>
+                        </div>
+                        <div class="text-center bg-white p-2 rounded-lg text-sm font-bold text-slate-700">
+                            換算總長：<span id="b-total-m" class="text-emerald-600 font-black">6250</span> 公尺
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 比較說明結果 -->
+                <div class="p-4 bg-slate-800 text-white rounded-xl space-y-1">
+                    <div class="text-xs font-semibold text-sky-300 uppercase tracking-wide">長度比較結論解析</div>
+                    <p id="cmp-explanation" class="text-sm font-medium">
+                        因為 9 公里大於 6 公里，所以「路線 A」比「路線 B」長！
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <main id="section-quiz" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-5 space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                            <i class="fa-solid fa-circle-question text-sky-600"></i> 長度單元挑戰 5 題觀念評量
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">測驗說明：回答下列問題，提交後可即時獲取詳細解析！</p>
+                    </div>
+                    <div class="bg-sky-100 text-sky-800 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-full">
+                        得分：<span id="quiz-score" class="text-base font-black text-sky-700">0</span> / 100
+                    </div>
+                </div>
+
+                <div id="quiz-container" class="space-y-6">
+                    <!-- 題庫動態渲染區域 -->
+                </div>
+
+                <div class="pt-4 border-t flex justify-end gap-3">
+                    <button onclick="resetQuiz()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-sm transition">
+                        <i class="fa-solid fa-rotate-left"></i> 重新測驗
+                    </button>
+                    <button onclick="gradeQuiz()" class="btn-shinkai text-white px-6 py-2 rounded-xl font-bold text-sm shadow-md">
+                        <i class="fa-solid fa-paper-plane mr-1"></i> 提交答案
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 頁腳 footer -->
+        <footer class="text-center text-white/80 text-xs py-4">
+        </footer>
+    </div>
+
+    <script>
+        // 頁籤切換邏輯
+        function switchTab(tabName) {
+            document.querySelectorAll('main').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // ==========================================
+        // 1. 換算器邏輯
+        // ==========================================
+        function updateConverterFromComplex() {
+            const km = parseInt(document.getElementById('km-slider').value) || 0;
+            const m = parseInt(document.getElementById('m-slider').value) || 0;
+
+            document.getElementById('km-val-display').innerText = `${km} 公里`;
+            document.getElementById('m-val-display').innerText = `${m} 公尺`;
+
+            const totalM = (km * 1000) + m;
+
+            // 更新結果文字
+            document.getElementById('res-complex').innerText = `${km} 公里 ${m} 公尺`;
+            document.getElementById('res-single').innerText = `${totalM} 公尺`;
+
+            // 更新計算歷程
+            document.getElementById('step-1-km').innerText = km;
+            document.getElementById('step-1-m').innerText = km * 1000;
+            document.getElementById('step-2-m').innerText = m;
+            document.getElementById('step-3-math').innerText = `${km * 1000} + ${m} = ${totalM}`;
+
+            // 更新比例棒 (以 10000m 為 100% 參考)
+            const maxVal = 10000;
+            const kmPercent = Math.min((km * 1000 / maxVal) * 100, 90);
+            const mPercent = Math.min((m / maxVal) * 100, 10);
+
+            document.getElementById('bar-km-fill').style.width = `${kmPercent}%`;
+            document.getElementById('bar-m-fill').style.width = `${mPercent}%`;
+            document.getElementById('bar-km-fill').innerText = km > 0 ? `${km}km` : '';
+            document.getElementById('bar-m-fill').innerText = m > 0 ? `${m}m` : '';
+        }
+
+        function loadPreset(km, m) {
+            document.getElementById('km-slider').value = km;
+            document.getElementById('m-slider').value = m;
+            updateConverterFromComplex();
+        }
+
+        // ==========================================
+        // 2. 比較器邏輯
+        // ==========================================
+        function runComparison() {
+            const aKm = parseInt(document.getElementById('a-km').value) || 0;
+            const aM = parseInt(document.getElementById('a-m').value) || 0;
+            const bKm = parseInt(document.getElementById('b-km').value) || 0;
+            const bM = parseInt(document.getElementById('b-m').value) || 0;
+
+            const aTotal = aKm * 1000 + aM;
+            const bTotal = bKm * 1000 + bM;
+
+            document.getElementById('a-total-m').innerText = aTotal;
+            document.getElementById('b-total-m').innerText = bTotal;
+
+            const symEl = document.getElementById('cmp-symbol');
+            const expEl = document.getElementById('cmp-explanation');
+
+            if (aTotal > bTotal) {
+                symEl.innerText = '>';
+                if (aKm !== bKm) {
+                    expEl.innerText = `因為 ${aKm} 公里大於 ${bKm} 公里，所以「路線 A」比較長！`;
+                } else {
+                    expEl.innerText = `公里數相同 (${aKm} 公里)，比較公尺數：${aM} 公尺大於 ${bM} 公尺，所以「路線 A」比較長！`;
+                }
+            } else if (aTotal < bTotal) {
+                symEl.innerText = '<';
+                if (aKm !== bKm) {
+                    expEl.innerText = `因為 ${aKm} 公里小於 ${bKm} 公里，所以「路線 B」比較長！`;
+                } else {
+                    expEl.innerText = `公里數相同 (${aKm} 公里)，比較公尺數：${aM} 公尺小於 ${bM} 公尺，所以「路線 B」比較長！`;
+                }
+            } else {
+                symEl.innerText = '=';
+                expEl.innerText = `兩條路線經換算後長度完全相同（皆為 ${aTotal} 公尺）！`;
+            }
+        }
+
+        function loadComparePreset() {
+            const preset = document.getElementById('compare-preset-select').value;
+            const aKmInput = document.getElementById('a-km');
+            const aMInput = document.getElementById('a-m');
+            const bKmInput = document.getElementById('b-km');
+            const bMInput = document.getElementById('b-m');
+            const aTag = document.getElementById('a-name-tag');
+            const bTag = document.getElementById('b-name-tag');
+
+            if (preset === 'alishan') {
+                aKmInput.value = 9; aMInput.value = 200; aTag.innerText = "(阿里山支線)";
+                bKmInput.value = 6; bMInput.value = 250; bTag.innerText = "(祝山線)";
+            } else if (preset === 'shenao') {
+                aKmInput.value = 1; aMInput.value = 300; aTag.innerText = "(深澳鐵道)";
+                bKmInput.value = 1; bMInput.value = 600; bTag.innerText = "(烏來台車)";
+            } else if (preset === 'tunnel') {
+                aKmInput.value = 5; aMInput.value = 286; aTag.innerText = "(南澳隧道 5286m)";
+                bKmInput.value = 2; bMInput.value = 76; aTag.innerText = "(三紹嶺隧道)";
+            } else {
+                aTag.innerText = "(自訂 A)";
+                bTag.innerText = "(自訂 B)";
+            }
+            runComparison();
+        }
+
+        // ==========================================
+        // 3. 測驗題庫資料與渲染
+        // ==========================================
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 工人鋪設道路，這段道路長比 2 公里多出 45 公尺，這段道路長是多少公尺？",
+                options: ["245 公尺", "2045 公尺", "2450 公尺", "20045 公尺"],
+                answer: 1,
+                explanation: "2 公里 = 2000 公尺，2000 公尺 + 45 公尺 = 2045 公尺。"
+            },
+            {
+                id: 2,
+                question: "2. 指示牌到二格山的路程長是 3000 公尺，也可以說是幾公里？",
+                options: ["3 公里", "30 公里", "300 公里", "0.3 公里"],
+                answer: 0,
+                explanation: "1000 公尺 = 1 公里，3000 公尺有 3 個 1000 公尺，所以是 3 公里。"
+            },
+            {
+                id: 3,
+                question: "3. 貓空纜車全長大約是 4030 公尺，也可以說是幾公里幾公尺？",
+                options: ["40 公里 30 公尺", "4 公里 300 公尺", "4 公里 30 公尺", "403 公里 0 公尺"],
+                answer: 2,
+                explanation: "4030 公尺拆解成 4000 公尺 + 30 公尺 = 4 公里 30 公尺。"
+            },
+            {
+                id: 4,
+                question: "4. 判斷對錯：3 公里再加 65 公尺，長度是 365 公尺。這句話正確嗎？",
+                options: ["正確", "錯誤"],
+                answer: 1,
+                explanation: "錯誤！3 公里 = 3000 公尺，3000 + 65 = 3065 公尺，而不是 365 公尺。"
+            },
+            {
+                id: 5,
+                question: "5. 比較長度：阿里山眠月線長 9 公里 200 公尺，祝山線長 6 公里 250 公尺，哪一條路線比較長？",
+                options: ["眠月線", "祝山線", "兩條一樣長", "無法比較"],
+                answer: 0,
+                explanation: "先比較公里數，9 公里 > 6 公里，所以眠月線（9km 200m）比祝山線（6km 250m）長。"
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map((q, idx) => `
+                <div class="bg-white/90 p-4 sm:p-5 rounded-xl border border-slate-200 space-y-3" id="q-card-${idx}">
+                    <div class="font-bold text-slate-800 text-sm sm:text-base">
+                        ${q.question}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${q.options.map((opt, optIdx) => `
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-sky-50/50 cursor-pointer text-xs sm:text-sm transition">
+                                <input type="radio" name="question-${idx}" value="${optIdx}" class="text-sky-600 focus:ring-sky-500">
+                                <span class="text-slate-700 font-medium">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${idx}" class="hidden p-3 rounded-lg text-xs sm:text-sm font-medium"></div>
+                </div>
+            `).join('');
+        }
+
+        function gradeQuiz() {
+            let score = 0;
+            quizData.forEach((q, idx) => {
+                const selected = document.querySelector(`input[name="question-${idx}"]:checked`);
+                const feedbackEl = document.getElementById(`feedback-${idx}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+                if (selected) {
+                    const userAns = parseInt(selected.value);
+                    if (userAns === q.answer) {
+                        score += 20;
+                        feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <b>回答正確！</b> ${q.explanation}`;
+                    } else {
+                        feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <b>回答錯誤。</b> ${q.explanation}`;
+                    }
+                } else {
+                    feedbackEl.classList.add('bg-amber-50', 'text-amber-800', 'border', 'border-amber-200');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1"></i> <b>未作答。</b> 正確答案為：${q.options[q.answer]}。${q.explanation}`;
+                }
+            });
+
+            document.getElementById('quiz-score').innerText = score;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-score').innerText = '0';
+            renderQuiz();
+        }
+
+        // 初始化載入執行
+        window.onload = function() {
+            updateConverterFromComplex();
+            runComparison();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

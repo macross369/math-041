@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>折線圖探究樂園 - 國小數學互動網頁</title>
+    <!-- Tailwind CSS for modern responsive utility layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 30%, #311b92 60%, #4a148c 100%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Makoto Shinkai Dreamy Sky Cards (Glassmorphism + Dynamic Glow) */
+        .shinkai-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 0 25px rgba(125, 211, 252, 0.3);
+            border-radius: 1.5rem;
+            color: #1e293b;
+        }
+
+        .shinkai-header-title {
+            background: linear-gradient(135deg, #38bdf8, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Soft anime cloud particles background overlay */
+        .sky-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle at 80% 20%, rgba(244, 114, 182, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 20% 70%, rgba(56, 189, 248, 0.15) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #6366f1;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #e0e7ff;
+        }
+
+        /* Glowing tabs */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4f46e5, #0284c7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Canvas element polish */
+        canvas {
+            border-radius: 1rem;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 relative">
+    <div class="sky-overlay"></div>
+
+    <main class="max-w-6xl mx-auto relative z-10 space-y-6">
+        
+        <!-- 閒雲數學小棧品牌標誌區塊 -->
+        <div class="w-full flex items-center justify-start mb-2 px-2">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header Section -->
+        <header class="text-center py-6 px-4 shinkai-card bg-opacity-90">
+            <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 font-bold rounded-full text-xs sm:text-sm mb-2 shadow-inner">
+                國小四年級數學 10-3 互動學習網頁
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2">
+                <span class="shinkai-header-title">折線圖報讀與觀察</span>
+            </h1>
+            <p class="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto font-medium">
+                拖動滑桿、切換按鈕，透過動態光影視覺觀察氣溫變化、折線斜率與省略符號的妙用！
+            </p>
+
+            <!-- Navigation Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mt-6">
+                <button id="tab-alishan-btn" onclick="switchTab('alishan')" class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-gray-200 text-gray-700">
+                    探究一：阿里山氣溫圖 (單線報讀)
+                </button>
+                <button id="tab-alishanCustom-btn" onclick="switchTab('alishanCustom')" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-gray-200 text-gray-700">
+                    體驗：阿里山氣溫圖 (設定數值)
+                </button>
+                <button id="tab-spoonbill-btn" onclick="switchTab('spoonbill')" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-gray-200 text-gray-700">
+                    探究二：黑面琵鷺統計 (多線比較)
+                </button>
+                <button id="tab-omission-btn" onclick="switchTab('omission')" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-gray-200 text-gray-700">
+                    探究三：省略符號波浪線 (軸線縮放)
+                </button>
+                <button id="tab-quiz-btn" onclick="switchTab('quiz')" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-amber-500 text-white hover:bg-amber-600">
+                    🎯 歷程性小測驗 (5題)
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: Alishan Temperature Interactive Chart -->
+        <section id="tab-alishan" class="shinkai-card p-4 sm:p-8">
+            <div class="flex flex-col lg:flex-row gap-6 items-center">
+                <!-- Left Control Panel -->
+                <div class="w-full lg:w-1/3 space-y-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <div class="border-b pb-3 border-slate-200">
+                        <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                            <span class="text-2xl">⛅</span> 阿里山氣溫觀測台
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">6月15日 8時至17時 氣溫變化統計</p>
+                    </div>
+
+                    <!-- Time Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center font-bold">
+                            <label for="time-slider" class="text-gray-700 text-sm">選擇時刻：</label>
+                            <span id="current-time-text" class="text-indigo-600 text-lg font-black bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-200">8 時</span>
+                        </div>
+                        <input type="range" id="time-slider" min="8" max="17" step="1" value="8" oninput="updateAlishanChart(this.value)">
+                        <div class="flex justify-between text-xs text-gray-400 font-semibold px-1">
+                            <span>8時</span>
+                            <span>12時</span>
+                            <span>17時</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Readout Indicators -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl text-center">
+                            <span class="text-xs text-sky-600 block font-bold">對應縱軸 (氣溫)</span>
+                            <span id="temp-display" class="text-2xl font-black text-sky-800">19 ℃</span>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl text-center">
+                            <span class="text-xs text-purple-600 block font-bold">對應橫軸 (時刻)</span>
+                            <span id="hour-display" class="text-2xl font-black text-purple-800">8 時</span>
+                        </div>
+                    </div>
+
+                    <!-- Slope & Trend Info Box -->
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-amber-800">趨勢與斜率分析：</span>
+                            <span id="trend-badge" class="px-2 py-0.5 rounded text-xs font-black bg-emerald-100 text-emerald-800">起點</span>
+                        </div>
+                        <p id="trend-explanation" class="text-xs text-slate-700 leading-relaxed font-medium">
+                            點擊或移動滑桿，觀察氣溫從前一個時刻到當前時刻是「右斜上升」、「右斜下降」或「水平不變」。
+                        </p>
+                    </div>
+
+                    <!-- Prompt Questions -->
+                    <div class="bg-indigo-900 text-indigo-100 p-4 rounded-xl text-xs space-y-1.5 shadow-md">
+                        <p class="font-bold text-amber-300">💡 思考小提問：</p>
+                        <p>1. 縱軸上的 1 小格代表幾度？（1度）</p>
+                        <p>2. 哪兩個相鄰時刻氣溫上升最多？（11時到12時）</p>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Chart Area -->
+                <div class="w-full lg:w-2/3 flex flex-col items-center">
+                    <div class="w-full relative shadow-lg rounded-2xl overflow-hidden border border-slate-200 bg-white p-2">
+                        <canvas id="alishanCanvas" class="w-full h-80 sm:h-96"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 text-center">
+                        圖表標題：<strong class="text-slate-800">阿里山6月15日8時到17時氣溫折線圖</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 1-Custom: Interactive Custom Alishan Chart -->
+        <section id="tab-alishanCustom" class="shinkai-card p-4 sm:p-8 hidden">
+            <div class="flex flex-col lg:flex-row gap-6 items-center">
+                <!-- Left Control Panel -->
+                <div class="w-full lg:w-1/3 space-y-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <div class="border-b pb-3 border-slate-200">
+                        <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                            <span class="text-2xl">🎛️</span> 阿里山氣溫設定體驗台
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">自由調整 8 時至 17 時氣溫 (16~25℃)，觀察折線圖變化！</p>
+                    </div>
+
+                    <!-- Time Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center font-bold">
+                            <label for="time-slider-custom" class="text-gray-700 text-sm">選擇時刻：</label>
+                            <span id="current-time-text-custom" class="text-indigo-600 text-lg font-black bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-200">8 時</span>
+                        </div>
+                        <input type="range" id="time-slider-custom" min="8" max="17" step="1" value="8" oninput="updateAlishanCustomChart(this.value)">
+                        <div class="flex justify-between text-xs text-gray-400 font-semibold px-1">
+                            <span>8時</span>
+                            <span>12時</span>
+                            <span>17時</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Readout Indicators -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl text-center">
+                            <span class="text-xs text-sky-600 block font-bold">對應縱軸 (氣溫)</span>
+                            <span id="temp-display-custom" class="text-2xl font-black text-sky-800">19 ℃</span>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 p-3 rounded-xl text-center">
+                            <span class="text-xs text-purple-600 block font-bold">對應橫軸 (時刻)</span>
+                            <span id="hour-display-custom" class="text-2xl font-black text-purple-800">8 時</span>
+                        </div>
+                    </div>
+
+                    <!-- Slope & Trend Info Box -->
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-amber-800">趨勢與斜率分析：</span>
+                            <span id="trend-badge-custom" class="px-2 py-0.5 rounded text-xs font-black bg-emerald-100 text-emerald-800">起點</span>
+                        </div>
+                        <p id="trend-explanation-custom" class="text-xs text-slate-700 leading-relaxed font-medium">
+                            修改上方選單或滑桿，觀察自訂氣溫趨勢是「右斜上升」、「右斜下降」或「水平不變」。
+                        </p>
+                    </div>
+
+                    <!-- Prompt Questions -->
+                    <div class="bg-indigo-900 text-indigo-100 p-4 rounded-xl text-xs space-y-1.5 shadow-md">
+                        <p class="font-bold text-amber-300">💡 探索任務：</p>
+                        <p>1. 嘗試將所有時刻設定為同一個溫度（如 20℃），看看折線圖會變成怎樣？（水平線）</p>
+                        <p>2. 嘗試創造一個「先上升再下降」的溫度變化趨勢吧！</p>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Chart Area -->
+                <div class="w-full lg:w-2/3 flex flex-col items-center">
+                    <!-- Temperature Dropdown Selectors Grid (Moved to top of chart) -->
+                    <div class="w-full bg-indigo-50/80 border border-indigo-200 p-3.5 rounded-2xl space-y-2 mb-4">
+                        <span class="text-xs font-bold text-indigo-900 block flex items-center gap-1">
+                            <span>⚙️</span> 各時刻氣溫設定（16℃ ~ 25℃）：
+                        </span>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">8時</label>
+                                <select id="select-temp-8" onchange="onCustomTempChange(8, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">9時</label>
+                                <select id="select-temp-9" onchange="onCustomTempChange(9, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">10時</label>
+                                <select id="select-temp-10" onchange="onCustomTempChange(10, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">11時</label>
+                                <select id="select-temp-11" onchange="onCustomTempChange(11, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">12時</label>
+                                <select id="select-temp-12" onchange="onCustomTempChange(12, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">13時</label>
+                                <select id="select-temp-13" onchange="onCustomTempChange(13, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">14時</label>
+                                <select id="select-temp-14" onchange="onCustomTempChange(14, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">15時</label>
+                                <select id="select-temp-15" onchange="onCustomTempChange(15, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">16時</label>
+                                <select id="select-temp-16" onchange="onCustomTempChange(16, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 font-bold mb-1">17時</label>
+                                <select id="select-temp-17" onchange="onCustomTempChange(17, this.value)" class="w-full bg-white border border-slate-300 rounded-lg p-1 font-bold text-slate-800 shadow-sm focus:ring-2 focus:ring-indigo-400"></select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full relative shadow-lg rounded-2xl overflow-hidden border border-slate-200 bg-white p-2">
+                        <canvas id="alishanCustomCanvas" class="w-full h-80 sm:h-96"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 text-center">
+                        圖表標題：<strong class="text-slate-800">自訂氣溫數值動態折線圖</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Multi-line Chart (Black-faced Spoonbill) -->
+        <section id="tab-spoonbill" class="shinkai-card p-4 sm:p-8 hidden">
+            <div class="flex flex-col lg:flex-row gap-6 items-center">
+                <!-- Left Control Panel -->
+                <div class="w-full lg:w-1/3 space-y-5 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <div class="border-b pb-3 border-slate-200">
+                        <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                            <span class="text-2xl">🦅</span> 黑面琵鷺數量統計
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">民國 105 年至 109 年 三縣市比較</p>
+                    </div>
+
+                    <!-- Year Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center font-bold">
+                            <label for="year-slider" class="text-gray-700 text-sm">選擇年份觀察：</label>
+                            <span id="current-year-text" class="text-cyan-600 text-lg font-black bg-cyan-50 px-3 py-1 rounded-lg border border-cyan-200">105 年</span>
+                        </div>
+                        <input type="range" id="year-slider" min="105" max="109" step="1" value="105" oninput="updateSpoonbillChart(this.value)">
+                        <div class="flex justify-between text-xs text-gray-400 font-semibold px-1">
+                            <span>105年</span>
+                            <span>107年</span>
+                            <span>109年</span>
+                        </div>
+                    </div>
+
+                    <!-- Readouts for 3 cities -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2.5 rounded-lg bg-cyan-100 text-cyan-900 border border-cyan-300 font-bold text-sm">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-500 inline-block"></span> 臺南市：</span>
+                            <span id="tainan-val" class="text-base font-black">1528 隻</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 rounded-lg bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-sm">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 嘉義縣：</span>
+                            <span id="chiayi-val" class="text-base font-black">305 隻</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 font-bold text-sm">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 高雄市：</span>
+                            <span id="kaohsiung-val" class="text-base font-black">186 隻</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-sky-50 border border-sky-200 p-4 rounded-xl text-xs space-y-1.5">
+                        <span class="font-bold text-sky-900 block text-sm mb-1">🔍 觀測小提示：</span>
+                        <p>1. 兩條折線距離越近，代表數量差異越小。</p>
+                        <p>2. 觀察 <strong>107年</strong>，臺南市 (1265) 與嘉義縣 (559) 距離最近！</p>
+                    </div>
+                </div>
+
+                <!-- Right Canvas Chart Area -->
+                <div class="w-full lg:w-2/3 flex flex-col items-center">
+                    <div class="w-full relative shadow-lg rounded-2xl overflow-hidden border border-slate-200 bg-white p-2">
+                        <canvas id="spoonbillCanvas" class="w-full h-80 sm:h-96"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 text-center">
+                        圖表標題：<strong class="text-slate-800">民國105年至109年三縣市黑面琵鷺普查數量折線圖</strong>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Omission Symbol Exploration -->
+        <section id="tab-omission" class="shinkai-card p-4 sm:p-8 hidden">
+            <div class="space-y-6">
+                <!-- Top Title Bar & Switch Buttons -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="space-y-1">
+                        <h2 class="text-2xl font-black text-indigo-900 flex items-center gap-2">
+                            <span>〰️</span> 報讀有省略符號的折線圖與長條圖
+                        </h2>
+                        <p class="text-sm text-gray-600">
+                            當數據很大或數據都集中在較高區間時，使用波浪線省略符號可避免圖表空間浪費！
+                        </p>
+                    </div>
+                    
+                    <!-- Toggle Buttons for Mode -->
+                    <div class="flex items-center gap-2 bg-slate-200/80 p-1.5 rounded-xl shadow-inner border border-slate-300">
+                        <button id="btn-omission-off" onclick="setOmissionMode(false)" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition">
+                            完整刻度 (0~130cm)
+                        </button>
+                        <button id="btn-omission-on" onclick="setOmissionMode(true)" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition">
+                            使用省略符號 (45~130cm)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Height Line Chart (Left 60% Chart / Right 40% Explanation) -->
+                <div class="flex flex-col lg:flex-row gap-6 items-stretch">
+                    <!-- Left 60%: Height Chart -->
+                    <div class="w-full lg:w-[60%] bg-white p-5 rounded-2xl border border-slate-200 shadow flex flex-col items-center justify-between">
+                        <h3 class="font-bold text-slate-800 text-lg mb-2">妹妹0歲到7歲身高變化折線圖</h3>
+                        <canvas id="omissionCanvas" class="w-full h-80"></canvas>
+                    </div>
+
+                    <!-- Right 40%: Concept Exploration Card -->
+                    <div class="w-full lg:w-[40%] flex flex-col justify-center">
+                        <div class="bg-indigo-50/70 p-6 rounded-2xl border border-indigo-100 shadow-sm space-y-5 h-full flex flex-col justify-center">
+                            <div class="space-y-2">
+                                <h4 class="text-lg font-extrabold text-indigo-950 flex items-center gap-2">
+                                    <span class="text-xl">💡</span> 觀念探究
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-700 leading-relaxed font-medium">
+                                    妹妹出生時身高為 <strong class="text-indigo-900">50cm</strong>，因此 <strong class="text-indigo-900">0~45cm</strong> 之間完全沒有數據。
+                                </p>
+                            </div>
+
+                            <!-- Dynamic Explanation Subcard -->
+                            <div id="omission-subcard" class="p-4 rounded-xl text-xs sm:text-sm leading-relaxed font-medium transition-all shadow-sm">
+                                <!-- Content dynamically updated via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Interactive Literacy Misconception Challenge (60% Chart / 40% Explanation) -->
+                <div class="bg-purple-50/70 p-6 rounded-2xl border border-purple-200 space-y-4">
+                    <div class="space-y-1">
+                        <h3 class="text-xl sm:text-2xl font-black text-amber-700 flex items-center gap-2">
+                            <span>⚠️</span> 素養挑戰：視覺高度陷阱！
+                        </h3>
+                        <p class="text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
+                            丹丹說：「綠色長條高度是橘色的 2 倍，所以男生人數是女生的 2 倍。」你覺得對嗎？點擊下方按鈕測試！
+                        </p>
+                    </div>
+
+                    <!-- Side-by-Side Flex Container -->
+                    <div class="flex flex-col lg:flex-row gap-6 items-center">
+                        <!-- Left 60%: Interactive Bar Chart Box -->
+                        <div class="w-full lg:w-[60%] bg-white p-5 rounded-2xl border border-purple-100 shadow-sm space-y-4">
+                            <!-- Toggle Buttons -->
+                            <div class="flex flex-wrap justify-center gap-3">
+                                <button id="btn-start-20" onclick="setBarStartY(20)" class="px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-amber-500 text-white shadow-md">
+                                    縱軸由 20 開始
+                                </button>
+                                <button id="btn-start-0" onclick="setBarStartY(0)" class="px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-gray-100 text-slate-700 hover:bg-sky-100">
+                                    縱軸由 0 開始
+                                </button>
+                            </div>
+
+                            <!-- Canvas for Bar Chart -->
+                            <div class="w-full relative">
+                                <canvas id="barTrapCanvas" class="w-full h-64 sm:h-72"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Right 40%: Question, Option Buttons & Dynamic Feedback Message Box -->
+                        <div class="w-full lg:w-[40%] flex flex-col justify-center space-y-4 bg-purple-100/50 p-5 rounded-2xl border border-purple-200">
+                            <div>
+                                <p class="text-sm sm:text-base font-bold text-purple-950 leading-relaxed mb-3">
+                                    綠色長條圖的高度看起來是橘色長條圖的 2 倍，所以男生人數是女生的 2 倍嗎？
+                                </p>
+                                <div class="flex gap-3">
+                                    <button id="btn-choice-yes" onclick="handleBarChoice('yes')" class="flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-slate-200 text-slate-700 hover:bg-rose-500 hover:text-white">
+                                        是
+                                    </button>
+                                    <button id="btn-choice-no" onclick="handleBarChoice('no')" class="flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white">
+                                        不是
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="bar-trap-feedback" class="p-4 rounded-2xl border text-sm sm:text-base font-medium leading-relaxed shadow-sm transition-all duration-300 hidden">
+                                <!-- Dynamic Feedback Content -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: Formative Quiz (5 Questions) -->
+        <section id="tab-quiz" class="shinkai-card p-4 sm:p-8 hidden">
+            <div class="max-w-3xl mx-auto space-y-6">
+                <div class="text-center space-y-2 border-b pb-4 border-gray-200">
+                    <h2 class="text-2xl sm:text-3xl font-black text-indigo-900">🎯 折線圖核心素養測驗</h2>
+                    <p class="text-xs sm:text-sm text-gray-500">共 5 題，測試你對折線圖報讀、趨勢與省略符號的理解！</p>
+                </div>
+
+                <!-- Quiz Form Container -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Questions will be dynamically rendered -->
+                </div>
+
+                <!-- Quiz Submit and Results -->
+                <div class="text-center pt-4 border-t border-gray-200">
+                    <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black rounded-xl text-base shadow-lg hover:opacity-90 transform hover:-translate-y-0.5 transition">
+                        提交答案並評分
+                    </button>
+                    <div id="quiz-result" class="mt-4 p-4 rounded-xl text-center hidden"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Datasets extracted from textbook prompts
+        const alishanData = [
+            { hour: 8, temp: 19 },
+            { hour: 9, temp: 20 },
+            { hour: 10, temp: 21 },
+            { hour: 11, temp: 21 },
+            { hour: 12, temp: 23 },
+            { hour: 13, temp: 20 },
+            { hour: 14, temp: 19 },
+            { hour: 15, temp: 18 },
+            { hour: 16, temp: 18 },
+            { hour: 17, temp: 17 }
+        ];
+
+        // Mutable custom dataset for Tab 1-Custom
+        let customAlishanData = JSON.parse(JSON.stringify(alishanData));
+
+        const spoonbillData = {
+            years: [105, 106, 107, 108, 109],
+            tainan: [1528, 1810, 1265, 1572, 1839],
+            chiayi: [305, 513, 559, 488, 550],
+            kaohsiung: [186, 247, 257, 245, 241]
+        };
+
+        const heightData = [
+            { age: 0, height: 50 },
+            { age: 1, height: 75 },
+            { age: 2, height: 90 },
+            { age: 3, height: 97 },
+            { age: 4, height: 105 },
+            { age: 5, height: 112 },
+            { age: 6, height: 120 },
+            { age: 7, height: 127 }
+        ];
+
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 在「阿里山6月15日8時到17時氣溫折線圖」中，縱軸每一小格代表多少氣溫？",
+                options: ["1 度", "2 度", "5 度", "10 度"],
+                answer: 0,
+                explanation: "正確！觀察縱軸刻度標記（15、16、17...25），每 1 小格代表 1 度。"
+            },
+            {
+                id: 2,
+                question: "2. 阿里山氣溫折線圖中，哪兩個相鄰時刻氣溫「上升最多」？",
+                options: ["8時到9時", "9時到10時", "11時到12時", "12時到13時"],
+                answer: 2,
+                explanation: "正確！11時為21度，12時升至23度，相差2度，折線右斜上升最陡峭。"
+            },
+            {
+                id: 3,
+                question: "3. 觀察黑面琵鷺統計折線圖，民國107年哪兩個縣市的黑面琵鷺數量最接近？",
+                options: ["臺南市與嘉義縣", "嘉義縣與高雄市", "臺南市與高雄市", "三縣市數量都一樣"],
+                answer: 0,
+                explanation: "正確！107年臺南市(1265)與嘉義縣(559)在圖表上的折線距離最接近。"
+            },
+            {
+                id: 4,
+                question: "4. 在妹妹身高折線圖中，為什麼縱軸 0~45cm 之間可以使用波浪省略符號？",
+                options: ["因為妹妹的身高只有45cm", "因為出生時身高為50cm，0~45cm之間完全沒有資料", "因為波浪線看起來比較漂亮", "為了把數據隱藏起來"],
+                answer: 1,
+                explanation: "正確！因為0~45cm之間沒有任何數據點，使用波浪省略符號可放大45cm以上的起伏。"
+            },
+            {
+                id: 5,
+                question: "5. 當長條圖縱軸使用省略符號（從20開始）時，丹丹看到綠色長條高度是橘色的2倍，直接說人數也是2倍，這樣說對嗎？",
+                options: ["對，視覺高度多大倍數就是幾倍", "不對，因為省略了下方區域，使高度比例被放大，真實比例需看數據（30與20人為1.5倍）", "對，長條圖不需要從0開始看", "不一定，要看顏色決定"],
+                answer: 1,
+                explanation: "正確！當縱軸省略下方部分時，長條高度不代表實際數值的倍數關係，這是常見的視覺高度陷阱。"
+            }
+        ];
+
+        let currentAlishanHour = 8;
+        let currentAlishanCustomHour = 8;
+        let currentSpoonbillYear = 105;
+        let isOmissionActive = false; // Default to Complete Scale (0~130cm) as requested
+        let barStartY = 20; // Default state matching screenshot (starting at 20)
+        let hasSelectedBarChoice = false; // Track if user has answered "是" or "不是"
+
+        // Populate dropdown options for custom Alishan temperature selectors (16~25°C)
+        function initCustomSelectOptions() {
+            customAlishanData.forEach(d => {
+                const selectEl = document.getElementById(`select-temp-${d.hour}`);
+                if (!selectEl) return;
+                selectEl.innerHTML = '';
+                for (let t = 16; t <= 25; t++) {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = `${t}℃`;
+                    if (t === d.temp) opt.selected = true;
+                    selectEl.appendChild(opt);
+                }
+            });
+        }
+
+        function onCustomTempChange(hour, newTemp) {
+            const target = customAlishanData.find(d => d.hour === hour);
+            if (target) {
+                target.temp = parseInt(newTemp);
+                updateAlishanCustomChart(currentAlishanCustomHour);
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tabKey) {
+            const tabs = ['alishan', 'alishanCustom', 'spoonbill', 'omission', 'quiz'];
+            tabs.forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}-btn`).classList.remove('active');
+            });
+
+            document.getElementById(`tab-${tabKey}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabKey}-btn`).classList.add('active');
+
+            // Trigger canvas redraws on tab change to handle width responsiveness
+            setTimeout(() => {
+                if (tabKey === 'alishan') drawAlishanChart();
+                if (tabKey === 'alishanCustom') drawAlishanCustomChart();
+                if (tabKey === 'spoonbill') drawSpoonbillChart();
+                if (tabKey === 'omission') {
+                    drawOmissionChart();
+                    drawBarTrapChart();
+                }
+            }, 50);
+        }
+
+        function updateAlishanChart(val) {
+            currentAlishanHour = parseInt(val);
+            document.getElementById('current-time-text').innerText = `${currentAlishanHour} 時`;
+            document.getElementById('hour-display').innerText = `${currentAlishanHour} 時`;
+
+            const dataObj = alishanData.find(d => d.hour === currentAlishanHour);
+            if (dataObj) {
+                document.getElementById('temp-display').innerText = `${dataObj.temp} ℃`;
+            }
+
+            // Calculate Trend Badge
+            const idx = alishanData.findIndex(d => d.hour === currentAlishanHour);
+            const badge = document.getElementById('trend-badge');
+            const explanation = document.getElementById('trend-explanation');
+
+            if (idx === 0) {
+                badge.className = "px-2 py-0.5 rounded text-xs font-black bg-slate-200 text-slate-800";
+                badge.innerText = "測量起點";
+                explanation.innerText = "這是 8 時的初始記錄氣溫（19度）。";
+            } else {
+                const prevTemp = alishanData[idx - 1].temp;
+                const currTemp = dataObj.temp;
+                const diff = currTemp - prevTemp;
+
+                if (diff > 0) {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-rose-100 text-rose-800";
+                    badge.innerText = "↗️ 右斜上升 (氣溫上升)";
+                    explanation.innerHTML = `從 <strong>${alishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanHour}時</strong>，氣溫由 ${prevTemp}度 升至 ${currTemp}度，上升了 <strong>${diff}度</strong>！`;
+                } else if (diff < 0) {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-cyan-100 text-cyan-800";
+                    badge.innerText = "↘️ 右斜下降 (氣溫下降)";
+                    explanation.innerHTML = `從 <strong>${alishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanHour}時</strong>，氣溫由 ${prevTemp}度 降至 ${currTemp}度，下降了 <strong>${Math.abs(diff)}度</strong>！`;
+                } else {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-amber-100 text-amber-800";
+                    badge.innerText = "➡️ 水平 (氣溫不變)";
+                    explanation.innerHTML = `從 <strong>${alishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanHour}時</strong>，氣溫保持在 ${currTemp}度，折線呈水平方向。`;
+                }
+            }
+
+            drawAlishanChart();
+        }
+
+        function drawAlishanChart() {
+            const canvas = document.getElementById('alishanCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            // Handle DPI resolution scaling
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = { top: 40, right: 30, bottom: 50, left: 50 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            // Y axis scale (15度 to 25度)
+            const minY = 15;
+            const maxY = 25;
+
+            // Shift X axis starting point right by 1 grid step
+            const step = graphWidth / alishanData.length;
+            const getX = (index) => padding.left + (index + 1) * step;
+            const getY = (temp) => padding.top + graphHeight - ((temp - minY) / (maxY - minY)) * graphHeight;
+
+            // Draw Background Grid Lines
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let t = minY; t <= maxY; t++) {
+                const y = getY(t);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                // Y labels
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px Noto Sans TC';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${t}度`, padding.left - 8, y + 4);
+            }
+
+            // Draw Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+
+            // Y axis title
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px Noto Sans TC';
+            ctx.textAlign = 'center';
+            ctx.fillText('氣溫 (度)', padding.left, padding.top - 15);
+
+            // X axis labels
+            alishanData.forEach((d, i) => {
+                const x = getX(i);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${d.hour}時`, x, height - padding.bottom + 20);
+
+                // Grid vertical tick
+                ctx.beginPath();
+                ctx.strokeStyle = '#f1f5f9';
+                ctx.moveTo(x, padding.top);
+                ctx.lineTo(x, height - padding.bottom);
+                ctx.stroke();
+            });
+
+            ctx.fillText('時刻', width - padding.right + 15, height - padding.bottom + 20);
+
+            // Draw Line Path
+            ctx.beginPath();
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 3.5;
+            ctx.lineJoin = 'round';
+
+            alishanData.forEach((d, i) => {
+                const x = getX(i);
+                const y = getY(d.temp);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Highlight selected point crosshairs
+            const selectedIdx = alishanData.findIndex(d => d.hour === currentAlishanHour);
+            if (selectedIdx !== -1) {
+                const target = alishanData[selectedIdx];
+                const targetX = getX(selectedIdx);
+                const targetY = getY(target.temp);
+
+                // Crosshair dashed lines
+                ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 2;
+
+                // Vertical to X axis
+                ctx.beginPath();
+                ctx.moveTo(targetX, targetY);
+                ctx.lineTo(targetX, height - padding.bottom);
+                ctx.stroke();
+
+                // Horizontal to Y axis
+                ctx.beginPath();
+                ctx.moveTo(targetX, targetY);
+                ctx.lineTo(padding.left, targetY);
+                ctx.stroke();
+
+                ctx.setLineDash([]); // Reset line dash
+
+                // Highlighted glowing point
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#f43f5e';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Floating tooltip label above point
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 13px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${target.temp}℃`, targetX, targetY - 14);
+            }
+
+            // Draw data dots
+            alishanData.forEach((d, i) => {
+                if (i === selectedIdx) return;
+                const x = getX(i);
+                const y = getY(d.temp);
+                ctx.beginPath();
+                ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#0284c7';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        function updateSpoonbillChart(val) {
+            currentSpoonbillYear = parseInt(val);
+            document.getElementById('current-year-text').innerText = `${currentSpoonbillYear} 年`;
+
+            const idx = spoonbillData.years.indexOf(currentSpoonbillYear);
+            if (idx !== -1) {
+                document.getElementById('tainan-val').innerText = `${spoonbillData.tainan[idx]} 隻`;
+                document.getElementById('chiayi-val').innerText = `${spoonbillData.chiayi[idx]} 隻`;
+                document.getElementById('kaohsiung-val').innerText = `${spoonbillData.kaohsiung[idx]} 隻`;
+            }
+
+            drawSpoonbillChart();
+        }
+
+        function drawSpoonbillChart() {
+            const canvas = document.getElementById('spoonbillCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = { top: 40, right: 40, bottom: 50, left: 60 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            const minY = 0;
+            const maxY = 2000;
+
+            // Shift X axis starting point right by 1 grid step
+            const step = graphWidth / spoonbillData.years.length;
+            const getX = (index) => padding.left + (index + 1) * step;
+            const getY = (val) => padding.top + graphHeight - (val / maxY) * graphHeight;
+
+            // Horizontal Grid Lines
+            const steps = [0, 500, 1000, 1500, 2000];
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            steps.forEach(val => {
+                const y = getY(val);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'right';
+                ctx.fillText(val, padding.left - 8, y + 4);
+            });
+
+            // Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+
+            // Y Axis Label
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px Noto Sans TC';
+            ctx.textAlign = 'center';
+            ctx.fillText('數量 (隻)', padding.left, padding.top - 15);
+
+            // X Axis Labels
+            spoonbillData.years.forEach((yr, i) => {
+                const x = getX(i);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${yr}年`, x, height - padding.bottom + 20);
+            });
+
+            const drawSeries = (dataArray, color, name) => {
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                dataArray.forEach((val, i) => {
+                    const x = getX(i);
+                    const y = getY(val);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+
+                // Data Dots & Values
+                dataArray.forEach((val, i) => {
+                    const x = getX(i);
+                    const y = getY(val);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+
+                    // Text labels
+                    ctx.fillStyle = '#334155';
+                    ctx.font = '10px Noto Sans TC';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(val, x, y - 8);
+                });
+            };
+
+            drawSeries(spoonbillData.tainan, '#06b6d4', '臺南市');
+            drawSeries(spoonbillData.chiayi, '#10b981', '嘉義縣');
+            drawSeries(spoonbillData.kaohsiung, '#f59e0b', '高雄市');
+
+            // Highlight Year Line
+            const yrIdx = spoonbillData.years.indexOf(currentSpoonbillYear);
+            if (yrIdx !== -1) {
+                const hX = getX(yrIdx);
+                ctx.strokeStyle = '#6366f1';
+                ctx.setLineDash([4, 4]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(hX, padding.top);
+                ctx.lineTo(hX, height - padding.bottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function setOmissionMode(active) {
+            isOmissionActive = active;
+            
+            const btnOff = document.getElementById('btn-omission-off');
+            const btnOn = document.getElementById('btn-omission-on');
+            const subcard = document.getElementById('omission-subcard');
+
+            if (isOmissionActive) {
+                btnOn.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-sky-600 text-white shadow";
+                btnOff.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-300";
+
+                subcard.className = "p-4 rounded-xl text-xs sm:text-sm leading-relaxed font-medium bg-sky-100/90 border border-sky-300 text-sky-950 shadow-sm space-y-1";
+                subcard.innerHTML = `
+                    <div class="font-bold text-sky-900 flex items-center gap-1.5 mb-1 text-sm sm:text-base">
+                        <span>✨</span> 使用省略符號優點：
+                    </div>
+                    <p>裁切掉 <strong>0~45cm</strong> 的空白區，讓圖表高度專注於有數據的區間。折線起伏被放大，更容易看出每年的細微成長！</p>
+                `;
+            } else {
+                btnOff.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow";
+                btnOn.className = "px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-300";
+
+                subcard.className = "p-4 rounded-xl text-xs sm:text-sm leading-relaxed font-medium bg-amber-100/90 border border-amber-300 text-amber-950 shadow-sm space-y-1";
+                subcard.innerHTML = `
+                    <div class="font-bold text-amber-900 flex items-center gap-1.5 mb-1 text-sm sm:text-base">
+                        <span>⚠️</span> 未加省略符號缺點：
+                    </div>
+                    <p>從 <strong>0cm</strong> 開始畫，下方會空出一大片無用區域，導致上方的數據點被嚴重壓縮，折線看起來太平緩了。</p>
+                `;
+            }
+
+            drawOmissionChart();
+        }
+
+        function drawOmissionChart() {
+            const canvas = document.getElementById('omissionCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = { top: 30, right: 30, bottom: 40, left: 55 };
+            const graphWidth = width - padding.left - padding.right;
+
+            const chartBottomY = height - padding.bottom;
+            const chartTopY = padding.top;
+            const wavyY = chartBottomY - 24; // 波浪線位置
+
+            // Coordinate mapping for Y axis
+            const getY = (val) => {
+                if (!isOmissionActive) {
+                    return chartTopY + (chartBottomY - chartTopY) * (1 - val / 130);
+                }
+                if (val <= 0) return chartBottomY;
+                if (val <= 45) {
+                    return chartBottomY - (val / 45) * (chartBottomY - wavyY);
+                }
+                return wavyY - ((val - 45) / (130 - 45)) * (wavyY - chartTopY);
+            };
+
+            const step = graphWidth / (heightData.length - 1);
+            const getX = (index) => padding.left + index * step;
+
+            // 10cm step Y ticks
+            const yTicks = isOmissionActive 
+                ? [0, 45, 50, 60, 70, 80, 90, 100, 110, 120, 130] 
+                : [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130];
+
+            yTicks.forEach(val => {
+                const y = getY(val);
+                
+                // Draw horizontal background grid lines
+                if (!isOmissionActive || val !== 45) {
+                    ctx.strokeStyle = '#f1f5f9';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(padding.left, y);
+                    ctx.lineTo(width - padding.right, y);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${val}cm`, padding.left - 8, y + 4);
+            });
+
+            // Draw Full-Width Bold Red Wavy Line across the line chart starting from y-axis (padding.left)
+            if (isOmissionActive) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#dc2626'; // Bold red color
+                ctx.lineWidth = 3.5;
+                const startX = padding.left;
+                const endX = width - padding.right;
+                const waveLength = 12;
+                const waveAmplitude = 4;
+
+                ctx.moveTo(startX, wavyY);
+                for (let x = startX; x < endX; x += waveLength) {
+                    const nextX = Math.min(x + waveLength, endX);
+                    const midX = (x + nextX) / 2;
+                    ctx.quadraticCurveTo((x + midX) / 2, wavyY - waveAmplitude, midX, wavyY);
+                    ctx.quadraticCurveTo((midX + nextX) / 2, wavyY + waveAmplitude, nextX, wavyY);
+                }
+                ctx.stroke();
+            }
+
+            // Main Axis frame lines
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, chartBottomY);
+            ctx.lineTo(width - padding.right, chartBottomY);
+            ctx.stroke();
+
+            // X Axis Labels
+            heightData.forEach((d, i) => {
+                const x = getX(i);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${d.age}歲`, x, chartBottomY + 18);
+            });
+
+            // Height Line Path
+            ctx.beginPath();
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            heightData.forEach((d, i) => {
+                const x = getX(i);
+                const y = getY(d.height);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Data Points
+            heightData.forEach((d, i) => {
+                const x = getX(i);
+                const y = getY(d.height);
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#8b5cf6';
+                ctx.fill();
+
+                ctx.fillStyle = '#4c1d95';
+                ctx.font = 'bold 10px Noto Sans TC';
+                ctx.fillText(d.height, x, y - 8);
+            });
+        }
+
+        function setBarStartY(val) {
+            barStartY = val;
+            const btn20 = document.getElementById('btn-start-20');
+            const btn0 = document.getElementById('btn-start-0');
+
+            if (val === 20) {
+                btn20.className = "px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-amber-500 text-white shadow-md";
+                btn0.className = "px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-gray-100 text-slate-700 hover:bg-sky-100";
+            } else {
+                btn20.className = "px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-gray-100 text-slate-700 hover:bg-amber-100";
+                btn0.className = "px-6 py-2.5 rounded-xl font-bold text-sm sm:text-base transition bg-sky-600 text-white shadow-md";
+            }
+
+            drawBarTrapChart();
+            updateBarTrapFeedback();
+        }
+
+        function handleBarChoice(choice) {
+            hasSelectedBarChoice = true;
+            if (choice === 'yes') {
+                setBarStartY(20);
+                updateChoiceButtonsUI('yes');
+            } else {
+                setBarStartY(0);
+                updateChoiceButtonsUI('no');
+            }
+        }
+
+        function updateChoiceButtonsUI(choice) {
+            const btnYes = document.getElementById('btn-choice-yes');
+            const btnNo = document.getElementById('btn-choice-no');
+
+            if (!btnYes || !btnNo) return;
+
+            if (choice === 'yes') {
+                btnYes.className = "flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-rose-500 text-white shadow-md ring-2 ring-rose-300";
+                btnNo.className = "flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white";
+            } else if (choice === 'no') {
+                btnYes.className = "flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-slate-200 text-slate-700 hover:bg-rose-500 hover:text-white";
+                btnNo.className = "flex-1 py-2.5 px-4 rounded-xl font-black text-sm sm:text-base transition bg-emerald-600 text-white shadow-md ring-2 ring-emerald-300";
+            }
+        }
+
+        function updateBarTrapFeedback() {
+            const feedbackBox = document.getElementById('bar-trap-feedback');
+            if (!feedbackBox) return;
+
+            if (!hasSelectedBarChoice) {
+                feedbackBox.classList.add('hidden');
+                return;
+            }
+
+            feedbackBox.classList.remove('hidden');
+
+            if (barStartY === 20) {
+                feedbackBox.className = "p-4 rounded-2xl border border-rose-200 bg-rose-50 text-rose-900 font-medium text-sm sm:text-base leading-relaxed shadow-sm";
+                feedbackBox.innerHTML = `
+                    <div class="flex items-start gap-2">
+                        <span class="text-xl">❌</span>
+                        <div>
+                            <strong class="text-rose-900 block font-bold text-base mb-1">被視覺欺騙了！</strong>
+                            當縱軸使用波浪省略符號時，男生(30人)長條佔了 <strong>4 格高度</strong>，女生(20人)長條只佔 <strong>2 格高度</strong>，視覺上看起來男生是女生的 <strong>2 倍高</strong>！但實際人數 30 並不是 20 的 2 倍（真實為 1.5 倍）。
+                        </div>
+                    </div>
+                `;
+            } else {
+                feedbackBox.className = "p-4 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-900 font-medium text-sm sm:text-base leading-relaxed shadow-sm";
+                feedbackBox.innerHTML = `
+                    <div class="flex items-start gap-2">
+                        <span class="text-xl">✅</span>
+                        <div>
+                            <strong class="text-emerald-900 block font-bold text-base mb-1">還原真實比例：</strong>
+                            縱軸從 0 開始且不使用省略符號，男生(30人)高 6 格，女生(20人)高 4 格，視覺高度比為 6:4 = 1.5 倍，才是真實的人數倍數比例！
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function drawBarTrapChart() {
+            const canvas = document.getElementById('barTrapCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = { top: 30, right: 30, bottom: 45, left: 55 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            let yTicks, getY;
+
+            if (barStartY === 20) {
+                // Ticks specified: 0, 10 (omission wave), 20, 25, 30, 35, 40
+                yTicks = [0, 10, 20, 25, 30, 35, 40];
+                const getLevel = (val) => {
+                    if (val <= 0) return 0;
+                    if (val === 10) return 1;
+                    if (val === 20) return 2;
+                    if (val === 25) return 3;
+                    if (val === 30) return 4;
+                    if (val === 35) return 5;
+                    if (val === 40) return 6;
+                    return 0;
+                };
+                getY = (val) => padding.top + graphHeight - (getLevel(val) / 6) * graphHeight;
+            } else {
+                yTicks = [0, 5, 10, 15, 20, 25, 30, 35, 40];
+                getY = (val) => padding.top + graphHeight - (val / 40) * graphHeight;
+            }
+
+            // Draw Y Grid lines & Ticks
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            yTicks.forEach(t => {
+                const y = getY(t);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px Noto Sans TC';
+                ctx.textAlign = 'right';
+                ctx.fillText(t, padding.left - 8, y + 4);
+            });
+
+            // Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+
+            const bars = [
+                { label: '四年級男生 (30人)', val: 30, color: '#22c55e' },
+                { label: '四年級女生 (20人)', val: 20, color: '#f97316' }
+            ];
+
+            const barWidth = Math.min(90, graphWidth / 3.5);
+            const slotWidth = graphWidth / 2;
+
+            // Draw Bars First
+            bars.forEach((b, i) => {
+                const centerX = padding.left + slotWidth * i + slotWidth / 2;
+                const barX = centerX - barWidth / 2;
+                const targetY = getY(b.val);
+                const baselineY = height - padding.bottom;
+                const barH = Math.max(0, baselineY - targetY);
+
+                // Draw rounded bar
+                ctx.fillStyle = b.color;
+                const cornerRadius = 8;
+                if (barH > 0) {
+                    ctx.beginPath();
+                    ctx.roundRect(barX, targetY, barWidth, barH, [cornerRadius, cornerRadius, 0, 0]);
+                    ctx.fill();
+                }
+
+                // X Axis Label
+                ctx.fillStyle = '#475569';
+                ctx.font = 'bold 13px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(b.label, centerX, height - padding.bottom + 22);
+            });
+
+            // Draw Wave Line OVER the bars when barStartY is 20
+            if (barStartY === 20) {
+                const waveY = getY(10);
+                ctx.beginPath();
+                ctx.strokeStyle = '#dc2626'; // Bold red wave line
+                ctx.lineWidth = 4;
+                const startX = padding.left;
+                const endX = width - padding.right;
+                const waveLength = 12;
+                const waveAmplitude = 4;
+
+                ctx.moveTo(startX, waveY);
+                for (let x = startX; x < endX; x += waveLength) {
+                    const nextX = Math.min(x + waveLength, endX);
+                    const midX = (x + nextX) / 2;
+                    ctx.quadraticCurveTo((x + midX) / 2, waveY - waveAmplitude, midX, waveY);
+                    ctx.quadraticCurveTo((midX + nextX) / 2, waveY + waveAmplitude, nextX, waveY);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map((q) => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <p class="font-bold text-slate-800 text-base">${q.question}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${q.options.map((opt, optIdx) => `
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50 transition">
+                                <input type="radio" name="q${q.id}" value="${optIdx}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${q.id}" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkQuizAnswers() {
+            let score = 0;
+            quizData.forEach(q => {
+                const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`feedback-${q.id}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+                if (selected && parseInt(selected.value) === q.answer) {
+                    score += 20;
+                    feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                    feedbackEl.innerHTML = `✅ ${q.explanation}`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
+                    feedbackEl.innerHTML = `❌ 解答說明：${q.explanation}`;
+                }
+            });
+
+            const resultDiv = document.getElementById('quiz-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.className = `mt-4 p-4 rounded-xl text-center font-bold text-lg ${score >= 80 ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`;
+            resultDiv.innerHTML = `🏆 您的總得分：${score} 分 / 100 分！ ${score === 100 ? '太棒了，完全掌握折線圖！' : '繼續加油，點擊上面的探究頁面再試試看吧！'}`;
+        }
+
+        function updateAlishanCustomChart(val) {
+            currentAlishanCustomHour = parseInt(val);
+            document.getElementById('current-time-text-custom').innerText = `${currentAlishanCustomHour} 時`;
+            document.getElementById('hour-display-custom').innerText = `${currentAlishanCustomHour} 時`;
+
+            const dataObj = customAlishanData.find(d => d.hour === currentAlishanCustomHour);
+            if (dataObj) {
+                document.getElementById('temp-display-custom').innerText = `${dataObj.temp} ℃`;
+            }
+
+            // Calculate Trend Badge
+            const idx = customAlishanData.findIndex(d => d.hour === currentAlishanCustomHour);
+            const badge = document.getElementById('trend-badge-custom');
+            const explanation = document.getElementById('trend-explanation-custom');
+
+            if (idx === 0) {
+                badge.className = "px-2 py-0.5 rounded text-xs font-black bg-slate-200 text-slate-800";
+                badge.innerText = "測量起點";
+                explanation.innerText = `這是 8 時的自訂初始氣溫（${dataObj ? dataObj.temp : 19}度）。`;
+            } else {
+                const prevTemp = customAlishanData[idx - 1].temp;
+                const currTemp = dataObj.temp;
+                const diff = currTemp - prevTemp;
+
+                if (diff > 0) {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-rose-100 text-rose-800";
+                    badge.innerText = "↗️ 右斜上升 (氣溫上升)";
+                    explanation.innerHTML = `從 <strong>${customAlishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanCustomHour}時</strong>，氣溫由 ${prevTemp}度 升至 ${currTemp}度，上升了 <strong>${diff}度</strong>！`;
+                } else if (diff < 0) {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-cyan-100 text-cyan-800";
+                    badge.innerText = "↘️ 右斜下降 (氣溫下降)";
+                    explanation.innerHTML = `從 <strong>${customAlishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanCustomHour}時</strong>，氣溫由 ${prevTemp}度 降至 ${currTemp}度，下降了 <strong>${Math.abs(diff)}度</strong>！`;
+                } else {
+                    badge.className = "px-2 py-0.5 rounded text-xs font-black bg-amber-100 text-amber-800";
+                    badge.innerText = "➡️ 水平 (氣溫不變)";
+                    explanation.innerHTML = `從 <strong>${customAlishanData[idx-1].hour}時</strong> 到 <strong>${currentAlishanCustomHour}時</strong>，氣溫保持在 ${currTemp}度，折線呈水平方向。`;
+                }
+            }
+
+            drawAlishanCustomChart();
+        }
+
+        function drawAlishanCustomChart() {
+            const canvas = document.getElementById('alishanCustomCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const padding = { top: 40, right: 30, bottom: 50, left: 50 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            const minY = 15;
+            const maxY = 25;
+
+            // Shift X axis starting point right by 1 grid step
+            const step = graphWidth / customAlishanData.length;
+            const getX = (index) => padding.left + (index + 1) * step;
+            const getY = (temp) => padding.top + graphHeight - ((temp - minY) / (maxY - minY)) * graphHeight;
+
+            // Draw Background Grid Lines
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let t = minY; t <= maxY; t++) {
+                const y = getY(t);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px Noto Sans TC';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${t}度`, padding.left - 8, y + 4);
+            }
+
+            // Draw Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, height - padding.bottom);
+            ctx.lineTo(width - padding.right, height - padding.bottom);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 12px Noto Sans TC';
+            ctx.textAlign = 'center';
+            ctx.fillText('氣溫 (度)', padding.left, padding.top - 15);
+
+            // X axis labels
+            customAlishanData.forEach((d, i) => {
+                const x = getX(i);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${d.hour}時`, x, height - padding.bottom + 20);
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#f1f5f9';
+                ctx.moveTo(x, padding.top);
+                ctx.lineTo(x, height - padding.bottom);
+                ctx.stroke();
+            });
+
+            ctx.fillText('時刻', width - padding.right + 15, height - padding.bottom + 20);
+
+            // Draw Line Path
+            ctx.beginPath();
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 3.5;
+            ctx.lineJoin = 'round';
+
+            customAlishanData.forEach((d, i) => {
+                const x = getX(i);
+                const y = getY(d.temp);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Highlight selected point crosshairs
+            const selectedIdx = customAlishanData.findIndex(d => d.hour === currentAlishanCustomHour);
+            if (selectedIdx !== -1) {
+                const target = customAlishanData[selectedIdx];
+                const targetX = getX(selectedIdx);
+                const targetY = getY(target.temp);
+
+                ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 2;
+
+                ctx.beginPath();
+                ctx.moveTo(targetX, targetY);
+                ctx.lineTo(targetX, height - padding.bottom);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(targetX, targetY);
+                ctx.lineTo(padding.left, targetY);
+                ctx.stroke();
+
+                ctx.setLineDash([]);
+
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#f43f5e';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 13px Noto Sans TC';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${target.temp}℃`, targetX, targetY - 14);
+            }
+
+            // Draw data dots
+            customAlishanData.forEach((d, i) => {
+                if (i === selectedIdx) return;
+                const x = getX(i);
+                const y = getY(d.temp);
+                ctx.beginPath();
+                ctx.arc(x, y, 4.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#6366f1';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+        }
+
+        window.onload = function() {
+            renderQuiz();
+            initCustomSelectOptions();
+            updateAlishanChart(8);
+            updateAlishanCustomChart(8);
+            updateSpoonbillChart(105);
+            setOmissionMode(false); // Default to Complete Scale (0~130cm)
+            setBarStartY(20);
+
+            window.addEventListener('resize', () => {
+                drawAlishanChart();
+                drawAlishanCustomChart();
+                drawSpoonbillChart();
+                drawOmissionChart();
+                drawBarTrapChart();
+            });
+        };
+    </script>
+</body>
+</html>

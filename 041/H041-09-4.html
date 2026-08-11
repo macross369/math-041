@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小數的加法與減法 - 互動探索樂園</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* 新海誠夢幻玻璃質感面板 */
+        .shinkai-glass {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 24px;
+        }
+
+        .shinkai-glass-dark {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+        }
+
+        .tab-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* 算術直式格線控制 */
+        .digit-box {
+            width: 48px;
+            height: 56px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 800;
+            border-radius: 12px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .borrow-carry {
+            font-size: 0.9rem;
+            color: #ef4444;
+            font-weight: 800;
+            height: 24px;
+        }
+
+        /* 微光動畫 */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(244, 114, 182, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.8); }
+        }
+
+        .glow-active {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* 歷程性評量卡片風格 */
+        .quiz-option {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #e2e8f0;
+        }
+
+        .quiz-option:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            transform: scale(1.01);
+        }
+
+        .quiz-option.selected-correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .quiz-option.selected-wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-8">
+
+    <!-- 主容器 -->
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- 閒雲數學小棧 Logo 區域 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 標頭 Banner -->
+        <header class="shinkai-glass p-6 md:p-8 mb-8 text-center relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-400 opacity-20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-400 opacity-20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <span class="px-4 py-1.5 bg-indigo-100 text-indigo-700 font-bold rounded-full text-xs tracking-wide uppercase inline-block mb-3">
+                <i class="fa-solid fa-cloud-sun mr-1.5"></i> 國小數學 9-4 互動教學網頁
+            </span>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 tracking-tight mb-2">
+                二位小數的加法與減法探究
+            </h1>
+            <p class="text-slate-600 font-medium text-sm md:text-base max-w-2xl mx-auto">
+                透過直觀的位值圖示、動態直式對齊與情境題解構，輕鬆掌握小數加減法與小數點末尾0的省略規則！
+            </p>
+        </header>
+
+        <!-- 分頁標籤頁簽 -->
+        <nav class="flex justify-center mb-8 gap-3 flex-wrap">
+            <button onclick="switchTab('explorer')" id="tab-explorer" class="tab-btn active px-6 py-3 rounded-2xl font-bold flex items-center gap-2 text-slate-700 bg-white shadow-md">
+                <i class="fa-solid fa-sliders text-lg"></i>
+                <span>直式與位值探究器</span>
+            </button>
+            <button onclick="switchTab('concept')" id="tab-concept" class="tab-btn px-6 py-3 rounded-2xl font-bold flex items-center gap-2 text-slate-700 bg-white shadow-md">
+                <i class="fa-solid fa-lightbulb text-lg"></i>
+                <span>末尾0與單位換算迷思</span>
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-6 py-3 rounded-2xl font-bold flex items-center gap-2 text-slate-700 bg-white shadow-md">
+                <i class="fa-solid fa-graduation-cap text-lg"></i>
+                <span>歷程性評量 (5題)</span>
+            </button>
+        </nav>
+
+        <!-- 內容區塊 1: 直式與位值探究器 -->
+        <section id="sec-explorer" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- 左側：參數控制台 -->
+                <div class="lg:col-span-5 shinkai-glass p-6 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-gears text-indigo-500"></i> 動態數值設定
+                        </h2>
+
+                        <!-- 課本經典快速預設按鈕 -->
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-slate-500 mb-2">課本例題快速帶入：</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="loadPreset(2.47, 1.68, '+')" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl font-semibold text-xs transition text-left">
+                                    <i class="fa-solid fa-fish text-indigo-400 mr-1"></i> 例1: 2.47 + 1.68
+                                </button>
+                                <button onclick="loadPreset(9.85, 2.15, '+')" class="px-3 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl font-semibold text-xs transition text-left">
+                                    <i class="fa-solid fa-ribbon text-pink-400 mr-1"></i> 例2: 9.85 + 2.15
+                                </button>
+                                <button onclick="loadPreset(3.16, 1.57, '-')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl font-semibold text-xs transition text-left">
+                                    <i class="fa-solid fa-wheat-awn text-amber-400 mr-1"></i> 例3: 3.16 - 1.57
+                                </button>
+                                <button onclick="loadPreset(281, 1.75, '-')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl font-semibold text-xs transition text-left">
+                                    <i class="fa-solid fa-bridge text-emerald-400 mr-1"></i> 例4: 281 - 1.75
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 運算子選擇 -->
+                        <div class="mb-5">
+                            <label class="block text-xs font-bold text-slate-500 mb-2">選擇運算類型：</label>
+                            <div class="flex gap-4">
+                                <label class="flex-1 border-2 border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer transition hover:border-indigo-400 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                                    <input type="radio" name="operation" value="+" checked onchange="updateCalc()" class="w-4 h-4 text-indigo-600">
+                                    <span class="font-extrabold text-lg text-slate-700">+ 加法</span>
+                                </label>
+                                <label class="flex-1 border-2 border-slate-200 rounded-xl p-3 flex items-center justify-center gap-2 cursor-pointer transition hover:border-indigo-400 has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                                    <input type="radio" name="operation" value="-" onchange="updateCalc()" class="w-4 h-4 text-indigo-600">
+                                    <span class="font-extrabold text-lg text-slate-700">- 減法</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 數字 A 滑桿 -->
+                        <div class="mb-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-slate-700 text-sm">被加數 / 被減數 (A)：</span>
+                                <span id="numA-val" class="font-black text-indigo-600 text-lg">2.47</span>
+                            </div>
+                            <input type="range" id="sliderA" min="0" max="300" step="0.01" value="2.47" oninput="updateCalc()" class="w-4/5 h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- 數字 B 滑桿 -->
+                        <div class="mb-5">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-slate-700 text-sm">加數 / 減數 (B)：</span>
+                                <span id="numB-val" class="font-black text-pink-600 text-lg">1.68</span>
+                            </div>
+                            <input type="range" id="sliderB" min="0" max="300" step="0.01" value="1.68" oninput="updateCalc()" class="w-4/5 h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-pink-600">
+                        </div>
+
+                        <!-- A,B 兩數運算結果顯示區塊 -->
+                        <div class="mb-5 p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl flex items-center justify-between shadow-sm">
+                            <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-emerald-600"></i>
+                                運算結果 <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-mono font-bold">(A <span id="calc-op-symbol" class="text-emerald-700">+</span> B)</span>：
+                            </span>
+                            <span id="result-display-val" class="font-black text-emerald-600 text-xl font-mono tracking-wide">4.15</span>
+                        </div>
+
+                        <!-- 顯示設定 -->
+                        <div class="p-3 bg-slate-100 rounded-xl flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600">省略末尾 0 自動簡化：</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="autoSimplify" checked onchange="updateCalc()" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 計算提示訊息 -->
+                    <div id="tip-box" class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-medium">
+                        <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> 提示：二位小數相加減，首要步驟是將小數點對齊！
+                    </div>
+                </div>
+
+                <!-- 右側：直式計算與動態位值板 -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- 直式面板 -->
+                    <div class="shinkai-glass p-6 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-purple-500"></i> 動態對齊直式看板
+                            </h3>
+                            <span id="equation-display" class="font-bold text-slate-600 bg-white/80 px-3 py-1 rounded-full text-xs shadow-sm border">
+                                2.47 + 1.68 = 4.15
+                            </span>
+                        </div>
+
+                        <!-- 直式位值表結構 -->
+                        <div class="flex justify-center my-4 overflow-x-auto">
+                            <div class="inline-block border-2 border-indigo-100 bg-white/90 p-6 rounded-2xl shadow-inner min-w-[320px]">
+                                
+                                <!-- 位值抬頭 -->
+                                <div class="flex border-b-2 border-indigo-200 pb-2 mb-2 text-center text-xs font-bold text-slate-400">
+                                    <div class="w-12">百位</div>
+                                    <div class="w-12">十位</div>
+                                    <div class="w-12">個位</div>
+                                    <div class="w-6"></div>
+                                    <div class="w-12 text-indigo-600">十分位<br>(0.1)</div>
+                                    <div class="w-12 text-pink-600">百分位<br>(0.01)</div>
+                                </div>
+
+                                <!-- 進位/借位顯示列 -->
+                                <div id="carry-row" class="flex text-center text-xs text-red-500 font-bold h-6 items-center">
+                                    <div class="w-12" id="c-hundreds"></div>
+                                    <div class="w-12" id="c-tens"></div>
+                                    <div class="w-12" id="c-units"></div>
+                                    <div class="w-6"></div>
+                                    <div class="w-12" id="c-tenths"></div>
+                                    <div class="w-12" id="c-hundredths"></div>
+                                </div>
+
+                                <!-- 被加數/被減數 A -->
+                                <div id="row-A" class="flex items-center text-slate-700 my-1 font-mono">
+                                    <div class="w-12 text-center text-xl font-bold" id="a-hundreds"></div>
+                                    <div class="w-12 text-center text-xl font-bold" id="a-tens"></div>
+                                    <div class="w-12 text-center text-xl font-bold" id="a-units">2</div>
+                                    <div class="w-6 text-center text-2xl font-black text-indigo-500">.</div>
+                                    <div class="w-12 text-center text-xl font-bold bg-indigo-50/50 rounded-lg py-1" id="a-tenths">4</div>
+                                    <div class="w-12 text-center text-xl font-bold bg-pink-50/50 rounded-lg py-1" id="a-hundredths">7</div>
+                                </div>
+
+                                <!-- 運算符 + 加數/減數 B -->
+                                <div id="row-B" class="flex items-center text-slate-700 my-1 font-mono border-b-4 border-slate-800 pb-2">
+                                    <div class="w-12 text-center text-xl font-bold text-purple-600" id="op-symbol">+</div>
+                                    <div class="w-12 text-center text-xl font-bold" id="b-tens"></div>
+                                    <div class="w-12 text-center text-xl font-bold" id="b-units">1</div>
+                                    <div class="w-6 text-center text-2xl font-black text-indigo-500">.</div>
+                                    <div class="w-12 text-center text-xl font-bold bg-indigo-50/50 rounded-lg py-1" id="b-tenths">6</div>
+                                    <div class="w-12 text-center text-xl font-bold bg-pink-50/50 rounded-lg py-1" id="b-hundredths">8</div>
+                                </div>
+
+                                <!-- 計算結果 Ans -->
+                                <div id="row-Ans" class="flex items-center text-slate-900 font-mono pt-2">
+                                    <div class="w-12 text-center text-2xl font-black" id="ans-hundreds"></div>
+                                    <div class="w-12 text-center text-2xl font-black" id="ans-tens"></div>
+                                    <div class="w-12 text-center text-2xl font-black text-emerald-600" id="ans-units">4</div>
+                                    <div class="w-6 text-center text-2xl font-black text-indigo-500">.</div>
+                                    <div class="w-12 text-center text-2xl font-black text-indigo-600 bg-indigo-100 rounded-lg py-1" id="ans-tenths">1</div>
+                                    <div class="w-12 text-center text-2xl font-black text-pink-600 bg-pink-100 rounded-lg py-1" id="ans-hundredths">5</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最終簡化結果提示 -->
+                        <div id="simplify-banner" class="hidden p-3 bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-xl text-center font-bold text-sm">
+                            <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>
+                            小數點後末尾的0可以省略不寫：<span id="simplified-result" class="text-base text-emerald-900 underline">12.00 → 12</span>
+                        </div>
+                    </div>
+
+                    <!-- 拆解教學邏輯區域 -->
+                    <div class="shinkai-glass p-6">
+                        <h4 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-list-ol text-indigo-500"></i> 計算步驟拆解
+                        </h4>
+                        <div id="step-breakdown" class="space-y-2 text-sm text-slate-700">
+                            <!-- 動態注入步驟描述 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 內容區塊 2: 末尾0與單位換算迷思 -->
+        <section id="sec-concept" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- 迷思卡片 1: 末尾0到底去不去？ -->
+                <div class="shinkai-glass p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xl">
+                                <i class="fa-solid fa-tags"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">觀念一：12.00 與 12 一樣大嗎？</h3>
+                                <p class="text-xs text-slate-500">課本 P.139 例題 2 核心學習點</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-600 text-sm mb-4 leading-relaxed">
+                            計算 <span class="font-mono font-bold text-indigo-600 px-1.5 py-0.5 bg-indigo-50 rounded">9.85 + 2.15</span> 時，直式算出來是 <span class="font-mono font-bold text-indigo-600">12.00</span>。因為十分位與百分位都是 0，代表沒有任何 0.1 與 0.01，所以 <span class="font-bold text-pink-600">12.00 和 12 是一樣大的</span>！在記法上，小數點後面的 0 可以省略不寫。
+                        </p>
+                        
+                        <div class="bg-white/90 p-4 rounded-xl border border-slate-200 text-center mb-4">
+                            <div class="text-2xl font-black text-slate-800 font-mono mb-1">
+                                9.85 + 2.15 = 12.00 = 12
+                            </div>
+                            <span class="text-xs bg-emerald-100 text-emerald-700 font-bold px-2.5 py-1 rounded-md">
+                                <i class="fa-solid fa-check mr-1"></i> 正確記法：答：12
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 bg-blue-50 rounded-xl text-xs text-blue-800">
+                        <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> <strong>老師提醒：</strong> 直式計算時請完整列出 12.00，寫最後答案時再省略成 12 即可！
+                    </div>
+                </div>
+
+                <!-- 迷思卡片 2: 單位不同不能直接相加減！ -->
+                <div class="shinkai-glass p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xl">
+                                <i class="fa-solid fa-ruler-combined"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg">觀念二：公分與公尺的單位陷阱</h3>
+                                <p class="text-xs text-slate-500">課本 P.140 素養評量題目剖析</p>
+                            </div>
+                        </div>
+
+                        <!-- 題目範例 -->
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-xl mb-4 text-xs text-red-900">
+                            <strong>題目：</strong> 一條緞帶長 825 公分，丁丁用掉 1.3 公尺，還剩下多少公尺？
+                        </div>
+
+                        <!-- 錯誤與正確對比 -->
+                        <div class="space-y-2 text-xs">
+                            <div class="p-3 bg-rose-50 rounded-xl border border-rose-200 flex items-start gap-2">
+                                <i class="fa-solid fa-xmark text-rose-500 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-rose-700">迷思錯誤算式：</strong> <span class="font-mono font-bold">825 - 1.3 = 823.7</span>
+                                    <p class="text-slate-500">原因：忽略了 825 是公分，1.3 是公尺，單位不同不能直接相減！</p>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-start gap-2">
+                                <i class="fa-solid fa-check text-emerald-500 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-emerald-700">正確解題步驟：</strong>
+                                    <p class="text-slate-700">1. 先將單位統一：<span class="font-mono font-bold">825 公分 = 8.25 公尺</span></p>
+                                    <p class="text-slate-700">2. 再進行小數減法：<span class="font-mono font-bold">8.25 - 1.3 = 6.95 公尺</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-purple-50 rounded-xl text-xs text-purple-800">
+                        <i class="fa-solid fa-bullhorn text-purple-500 mr-1"></i> <strong>素養要點：</strong> 解題前一定要先檢查單位是否一致喔！
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 內容區塊 3: 歷程性評量 (5題) -->
+        <section id="sec-quiz" class="hidden space-y-6">
+            <div class="shinkai-glass p-6 md:p-8">
+                
+                <!-- 測驗標頭與計分 -->
+                <div class="flex flex-col md:flex-row justify-between items-center pb-6 mb-6 border-b border-slate-200 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-indigo-500"></i> 小數加減法 - 隨堂測驗
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">即時觀念檢測，答題後可觀看詳細解析！</p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/80 px-5 py-2.5 rounded-2xl border shadow-sm">
+                        <span class="text-xs font-bold text-slate-500">得分：</span>
+                        <span id="quiz-score" class="text-2xl font-black text-indigo-600">0 / 5</span>
+                    </div>
+                </div>
+
+                <!-- 題目列表 -->
+                <div id="quiz-container" class="space-y-8">
+                    <!-- JS 動態生成題目 -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 頁尾 footer -->
+        <footer class="mt-12 text-center text-white/80 text-xs font-medium pb-6">
+        </footer>
+
+    </div>
+
+    <!-- JavaScript 核心邏輯 -->
+    <script>
+        // 切換 Tab
+        function switchTab(tabName) {
+            document.querySelectorAll('section[id^="sec-"]').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('sec-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // 預設按鈕帶入
+        function loadPreset(a, b, op) {
+            document.getElementById('sliderA').value = a;
+            document.getElementById('sliderB').value = b;
+            const radios = document.getElementsByName('operation');
+            for(let r of radios) {
+                if(r.value === op) r.checked = true;
+            }
+            updateCalc();
+        }
+
+        // 核心直式計算與介面更新邏輯
+        function updateCalc() {
+            const sliderA = document.getElementById('sliderA');
+            const sliderB = document.getElementById('sliderB');
+            const op = document.querySelector('input[name="operation"]:checked').value;
+
+            // 確保進行減法運算時，被減數 (A) 恆大於或等於減數 (B)
+            if (op === '-') {
+                sliderB.max = sliderA.value;
+                if (parseFloat(sliderB.value) > parseFloat(sliderA.value)) {
+                    sliderB.value = sliderA.value;
+                }
+            } else {
+                sliderB.max = "300";
+            }
+
+            const numA = parseFloat(sliderA.value);
+            const numB = parseFloat(sliderB.value);
+            const autoSimplify = document.getElementById('autoSimplify').checked;
+
+            document.getElementById('numA-val').innerText = numA.toFixed(2);
+            document.getElementById('numB-val').innerText = numB.toFixed(2);
+            document.getElementById('op-symbol').innerText = op;
+            document.getElementById('calc-op-symbol').innerText = op;
+
+            // 計算結果
+            let rawResult = op === '+' ? (numA + numB) : (numA - numB);
+            if (rawResult < 0) rawResult = 0; // 防呆
+            const resStr = rawResult.toFixed(2);
+
+            // 更新等式文字與結果顯示區
+            let finalAnsText = resStr;
+            if (autoSimplify && resStr.endsWith('.00')) {
+                finalAnsText = Math.round(rawResult).toString();
+            } else if (autoSimplify && resStr.endsWith('0') && resStr.includes('.')) {
+                finalAnsText = rawResult.toFixed(1);
+            }
+            document.getElementById('equation-display').innerText = `${numA.toFixed(2)} ${op} ${numB.toFixed(2)} = ${finalAnsText}`;
+            document.getElementById('result-display-val').innerText = finalAnsText;
+
+            // 將數字拆解成各個位數
+            const parseDigits = (num) => {
+                const str = num.toFixed(2);
+                const [intPart, decPart] = str.split('.');
+                const intNum = parseInt(intPart, 10);
+                const h = Math.floor(intNum / 100) % 10;
+                const t = Math.floor(intNum / 10) % 10;
+                const u = intNum % 10;
+                const tenths = parseInt(decPart[0], 10);
+                const hundredths = parseInt(decPart[1], 10);
+                return { 
+                    h: h > 0 ? h : '', 
+                    t: (intNum >= 10) ? t : '', 
+                    u: u, 
+                    d1: tenths, 
+                    d2: hundredths 
+                };
+            };
+
+            const dA = parseDigits(numA);
+            const dB = parseDigits(numB);
+            const dAns = parseDigits(rawResult);
+
+            // 填入直式格線
+            document.getElementById('a-hundreds').innerText = dA.h;
+            document.getElementById('a-tens').innerText = dA.t;
+            document.getElementById('a-units').innerText = dA.u;
+            document.getElementById('a-tenths').innerText = dA.d1;
+            document.getElementById('a-hundredths').innerText = dA.d2;
+
+            document.getElementById('b-tens').innerText = dB.t;
+            document.getElementById('b-units').innerText = dB.u;
+            document.getElementById('b-tenths').innerText = dB.d1;
+            document.getElementById('b-hundredths').innerText = dB.d2;
+
+            document.getElementById('ans-hundreds').innerText = dAns.h;
+            document.getElementById('ans-tens').innerText = dAns.t;
+            document.getElementById('ans-units').innerText = dAns.u;
+
+            const ansTenthsEl = document.getElementById('ans-tenths');
+            const ansHundredthsEl = document.getElementById('ans-hundredths');
+
+            ansTenthsEl.innerText = dAns.d1;
+            ansHundredthsEl.innerText = dAns.d2;
+
+            // 重置基本樣式（保留原本的藍色/粉紅色背景與 padding）
+            ansTenthsEl.className = "w-12 text-center text-2xl font-black bg-indigo-100 rounded-lg py-1";
+            ansHundredthsEl.className = "w-12 text-center text-2xl font-black bg-pink-100 rounded-lg py-1";
+
+            // 省略末尾 0 自動簡化啟用時，新增刪除線與灰色字體
+            if (autoSimplify && resStr.endsWith('.00')) {
+                ansTenthsEl.classList.add('text-slate-400', 'line-through');
+                ansHundredthsEl.classList.add('text-slate-400', 'line-through');
+            } else if (autoSimplify && resStr.endsWith('0') && resStr.includes('.')) {
+                ansTenthsEl.classList.add('text-indigo-600');
+                ansHundredthsEl.classList.add('text-slate-400', 'line-through');
+            } else {
+                ansTenthsEl.classList.add('text-indigo-600');
+                ansHundredthsEl.classList.add('text-pink-600');
+            }
+
+            // 計算進位與借位標記
+            const carryRow = { h: '', t: '', u: '', d1: '', d2: '' };
+            let steps = [];
+
+            if (op === '+') {
+                // 百分位進位
+                let sumD2 = dA.d2 + dB.d2;
+                if (sumD2 >= 10) {
+                    carryRow.d1 = '1';
+                    steps.push(`1. <strong>百分位計算：</strong> <span class="font-mono font-bold">${dA.d2} + ${dB.d2} = ${sumD2}</span>，滿 10 進 1 到十分位，百分位寫 <span class="font-mono font-bold">${sumD2 % 10}</span>。`);
+                } else {
+                    steps.push(`1. <strong>百分位計算：</strong> <span class="font-mono font-bold">${dA.d2} + ${dB.d2} = ${sumD2}</span>，百分位寫 <span class="font-mono font-bold">${sumD2}</span>。`);
+                }
+
+                // 十分位進位
+                let carry1 = carryRow.d1 ? 1 : 0;
+                let sumD1 = dA.d1 + dB.d1 + carry1;
+                if (sumD1 >= 10) {
+                    carryRow.u = '1';
+                    steps.push(`2. <strong>十分位計算：</strong> <span class="font-mono font-bold">${dA.d1} + ${dB.d1}${carry1 ? ' + 1(進位)' : ''} = ${sumD1}</span>，滿 10 進 1 到個位，十分位寫 <span class="font-mono font-bold">${sumD1 % 10}</span>。`);
+                } else {
+                    steps.push(`2. <strong>十分位計算：</strong> <span class="font-mono font-bold">${dA.d1} + ${dB.d1}${carry1 ? ' + 1(進位)' : ''} = ${sumD1}</span>，十分位寫 <span class="font-mono font-bold">${sumD1}</span>。`);
+                }
+
+                // 個位計算
+                let carry2 = carryRow.u ? 1 : 0;
+                let sumU = (dA.u || 0) + (dB.u || 0) + carry2;
+                steps.push(`3. <strong>個位與整數計算：</strong> <span class="font-mono font-bold">${dA.u} + ${dB.u}${carry2 ? ' + 1(進位)' : ''} = ${sumU}</span>。`);
+
+            } else {
+                // 減法邏輯
+                if (numA < numB) {
+                    steps.push(`<span class="text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 被減數小於減數，請調高被減數！</span>`);
+                } else {
+                    if (dA.d2 < dB.d2) {
+                        carryRow.d2 = '+10';
+                        steps.push(`1. <strong>百分位不夠減：</strong> 向十分位借 1 當作 10 個 0.01，<span class="font-mono font-bold">10 + ${dA.d2} - ${dB.d2} = ${10 + dA.d2 - dB.d2}</span>。`);
+                    } else {
+                        steps.push(`1. <strong>百分位計算：</strong> <span class="font-mono font-bold">${dA.d2} - ${dB.d2} = ${dA.d2 - dB.d2}</span>。`);
+                    }
+
+                    if (dA.d1 < dB.d1) {
+                        carryRow.d1 = '+10';
+                        steps.push(`2. <strong>十分位不夠減：</strong> 向個位借 1 當作 10 個 0.1，進行減法計算。`);
+                    } else {
+                        steps.push(`2. <strong>十分位計算：</strong> 直接進行減法計算。`);
+                    }
+                    steps.push(`3. <strong>小數點記得對齊：</strong> 將小數點落於答案對應位置。`);
+                }
+            }
+
+            // 更新進位列
+            document.getElementById('c-tenths').innerText = carryRow.d1;
+            document.getElementById('c-hundredths').innerText = carryRow.d2;
+            document.getElementById('c-units').innerText = carryRow.u;
+
+            // 簡化提示顯示
+            const simplifyBanner = document.getElementById('simplify-banner');
+            if (resStr.endsWith('.00')) {
+                simplifyBanner.classList.remove('hidden');
+                document.getElementById('simplified-result').innerText = `${resStr} → ${Math.round(rawResult)}`;
+            } else if (resStr.endsWith('0') && resStr.includes('.')) {
+                simplifyBanner.classList.remove('hidden');
+                document.getElementById('simplified-result').innerText = `${resStr} → ${rawResult.toFixed(1)}`;
+            } else {
+                simplifyBanner.classList.add('hidden');
+            }
+
+            // 渲染步驟
+            document.getElementById('step-breakdown').innerHTML = steps.map(s => `<p class="py-1 border-b border-slate-100">${s}</p>`).join('');
+        }
+
+        // 歷程性評量題目資料
+        const quizData = [
+            {
+                q: "1. 奶奶買了兩條魚，一條重 2.47 公斤，另一條重 1.68 公斤，兩條魚合起來是多少公斤？",
+                options: ["3.15 公斤", "4.05 公斤", "4.15 公斤", "4.25 公斤"],
+                ans: 2,
+                explain: "直式計算：2.47 + 1.68。百分位 7+8=15 進 1 到十分位；十分位 4+6+1=11 進 1 到個位；個位 2+1+1=4。答案為 4.15 公斤。"
+            },
+            {
+                q: "2. 白色彩帶長 9.85 公尺，紅色彩帶比白色彩帶長 2.15 公尺，紅色彩帶長幾公尺？",
+                options: ["12 公尺", "12.00 公尺", "11.95 公尺", "12.10 公尺"],
+                ans: 0,
+                explain: "9.85 + 2.15 = 12.00。因為小數點後末尾的 0 可以省略不寫，所以最簡記法為 12 公尺。"
+            },
+            {
+                q: "3. 麵粉重 3.16 公斤，爸爸做點心用掉 1.57 公斤，還剩下多少公斤？",
+                options: ["1.49 公斤", "1.59 公斤", "1.69 公斤", "2.59 公斤"],
+                ans: 1,
+                explain: "3.16 - 1.57。百分位 6 不夠減 7，向十分位借 1 當 10，16 - 7 = 9；十分位 0 不夠減 5，向個位借 1 當 10，10 - 5 = 5；個位 2 - 1 = 1。剩餘 1.59 公斤。"
+            },
+            {
+                q: "4. 全臺海拔最高的吊橋是嘉義太平雲梯，全長 281 公尺。爸爸離終點還差 1.75 公尺，他已經走了多少公尺？",
+                options: ["279.25 公尺", "280.25 公尺", "279.75 公尺", "280.75 公尺"],
+                ans: 0,
+                explain: "整數減小數：將 281 補零為 281.00，進行 281.00 - 1.75 計算，借位後得到 279.25 公尺。"
+            },
+            {
+                q: "5. 【素養題】有一條緞帶長 825 公分，丁丁用掉 1.3 公尺，還剩下多少公尺？",
+                options: ["823.7 公尺", "6.95 公尺", "6.95 公分", "8.12 公尺"],
+                ans: 1,
+                explain: "要注意單位換算！825 公分 = 8.25 公尺。再計算 8.25 - 1.3 = 6.95 公尺。"
+            }
+        ];
+
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizData.map((item, idx) => `
+                <div class="bg-white/90 rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 text-base mb-4">${item.q}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                        ${item.options.map((opt, optIdx) => `
+                            <button onclick="selectOption(${idx}, ${optIdx})" id="q-${idx}-opt-${optIdx}" class="quiz-option text-left px-4 py-3 rounded-xl font-semibold text-sm text-slate-700">
+                                ${['A','B','C','D'][optIdx]}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="q-${idx}-explain" class="hidden p-4 rounded-xl text-xs leading-relaxed"></div>
+                </div>
+            `).join('');
+        }
+
+        function selectOption(qIdx, optIdx) {
+            userAnswers[qIdx] = optIdx;
+            const item = quizData[qIdx];
+            const isCorrect = (optIdx === item.ans);
+
+            // 更新按鈕樣式
+            item.options.forEach((_, i) => {
+                const btn = document.getElementById(`q-${qIdx}-opt-${i}`);
+                btn.className = "quiz-option text-left px-4 py-3 rounded-xl font-semibold text-sm text-slate-700";
+                if (i === item.ans) {
+                    btn.classList.add('selected-correct');
+                } else if (i === optIdx && !isCorrect) {
+                    btn.classList.add('selected-wrong');
+                }
+            });
+
+            // 顯示解析
+            const explainBox = document.getElementById(`q-${qIdx}-explain`);
+            explainBox.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+            
+            if (isCorrect) {
+                explainBox.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
+                explainBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1 text-sm"></i> <strong>回答正確！</strong> ${item.explain}`;
+            } else {
+                explainBox.classList.add('bg-rose-50', 'text-rose-900', 'border', 'border-rose-200');
+                explainBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1 text-sm"></i> <strong>再試試看！</strong> ${item.explain}`;
+            }
+
+            // 更新總分
+            const score = userAnswers.reduce((acc, curr, i) => (curr === quizData[i].ans ? acc + 1 : acc), 0);
+            document.getElementById('quiz-score').innerText = `${score} / ${quizData.length}`;
+        }
+
+        // 初始化
+        window.onload = function() {
+            updateCalc();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

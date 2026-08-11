@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分數的大小與換算互動教學館</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #e0c3fc 70%, #8ec5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        /* 新海誠風格：雲朵與光芒裝飾背景 */
+        .shinkai-bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(255, 200, 220, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+        }
+
+        /* 玻璃擬態卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+        }
+
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.18);
+        }
+
+        /* 頁籤切換樣式 */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        /* 酸梅湯杯子視覺化 */
+        .cup-container {
+            width: 60px;
+            height: 90px;
+            border: 3px solid #334155;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+        }
+
+        .juice-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(0deg, #c026d3 0%, #e879f9 100%);
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cup-grid-line {
+            position: absolute;
+            width: 100%;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.7);
+            z-index: 2;
+        }
+
+        /* 自訂滑桿 */
+        input[type=range] {
+            accent-color: #7c3aed;
+        }
+
+        /* 動畫效果 */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* 直式分數樣式 */
+        .frac-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            line-height: 1.1;
+            margin: 0 2px;
+        }
+        .frac-num {
+            border-bottom: 2px solid currentColor;
+            padding: 0 4px;
+            text-align: center;
+            font-size: 0.82em;
+            font-weight: bold;
+        }
+        .frac-den {
+            text-align: center;
+            font-size: 0.82em;
+            font-weight: bold;
+            padding-top: 1px;
+        }
+        .mixed-num {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 800;
+        }
+        .symbol-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-6 relative">
+    <div class="shinkai-bg-overlay"></div>
+
+    <!-- 主要內容包裹容器 -->
+    <div class="max-w-5xl mx-auto relative z-10 space-y-6">
+
+        <!-- 頂部品牌 Logo 區 -->
+        <div class="w-full max-w-5xl flex items-center justify-start px-2">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 頂部標題區 -->
+        <header class="glass-card rounded-3xl p-6 text-center relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-pink-300 rounded-full blur-3xl opacity-50"></div>
+            <div class="absolute -left-10 -top-10 w-40 h-40 bg-blue-300 rounded-full blur-3xl opacity-50"></div>
+            
+            <span class="inline-block px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold rounded-full mb-2 tracking-wide shadow-sm">
+                <i class="fa-solid fa-cloud-sun mr-1"></i> 國小數學互動探索教室
+            </span>
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-purple-700 to-pink-600 tracking-tight">
+                4-3 分數的大小比較與換算
+            </h1>
+            <p class="text-gray-600 text-xs sm:text-sm mt-1">拉動滑桿、動手觀察，探索帶分數與假分數的神秘關係！</p>
+
+            <!-- 頁籤選單 -->
+            <div class="flex flex-wrap justify-center gap-2 mt-6">
+                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-wine-glass-drop"></i> 活動 1：酸梅湯 (帶分數比較)
+                </button>
+                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn bg-white/60 text-gray-700 hover:bg-white/90 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-strawberry"></i> 活動 2：草莓盒 (帶分數與假分數)
+                </button>
+                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn bg-white/60 text-gray-700 hover:bg-white/90 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> 隨堂測驗 (5題挑戰)
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: 酸梅湯帶分數比較 -->
+        <main id="tab1" class="tab-content space-y-6">
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <div class="border-b border-gray-200 pb-3 mb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-black">1</span>
+                        帶分數的大小比較：喝酸梅湯情境
+                    </h2>
+                    <span class="text-xs text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">分母固定為 5</span>
+                </div>
+
+                <p class="text-sm text-gray-600 mb-6 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <strong>解題觀念：</strong>
+                    兩個帶分數比較大小時，先比較<strong>整數部分</strong>；整數部分相同時，再比較<strong>分數部分</strong>。
+                </p>
+
+                <!-- 角色比較控制器與視覺化 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- 丹丹 -->
+                    <div class="bg-gradient-to-b from-orange-50/80 to-amber-50/80 border border-orange-200/80 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="font-bold text-orange-800 text-base flex items-center gap-2">
+                                    <span class="w-7 h-7 bg-orange-500 text-white rounded-full inline-flex items-center justify-center text-xs">丹</span>
+                                    丹丹喝的酸梅湯
+                                </span>
+                                <span id="dan-fraction-display" class="text-2xl font-black text-orange-600 bg-white px-3 py-1.5 rounded-xl shadow-sm border border-orange-100 flex items-center gap-1">
+                                    <!-- JS 動態渲染直式分數 -->
+                                </span>
+                            </div>
+
+                            <!-- 控制項 -->
+                            <div class="space-y-3 bg-white/70 p-3 rounded-xl border border-orange-100 mb-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-600 flex justify-between">
+                                        <span>整數部分 (滿杯數)：</span>
+                                        <span id="dan-whole-val" class="text-orange-600 font-black">2</span>
+                                    </label>
+                                    <input type="range" id="dan-whole" min="0" max="3" value="2" class="w-full h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer" oninput="updatePlumJuice()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-600 flex justify-between">
+                                        <span>分數部分 (幾分之幾杯)：</span>
+                                        <span id="dan-num-val" class="text-orange-600 font-black inline-flex items-center">
+                                            <!-- JS 動態渲染 -->
+                                        </span>
+                                    </label>
+                                    <input type="range" id="dan-num" min="0" max="4" value="1" class="w-full h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer" oninput="updatePlumJuice()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 畫面上呈現的杯子模型 -->
+                        <div class="bg-white/90 p-3 rounded-xl border border-orange-100">
+                            <div class="text-xs text-gray-500 mb-2 font-bold text-center">酸梅湯視覺模型</div>
+                            <div id="dan-cups-container" class="flex justify-center items-center gap-2 flex-wrap min-h-[100px]">
+                                <!-- JavaScript 動態生成杯子 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 皮皮 -->
+                    <div class="bg-gradient-to-b from-purple-50/80 to-indigo-50/80 border border-purple-200/80 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="font-bold text-purple-800 text-base flex items-center gap-2">
+                                    <span class="w-7 h-7 bg-purple-500 text-white rounded-full inline-flex items-center justify-center text-xs">皮</span>
+                                    皮皮喝的酸梅湯
+                                </span>
+                                <span id="pi-fraction-display" class="text-2xl font-black text-purple-600 bg-white px-3 py-1.5 rounded-xl shadow-sm border border-purple-100 flex items-center gap-1">
+                                    <!-- JS 動態渲染直式分數 -->
+                                </span>
+                            </div>
+
+                            <!-- 控制項 -->
+                            <div class="space-y-3 bg-white/70 p-3 rounded-xl border border-purple-100 mb-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-600 flex justify-between">
+                                        <span>整數部分 (滿杯數)：</span>
+                                        <span id="pi-whole-val" class="text-purple-600 font-black">1</span>
+                                    </label>
+                                    <input type="range" id="pi-whole" min="0" max="3" value="1" class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer" oninput="updatePlumJuice()">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-600 flex justify-between">
+                                        <span>分數部分 (幾分之幾杯)：</span>
+                                        <span id="pi-num-val" class="text-purple-600 font-black inline-flex items-center">
+                                            <!-- JS 動態渲染 -->
+                                        </span>
+                                    </label>
+                                    <input type="range" id="pi-num" min="0" max="4" value="4" class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer" oninput="updatePlumJuice()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 畫面上呈現的杯子模型 -->
+                        <div class="bg-white/90 p-3 rounded-xl border border-purple-100">
+                            <div class="text-xs text-gray-500 mb-2 font-bold text-center">酸梅湯視覺模型</div>
+                            <div id="pi-cups-container" class="flex justify-center items-center gap-2 flex-wrap min-h-[100px]">
+                                <!-- JavaScript 動態生成杯子 -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 即時比較結果看板 -->
+                <div class="mt-6 bg-gradient-to-r from-blue-600 to-violet-600 text-white p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 text-xl sm:text-2xl font-black">
+                        <span class="flex items-center gap-1">丹丹 (<span id="summary-dan" class="inline-flex items-center"></span>)</span>
+                        <span id="comparison-symbol" class="symbol-badge bg-white text-indigo-700 text-2xl shadow-md">＞</span>
+                        <span class="flex items-center gap-1">皮皮 (<span id="summary-pi" class="inline-flex items-center"></span>)</span>
+                    </div>
+                    <div id="explanation-box" class="text-sm bg-white/20 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/30 text-center sm:text-right flex items-center justify-center sm:justify-end gap-1 flex-wrap">
+                        <!-- JS 動態說明語句 -->
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- TAB 2: 草莓盒帶分數與假分數換算 -->
+        <main id="tab2" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <div class="border-b border-gray-200 pb-3 mb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-rose-900 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-black">2</span>
+                        帶分數與假分數的互換與比較：草莓盒情境
+                    </h2>
+                    <span class="text-xs text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md border border-rose-100">1盒有 9 顆草莓</span>
+                </div>
+
+                <!-- 控制區域 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    
+                    <div class="md:col-span-5 bg-rose-50/70 border border-rose-200 p-5 rounded-2xl space-y-4">
+                        <h3 class="font-bold text-rose-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-rose-500"></i> 設定草莓數量
+                        </h3>
+
+                        <div>
+                            <label class="text-xs font-bold text-gray-700 flex justify-between mb-1">
+                                <span>完整的整數盒數：</span>
+                                <span id="berry-whole-val" class="text-rose-600 font-bold">1 盒</span>
+                            </label>
+                            <input type="range" id="berry-whole" min="0" max="3" value="1" class="w-full h-2 bg-rose-200 rounded-lg appearance-none cursor-pointer" oninput="updateStrawberry()">
+                        </div>
+
+                        <div>
+                            <label class="text-xs font-bold text-gray-700 flex justify-between mb-1">
+                                <span>散裝草莓顆數 (不足一盒)：</span>
+                                <span id="berry-single-val" class="text-rose-600 font-bold">4 顆</span>
+                            </label>
+                            <input type="range" id="berry-single" min="0" max="8" value="4" class="w-full h-2 bg-rose-200 rounded-lg appearance-none cursor-pointer" oninput="updateStrawberry()">
+                        </div>
+
+                        <div class="pt-2 border-t border-rose-200/60 flex items-center justify-between text-xs text-gray-600 font-bold">
+                            <span>總顆數：<span id="berry-total-count" class="text-rose-600 text-base">13</span> 顆</span>
+                            <span class="bg-white px-2.5 py-1 rounded-lg border border-rose-200 shadow-sm text-rose-700">1 盒 = 9 顆</span>
+                        </div>
+                    </div>
+
+                    <!-- 兩種表示法卡片比較 -->
+                    <div class="md:col-span-7 grid grid-cols-2 gap-4">
+                        <div class="bg-white/90 border-2 border-rose-200 p-4 rounded-2xl text-center shadow-sm relative hover:border-rose-400 transition">
+                            <span class="absolute top-2 left-2 text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold">帶分數表示</span>
+                            <div class="mt-4 text-3xl sm:text-4xl font-black text-rose-600 py-2 flex items-center justify-center min-h-[64px]" id="mixed-fraction-text">
+                                <!-- JS 直式帶分數 -->
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 flex items-center justify-center gap-1" id="mixed-desc-text">整盒與散裝</p>
+                        </div>
+
+                        <div class="bg-white/90 border-2 border-indigo-200 p-4 rounded-2xl text-center shadow-sm relative hover:border-indigo-400 transition">
+                            <span class="absolute top-2 left-2 text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">假分數表示</span>
+                            <div class="mt-4 text-3xl sm:text-4xl font-black text-indigo-600 py-2 flex items-center justify-center min-h-[64px]" id="improper-fraction-text">
+                                <!-- JS 直式假分數 -->
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 flex items-center justify-center gap-1" id="improper-desc-text">所有草莓顆數</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 草莓盒圖示呈現區 -->
+                <div class="mt-6 bg-white/80 p-5 rounded-2xl border border-gray-200">
+                    <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-packing text-amber-500"></i> 草莓盒圖示 (每盒 9 格)
+                    </h3>
+                    <div id="strawberry-boxes-container" class="flex flex-wrap gap-4 justify-center items-center min-h-[140px]">
+                        <!-- JS 動態生成草莓盒 -->
+                    </div>
+                </div>
+
+                <!-- 分數大小比較模擬觀念 -->
+                <div class="mt-6 bg-amber-50/90 border border-amber-200 p-4 rounded-2xl">
+                    <h4 class="font-bold text-amber-900 text-sm mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-calculator text-amber-600"></i> 換算秘訣與符號：
+                    </h4>
+                    <div class="text-xs text-amber-800 leading-relaxed space-y-2">
+                        <p class="flex items-center gap-1 flex-wrap">
+                            把帶分數換成假分數：整數 × 分母 ＋ 分子。例如：
+                            <span class="mixed-num text-sm text-rose-700">1<span class="frac-container"><span class="frac-num">4</span><span class="frac-den">9</span></span></span>
+                            ＝
+                            <span class="frac-container text-sm text-indigo-700"><span class="frac-num">1 × 9 ＋ 4</span><span class="frac-den">9</span></span>
+                            ＝
+                            <span class="frac-container text-sm text-indigo-700"><span class="frac-num">13</span><span class="frac-den">9</span></span>。
+                        </p>
+                        <p class="flex items-center gap-1 flex-wrap">
+                            比較 
+                            <span class="mixed-num text-sm text-rose-700">1<span class="frac-container"><span class="frac-num">4</span><span class="frac-den">9</span></span></span>
+                            與 
+                            <span class="frac-container text-sm text-indigo-700"><span class="frac-num">14</span><span class="frac-den">9</span></span>
+                            的大小時，可以都換成假分數（
+                            <span class="frac-container text-xs text-indigo-700"><span class="frac-num">13</span><span class="frac-den">9</span></span>
+                            <span class="font-black text-rose-600 mx-0.5">＜</span>
+                            <span class="frac-container text-xs text-indigo-700"><span class="frac-num">14</span><span class="frac-den">9</span></span>），
+                            或者把假分數換成帶分數（
+                            <span class="frac-container text-xs text-indigo-700"><span class="frac-num">14</span><span class="frac-den">9</span></span>
+                            ＝
+                            <span class="mixed-num text-xs text-rose-700">1<span class="frac-container"><span class="frac-num">5</span><span class="frac-den">9</span></span></span>）來比較！
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- TAB 3: 隨堂測驗 -->
+        <main id="tab3" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-5 sm:p-6">
+                <div class="border-b border-gray-200 pb-3 mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-purple-900 flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-black">3</span>
+                            歷程性自我評量（5 題）
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">即時檢測學習成效，並提供詳細答題解析！</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="score-tag" class="text-sm font-black bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl border border-purple-200">
+                            得分：<span id="current-score" class="text-lg">0</span> / 100
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 測驗題目清單 -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- 題目將由 JS 渲染出來 -->
+                </div>
+
+                <!-- 重設按鈕 -->
+                <div class="mt-8 text-center">
+                    <button onclick="resetQuiz()" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold text-sm shadow-md hover:opacity-90 transition">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> 重新測驗
+                    </button>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- JavaScript 互動邏輯編寫 -->
+    <script>
+        // 輔助函式：產生直式分數 HTML
+        function makeFracHTML(num, den) {
+            return `<span class="frac-container"><span class="frac-num">${num}</span><span class="frac-den">${den}</span></span>`;
+        }
+
+        // 輔助函式：產生帶分數/假分數 HTML
+        function makeMixedHTML(whole, num, den) {
+            if (whole === 0 && num === 0) return '0';
+            if (whole === 0) return makeFracHTML(num, den);
+            if (num === 0) return `<span>${whole}</span>`;
+            return `<span class="mixed-num"><span>${whole}</span>${makeFracHTML(num, den)}</span>`;
+        }
+
+        // Tab 切換
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-white/60', 'text-gray-700');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-white/60', 'text-gray-700');
+        }
+
+        /* -------------------------------------------------------------
+           活動 1：酸梅湯帶分數比較繪製邏輯
+        ------------------------------------------------------------- */
+        function updatePlumJuice() {
+            const danWhole = parseInt(document.getElementById('dan-whole').value);
+            const danNum = parseInt(document.getElementById('dan-num').value);
+            const piWhole = parseInt(document.getElementById('pi-whole').value);
+            const piNum = parseInt(document.getElementById('pi-num').value);
+
+            // 更新顯示文字 (直式分數)
+            document.getElementById('dan-whole-val').innerText = danWhole;
+            document.getElementById('dan-num-val').innerHTML = makeFracHTML(danNum, 5);
+            document.getElementById('dan-fraction-display').innerHTML = `${makeMixedHTML(danWhole, danNum, 5)} 杯`;
+            document.getElementById('summary-dan').innerHTML = makeMixedHTML(danWhole, danNum, 5);
+
+            document.getElementById('pi-whole-val').innerText = piWhole;
+            document.getElementById('pi-num-val').innerHTML = makeFracHTML(piNum, 5);
+            document.getElementById('pi-fraction-display').innerHTML = `${makeMixedHTML(piWhole, piNum, 5)} 杯`;
+            document.getElementById('summary-pi').innerHTML = makeMixedHTML(piWhole, piNum, 5);
+
+            // 渲染丹丹杯子
+            renderCups('dan-cups-container', danWhole, danNum, 5);
+            // 渲染皮皮杯子
+            renderCups('pi-cups-container', piWhole, piNum, 5);
+
+            // 計算數值並比較
+            const danVal = danWhole + (danNum / 5);
+            const piVal = piWhole + (piNum / 5);
+
+            const symbolEl = document.getElementById('comparison-symbol');
+            const expEl = document.getElementById('explanation-box');
+
+            if (danVal > piVal) {
+                symbolEl.innerText = '＞';
+                symbolEl.className = 'symbol-badge bg-emerald-500 text-white text-2xl shadow-md';
+                if (danWhole !== piWhole) {
+                    expEl.innerHTML = `因為整數部分 <strong>${danWhole}</strong> 大於 <strong>${piWhole}</strong>，所以 ${makeMixedHTML(danWhole, danNum, 5)} <strong class="text-amber-300 mx-1">＞</strong> ${makeMixedHTML(piWhole, piNum, 5)}！`;
+                } else {
+                    expEl.innerHTML = `整數相同(${danWhole})，比較分子 <strong>${danNum} ＞ ${piNum}</strong>，所以 ${makeMixedHTML(danWhole, danNum, 5)} <strong class="text-amber-300 mx-1">＞</strong> ${makeMixedHTML(piWhole, piNum, 5)}！`;
+                }
+            } else if (danVal < piVal) {
+                symbolEl.innerText = '＜';
+                symbolEl.className = 'symbol-badge bg-rose-500 text-white text-2xl shadow-md';
+                if (danWhole !== piWhole) {
+                    expEl.innerHTML = `因為整數部分 <strong>${danWhole}</strong> 小於 <strong>${piWhole}</strong>，所以 ${makeMixedHTML(danWhole, danNum, 5)} <strong class="text-amber-300 mx-1">＜</strong> ${makeMixedHTML(piWhole, piNum, 5)}！`;
+                } else {
+                    expEl.innerHTML = `整數相同(${danWhole})，比較分子 <strong>${danNum} ＜ ${piNum}</strong>，所以 ${makeMixedHTML(danWhole, danNum, 5)} <strong class="text-amber-300 mx-1">＜</strong> ${makeMixedHTML(piWhole, piNum, 5)}！`;
+                }
+            } else {
+                symbolEl.innerText = '＝';
+                symbolEl.className = 'symbol-badge bg-blue-500 text-white text-2xl shadow-md';
+                expEl.innerHTML = `整數與分數部分皆相同，兩者一樣多 (${makeMixedHTML(danWhole, danNum, 5)} <strong class="text-amber-300 mx-1">＝</strong> ${makeMixedHTML(piWhole, piNum, 5)})！`;
+            }
+        }
+
+        function renderCups(containerId, whole, num, den) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // 繪製整數滿杯
+            for (let i = 0; i < whole; i++) {
+                const cup = createCupHTML(100, den);
+                container.appendChild(cup);
+            }
+
+            // 繪製分數杯 (如果有剩餘)
+            if (num > 0 || whole === 0) {
+                const pct = (num / den) * 100;
+                const cup = createCupHTML(pct, den);
+                container.appendChild(cup);
+            }
+        }
+
+        function createCupHTML(fillPercentage, den) {
+            const cupDiv = document.createElement('div');
+            cupDiv.className = 'cup-container flex flex-col justify-end';
+
+            for (let i = 1; i < den; i++) {
+                const line = document.createElement('div');
+                line.className = 'cup-grid-line';
+                line.style.bottom = `${(i / den) * 100}%`;
+                cupDiv.appendChild(line);
+            }
+
+            const juice = document.createElement('div');
+            juice.className = 'juice-fill';
+            juice.style.height = `${fillPercentage}%`;
+            cupDiv.appendChild(juice);
+
+            return cupDiv;
+        }
+
+        /* -------------------------------------------------------------
+           活動 2：草莓盒與分數互換邏輯
+        ------------------------------------------------------------- */
+        function updateStrawberry() {
+            const whole = parseInt(document.getElementById('berry-whole').value);
+            const single = parseInt(document.getElementById('berry-single').value);
+            const den = 9; // 每盒9顆
+
+            document.getElementById('berry-whole-val').innerText = whole + " 盒";
+            document.getElementById('berry-single-val').innerText = single + " 顆";
+
+            const totalBerries = whole * den + single;
+            document.getElementById('berry-total-count').innerText = totalBerries;
+
+            // 帶分數顯示
+            document.getElementById('mixed-fraction-text').innerHTML = `${makeMixedHTML(whole, single, den)} <span class="text-base font-normal ml-1">盒</span>`;
+            document.getElementById('mixed-desc-text').innerText = `${whole} 整盒 ＋ ${single}/9 盒`;
+
+            // 假分數顯示
+            document.getElementById('improper-fraction-text').innerHTML = `${makeFracHTML(totalBerries, den)} <span class="text-base font-normal ml-1">盒</span>`;
+            document.getElementById('improper-desc-text').innerText = `共 ${totalBerries} 個 1/9 盒`;
+
+            // 繪製草莓盒視覺圖形
+            renderStrawberryBoxes('strawberry-boxes-container', whole, single, den);
+        }
+
+        function renderStrawberryBoxes(containerId, whole, single, den) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const totalBoxes = whole + (single > 0 ? 1 : 0);
+            
+            if (totalBoxes === 0) {
+                container.innerHTML = `<span class="text-gray-400 text-xs">目前沒有草莓喔！</span>`;
+                return;
+            }
+
+            for (let b = 0; b < totalBoxes; b++) {
+                const boxDiv = document.createElement('div');
+                boxDiv.className = 'border-2 border-amber-300 bg-amber-50/80 p-2 rounded-xl shadow-sm flex flex-col items-center';
+
+                const title = document.createElement('div');
+                title.className = 'text-[10px] font-bold text-amber-800 mb-1 flex items-center gap-1';
+                title.innerHTML = b < whole ? `第 ${b+1} 滿盒 (${makeFracHTML(9,9)})` : `第 ${b+1} 盒散裝 (${makeFracHTML(single,9)})`;
+                boxDiv.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-3 gap-1.5 bg-white p-1.5 rounded-lg border border-amber-200';
+
+                const filledCount = (b < whole) ? 9 : single;
+
+                for (let i = 0; i < 9; i++) {
+                    const berryCell = document.createElement('div');
+                    berryCell.className = 'w-7 h-7 rounded-md flex items-center justify-center text-xs transition-all';
+                    
+                    if (i < filledCount) {
+                        berryCell.className += ' bg-rose-100 text-rose-500 scale-100';
+                        berryCell.innerHTML = '<i class="fa-solid fa-strawberry text-base"></i>';
+                    } else {
+                        berryCell.className += ' bg-gray-100 text-gray-300';
+                        berryCell.innerHTML = '<i class="fa-regular fa-circle text-[8px]"></i>';
+                    }
+                    grid.appendChild(berryCell);
+                }
+
+                boxDiv.appendChild(grid);
+                container.appendChild(boxDiv);
+            }
+        }
+
+        /* -------------------------------------------------------------
+           活動 3：5題歷程評量問答邏輯
+        ------------------------------------------------------------- */
+        const quizData = [
+            {
+                id: 1,
+                question: "比較兩個分數的大小，在 ( &nbsp; ) 中填入正確符號：",
+                leftHTML: makeMixedHTML(2, 1, 5),
+                rightHTML: makeMixedHTML(1, 4, 5),
+                options: ["＞", "＜", "＝"],
+                answer: "＞",
+                explanation: `先比較整數部分，因為 2 ＞ 1，所以 ${makeMixedHTML(2, 1, 5)} ＞ ${makeMixedHTML(1, 4, 5)}！`
+            },
+            {
+                id: 2,
+                question: "比較兩個分數的大小，在 ( &nbsp; ) 中填入正確符號：",
+                leftHTML: makeMixedHTML(1, 2, 5),
+                rightHTML: makeMixedHTML(1, 4, 5),
+                options: ["＞", "＜", "＝"],
+                answer: "＜",
+                explanation: `整數部分相同(都是 1)，比較分子：2 ＜ 4，所以 ${makeMixedHTML(1, 2, 5)} ＜ ${makeMixedHTML(1, 4, 5)}！`
+            },
+            {
+                id: 3,
+                question: "比較帶分數與假分數的大小，在 ( &nbsp; ) 中填入正確符號：",
+                leftHTML: makeMixedHTML(1, 4, 9),
+                rightHTML: makeFracHTML(14, 9),
+                options: ["＞", "＜", "＝"],
+                answer: "＜",
+                explanation: `把 ${makeMixedHTML(1, 4, 9)} 換成假分數是 ${makeFracHTML(13, 9)}；或者把 ${makeFracHTML(14, 9)} 換成帶分數是 ${makeMixedHTML(1, 5, 9)}。因為 ${makeFracHTML(13, 9)} ＜ ${makeFracHTML(14, 9)}，所以 ${makeMixedHTML(1, 4, 9)} ＜ ${makeFracHTML(14, 9)}！`
+            },
+            {
+                id: 4,
+                question: "比較帶分數與假分數的大小，在 ( &nbsp; ) 中填入正確符號：",
+                leftHTML: makeMixedHTML(2, 1, 3),
+                rightHTML: makeFracHTML(8, 3),
+                options: ["＞", "＜", "＝"],
+                answer: "＜",
+                explanation: `${makeMixedHTML(2, 1, 3)} ＝ ${makeFracHTML('2×3+1', 3)} ＝ ${makeFracHTML(7, 3)}。因為 ${makeFracHTML(7, 3)} ＜ ${makeFracHTML(8, 3)}，所以 ${makeMixedHTML(2, 1, 3)} ＜ ${makeFracHTML(8, 3)}！`
+            },
+            {
+                id: 5,
+                question: "【素養挑戰題】下列哪一個分數介於指定範圍之間？",
+                leftHTML: `大於 ${makeMixedHTML(2, 1, 8)}`,
+                rightHTML: `小於 ${makeFracHTML(22, 8)}`,
+                options: [makeFracHTML(18, 8), makeFracHTML(16, 8), makeFracHTML(23, 8)],
+                answer: makeFracHTML(18, 8),
+                explanation: `${makeMixedHTML(2, 1, 8)} ＝ ${makeFracHTML(17, 8)}。介於 ${makeFracHTML(17, 8)} 與 ${makeFracHTML(22, 8)} 之間的分數有 ${makeFracHTML(18, 8)}、${makeFracHTML(19, 8)}、${makeFracHTML(20, 8)}、${makeFracHTML(21, 8)} (即 ${makeMixedHTML(2, 2, 8)}～${makeMixedHTML(2, 5, 8)})。因此 ${makeFracHTML(18, 8)} 是正確答案！`
+            }
+        ];
+
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/90 p-5 rounded-2xl border border-purple-100 shadow-sm space-y-3';
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 class="font-bold text-gray-800 text-sm sm:text-base">
+                            <span class="inline-block bg-purple-600 text-white rounded-md px-2 py-0.5 text-xs mr-1">第 ${index + 1} 題</span>
+                            ${item.question}
+                        </h3>
+                    </div>
+
+                    <div class="my-2 p-3 bg-purple-50/60 rounded-xl text-center font-black text-purple-900 text-lg flex items-center justify-center gap-3">
+                        <span class="inline-flex items-center">${item.leftHTML}</span>
+                        <span class="w-10 h-10 border-2 border-dashed border-purple-400 rounded-lg flex items-center justify-center text-purple-600 font-black text-xl bg-white shadow-inner">( &nbsp; )</span>
+                        <span class="inline-flex items-center">${item.rightHTML}</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 pt-2">
+                        ${item.options.map((opt, optIdx) => `
+                            <button onclick="selectAnswer(${item.id}, ${optIdx}, this)" 
+                                class="option-btn-${item.id} flex-1 min-w-[80px] py-2.5 px-3 rounded-xl border-2 border-purple-200 bg-white font-black text-base text-purple-900 hover:bg-purple-50 transition flex items-center justify-center gap-1">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div id="feedback-${item.id}" class="hidden p-3 rounded-xl text-xs leading-relaxed font-bold"></div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function selectAnswer(qId, optIdx, btn) {
+            const quizItem = quizData.find(q => q.id === qId);
+            const selectedOption = quizItem.options[optIdx];
+            userAnswers[qId] = selectedOption;
+
+            // 樣式變更
+            document.querySelectorAll(`.option-btn-${qId}`).forEach(b => {
+                b.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
+                b.classList.add('bg-white', 'border-purple-200', 'text-purple-900');
+            });
+
+            btn.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
+            btn.classList.remove('bg-white', 'border-purple-200', 'text-purple-900');
+
+            // 驗證答案
+            const feedbackEl = document.getElementById(`feedback-${qId}`);
+            feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+            if (selectedOption === quizItem.answer) {
+                feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1 text-sm"></i> 答對了！${quizItem.explanation}`;
+            } else {
+                feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1 text-sm"></i> 答錯囉！${quizItem.explanation}`;
+            }
+
+            calculateScore();
+        }
+
+        function calculateScore() {
+            let correctCount = 0;
+            quizData.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+            const score = (correctCount / quizData.length) * 100;
+            document.getElementById('current-score').innerText = Math.round(score);
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            document.getElementById('current-score').innerText = '0';
+            renderQuiz();
+        }
+
+        // 頁面初始化
+        window.onload = function() {
+            updatePlumJuice();
+            updateStrawberry();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-2 畫三角形 - 動態數學探究教室</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #4c1d95 75%, #831843 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* Shinkai style starry shimmer background */
+        .shinkai-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0.4;
+        }
+
+        /* Glassmorphism containers */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .glass-tab {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .glass-tab.active {
+            background: rgba(255, 255, 255, 0.95);
+            color: #312e81;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Custom interactive sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            border-radius: 5px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #6366f1;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Canvas container */
+        .canvas-shadow {
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.08);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 relative">
+    <div class="shinkai-bg"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- 閒雲數學小棧 Logo 與標題 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <div class="inline-flex items-center gap-2 bg-indigo-900/60 text-indigo-100 px-4 py-1.5 rounded-full text-sm backdrop-blur-md border border-indigo-300/30 mb-3">
+                <i class="fa-solid fa-graduation-cap text-pink-400"></i>
+                <span>國小數學 7-2 畫三角形 互動探究教材</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide drop-shadow-md">
+                畫三角形與幾何性質探究
+            </h1>
+            <p class="text-indigo-100 text-sm md:text-base mt-2 opacity-90">
+                透過釘板作圖、動態邊角調控與尺規畫圖示範，自主探索三角形的奧秘！
+            </p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-6">
+            <button onclick="switchTab('tab-geoboard')" id="btn-tab-geoboard" class="glass-tab active px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-border-all"></i>
+                <span>1. 百點卡釘板繪圖</span>
+            </button>
+            <button onclick="switchTab('tab-explorer')" id="btn-tab-explorer" class="glass-tab px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-sliders"></i>
+                <span>2. 動態邊角探究</span>
+            </button>
+            <button onclick="switchTab('tab-construction')" id="btn-tab-construction" class="glass-tab px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-ruler-combined"></i>
+                <span>3. 尺規作圖教學示範</span>
+            </button>
+            <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="glass-tab px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm md:text-base">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>4. 隨堂觀念診斷測驗</span>
+            </button>
+        </nav>
+
+        <!-- TAB 1: GEOBOARD (百點卡) -->
+        <section id="tab-geoboard" class="tab-content block">
+            <div class="glass-card rounded-2xl p-4 md:p-6 mb-6">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Left Control Panel -->
+                    <div class="w-full lg:w-1/3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                                <h2 class="text-xl font-bold text-indigo-950">百點卡 (釘板) 畫三角形</h2>
+                            </div>
+                            <p class="text-slate-600 text-sm mb-4 leading-relaxed">
+                                請在右側百點卡點陣圖上，<b>點擊或拖拽 A、B、C 三個頂點</b>。透過格點畫出指定條件的三角形！
+                            </p>
+
+                            <!-- Preset Scenarios -->
+                            <div class="space-y-2 mb-4">
+                                <span class="text-xs font-bold text-indigo-800 uppercase tracking-wider">快速任務選單：</span>
+                                <button onclick="setGeoboardPreset('right')" class="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-sm text-left flex items-center justify-between transition border border-indigo-200">
+                                    <span><i class="fa-solid fa-play text-indigo-500 mr-2"></i>任務 A：作直角三角形</span>
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                                <button onclick="setGeoboardPreset('isosceles-right')" class="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-sm text-left flex items-center justify-between transition border border-indigo-200">
+                                    <span><i class="fa-solid fa-play text-indigo-500 mr-2"></i>任務 B：作等腰直角三角形</span>
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                                <button onclick="setGeoboardPreset('obtuse')" class="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-sm text-left flex items-center justify-between transition border border-indigo-200">
+                                    <span><i class="fa-solid fa-play text-indigo-500 mr-2"></i>任務 C：作鈍角三角形</span>
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Realtime Triangle Analysis Card -->
+                        <div class="bg-gradient-to-r from-indigo-500/10 to-pink-500/10 p-4 rounded-xl border border-indigo-200">
+                            <h3 class="font-bold text-indigo-900 text-sm mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-microscope text-pink-500"></i> 當前幾何數據特徵：
+                            </h3>
+                            <div class="space-y-1 text-xs md:text-sm text-slate-700">
+                                <div class="flex justify-between">
+                                    <span>邊長關係：</span>
+                                    <span id="geo-sides-info" class="font-bold text-slate-900">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>最大內角：</span>
+                                    <span id="geo-angle-info" class="font-bold text-slate-900">-</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t border-indigo-200/50">
+                                    <span class="font-bold">圖形分類：</span>
+                                    <span id="geo-type-badge" class="px-2.5 py-1 bg-indigo-600 text-white rounded-md font-bold text-xs">一般三角形</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Geoboard Canvas Area -->
+                    <div class="w-full lg:w-2/3 flex flex-col items-center">
+                        <div class="relative bg-amber-50/60 rounded-2xl p-4 border border-amber-200/80 w-full flex flex-col items-center canvas-shadow">
+                            <canvas id="geoboardCanvas" width="450" height="450" class="cursor-pointer max-w-full touch-none rounded-xl"></canvas>
+                            <div class="flex gap-3 mt-3 w-full justify-center">
+                                <button onclick="resetGeoboard()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate-right"></i> 重置頂點
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: DYNAMIC EXPLORER -->
+        <section id="tab-explorer" class="tab-content hidden">
+            <div class="glass-card rounded-2xl p-4 md:p-6 mb-6">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Left Sliders Control -->
+                    <div class="w-full lg:w-5/12 space-y-5">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-pink-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                            <h2 class="text-xl font-bold text-indigo-950">夾角與兩腰 (邊長) 動態探究器</h2>
+                        </div>
+                        <p class="text-slate-600 text-sm">
+                            調整 <b class="text-indigo-600">頂角 ∠A</b> 與兩邊長 <b class="text-pink-600">AB、AC</b>，即時觀察三角形形狀變化！
+                        </p>
+
+                        <!-- Slider 1: Angle A -->
+                        <div class="bg-white/80 p-4 rounded-xl border border-indigo-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-compass text-indigo-500"></i> 頂角 ∠A 角度：
+                                </label>
+                                <span id="val-angleA" class="font-black text-indigo-600 text-lg">90°</span>
+                            </div>
+                            <input type="range" id="slider-angleA" min="30" max="150" value="90" step="1" oninput="updateExplorer()">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1">
+                                <span>銳角 (30°)</span>
+                                <span>直角 (90°)</span>
+                                <span>鈍角 (150°)</span>
+                            </div>
+                        </div>
+
+                        <!-- Slider 2: Side AB -->
+                        <div class="bg-white/80 p-4 rounded-xl border border-indigo-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-ruler-horizontal text-pink-500"></i> 邊長 AB (腰/鄰邊)：
+                                </label>
+                                <span id="val-sideAB" class="font-black text-pink-600 text-lg">3.0 cm</span>
+                            </div>
+                            <input type="range" id="slider-sideAB" min="1.0" max="6.0" value="3.0" step="0.5" oninput="updateExplorer()">
+                        </div>
+
+                        <!-- Slider 3: Side AC -->
+                        <div class="bg-white/80 p-4 rounded-xl border border-indigo-100 shadow-sm">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-ruler-horizontal text-emerald-500"></i> 邊長 AC (腰/鄰邊)：
+                                </label>
+                                <span id="val-sideAC" class="font-black text-emerald-600 text-lg">3.0 cm</span>
+                            </div>
+                            <input type="range" id="slider-sideAC" min="1.0" max="6.0" value="3.0" step="0.5" oninput="updateExplorer()">
+                        </div>
+
+                        <!-- Preset Buttons -->
+                        <div class="grid grid-cols-2 gap-2 pt-2">
+                            <button onclick="setExplorerPreset(90, 3, 3)" class="py-2 px-3 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-lg text-xs font-bold transition">
+                                設定為「等腰直角三角形」
+                            </button>
+                            <button onclick="setExplorerPreset(120, 3, 4)" class="py-2 px-3 bg-pink-100 hover:bg-pink-200 text-pink-800 rounded-lg text-xs font-bold transition">
+                                設定為「120° 鈍角三角形」
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right Interactive SVG Canvas -->
+                    <div class="w-full lg:w-7/12 flex flex-col items-center">
+                        <div class="bg-slate-900/5 rounded-2xl p-4 w-full h-[380px] flex flex-col items-center justify-between relative border border-slate-200 overflow-hidden">
+                            <!-- Dynamic Badge Overlay -->
+                            <div class="absolute top-4 left-4 z-10 flex flex-col gap-1">
+                                <span id="exp-badge-type" class="px-3 py-1 bg-indigo-600 text-white rounded-full text-xs font-bold shadow-md">
+                                    等腰直角三角形
+                                </span>
+                                <span id="exp-badge-isosceles" class="px-3 py-1 bg-pink-500 text-white rounded-full text-xs font-bold shadow-md">
+                                    腰長 AB = AC (等腰)
+                                </span>
+                            </div>
+
+                            <!-- SVG Drawing -->
+                            <svg id="explorerSvg" width="100%" height="300" viewBox="0 0 400 300" class="w-full h-full">
+                                <!-- Drawn dynamically via Javascript -->
+                            </svg>
+
+                            <!-- Bottom Statistics -->
+                            <div class="w-full bg-white/90 backdrop-blur p-3 rounded-xl border border-white flex justify-around text-xs md:text-sm font-medium">
+                                <div>底邊長 BC: <span id="exp-bc-val" class="font-bold text-indigo-600">4.24 cm</span></div>
+                                <div>底角 ∠B: <span id="exp-angB-val" class="font-bold text-indigo-600">45°</span></div>
+                                <div>底角 ∠C: <span id="exp-angC-val" class="font-bold text-indigo-600">45°</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CONSTRUCTION SIMULATION -->
+        <section id="tab-construction" class="tab-content hidden">
+            <div class="glass-card rounded-2xl p-4 md:p-6 mb-6">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="bg-purple-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                    <h2 class="text-xl font-bold text-indigo-950">尺規與量角器 畫三角形步驟示範</h2>
+                </div>
+
+                <!-- Scenario Selector Buttons -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="selectConstructionScenario(1)" id="scenario-btn-1" class="scen-btn active px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                        示例 1：畫 ∠A 為頂角，兩腰 2cm 的等腰三角形
+                    </button>
+                    <button onclick="selectConstructionScenario(2)" id="scenario-btn-2" class="scen-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                        示例 2：畫 ∠A 為直角，兩腰 3cm 的等腰直角三角形
+                    </button>
+                    <button onclick="selectConstructionScenario(3)" id="scenario-btn-3" class="scen-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                        示例 3：畫 ∠A 為 120°，兩邊 3cm 與 4cm 的鈍角三角形
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <!-- Visual Canvas Display -->
+                    <div class="lg:col-span-7 bg-indigo-950/5 p-4 rounded-2xl border border-indigo-100 flex flex-col items-center">
+                        <svg id="constructionSvg" width="100%" height="300" viewBox="0 0 400 300" class="max-w-full">
+                            <!-- Animated Step Visuals -->
+                        </svg>
+                    </div>
+
+                    <!-- Step Stepper & Explanations -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
+                            <div class="text-xs font-bold text-purple-600 mb-1" id="step-number-tag">步驟 1 / 3</div>
+                            <h3 class="font-bold text-slate-900 text-base mb-2" id="step-title-text">畫出頂角或基準邊</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed" id="step-desc-text">
+                                先確定頂點 A 的位置，利用直尺或量角器畫出指定角度的兩邊。
+                            </p>
+                        </div>
+
+                        <!-- Player Navigation -->
+                        <div class="flex gap-3">
+                            <button onclick="prevStep()" id="btn-prev-step" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-sm transition disabled:opacity-40">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> 上一步
+                            </button>
+                            <button onclick="nextStep()" id="btn-next-step" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm transition shadow-md">
+                                下一步 <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: FORMATIVE ASSESSMENT (QUIZ) -->
+        <section id="tab-quiz" class="tab-content hidden">
+            <div class="glass-card rounded-2xl p-4 md:p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-rose-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                        <h2 class="text-xl font-bold text-indigo-950">學習成效隨堂診斷測驗</h2>
+                    </div>
+                    <div class="bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-bold text-xs">
+                        共 5 題觀念挑戰
+                    </div>
+                </div>
+
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Questions will be injected dynamically -->
+                </div>
+
+                <!-- Quiz Submit & Result Area -->
+                <div class="mt-8 pt-4 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <button onclick="checkQuizResults()" class="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-700 hover:to-rose-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> 提交測驗解答
+                    </button>
+                    <div id="quiz-score-banner" class="hidden text-center md:text-right">
+                        <span class="text-sm text-slate-600">總成績得分：</span>
+                        <span id="quiz-score" class="text-3xl font-black text-indigo-600 ml-2">0</span>
+                        <span class="text-slate-600">/ 100 分</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let currentTab = 'tab-geoboard';
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.glass-tab').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            currentTab = tabId;
+
+            if(tabId === 'tab-explorer') {
+                updateExplorer();
+            } else if(tabId === 'tab-construction') {
+                renderConstructionStep();
+            }
+        }
+
+        /* -------------------------------------------------------------
+           1. GEOBOARD CANVAS LOGIC
+           ------------------------------------------------------------- */
+        const geoCanvas = document.getElementById('geoboardCanvas');
+        const geoCtx = geoCanvas.getContext('2d');
+        const gridCols = 7;
+        const gridRows = 7;
+        const gridSpacing = 60;
+        const offsetX = 45;
+        const offsetY = 45;
+
+        // Vertices coordinates in grid units
+        let pA = { x: 2, y: 1 };
+        let pB = { x: 2, y: 5 };
+        let pC = { x: 5, y: 5 };
+
+        let draggingPoint = null;
+
+        function getCanvasPos(gridP) {
+            return {
+                x: offsetX + gridP.x * gridSpacing,
+                y: offsetY + gridP.y * gridSpacing
+            };
+        }
+
+        function drawGeoboard() {
+            geoCtx.clearRect(0, 0, geoCanvas.width, geoCanvas.height);
+
+            // Draw Grid Lines & Pegs
+            for (let i = 0; i < gridCols; i++) {
+                for (let j = 0; j < gridRows; j++) {
+                    const pos = getCanvasPos({ x: i, y: j });
+                    geoCtx.beginPath();
+                    geoCtx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+                    geoCtx.fillStyle = '#94a3b8';
+                    geoCtx.fill();
+                }
+            }
+
+            const cA = getCanvasPos(pA);
+            const cB = getCanvasPos(pB);
+            const cC = getCanvasPos(pC);
+
+            // Draw Triangle Fill
+            geoCtx.beginPath();
+            geoCtx.moveTo(cA.x, cA.y);
+            geoCtx.lineTo(cB.x, cB.y);
+            geoCtx.lineTo(cC.x, cC.y);
+            geoCtx.closePath();
+            geoCtx.fillStyle = 'rgba(99, 102, 241, 0.18)';
+            geoCtx.fill();
+            geoCtx.lineWidth = 3;
+            geoCtx.strokeStyle = '#4338ca';
+            geoCtx.stroke();
+
+            // Draw Vertices
+            drawVertex(cA, 'A', '#ef4444');
+            drawVertex(cB, 'B', '#3b82f6');
+            drawVertex(cC, 'C', '#10b981');
+
+            analyzeGeoboardTriangle();
+        }
+
+        function drawVertex(pos, label, color) {
+            geoCtx.beginPath();
+            geoCtx.arc(pos.x, pos.y, 10, 0, Math.PI * 2);
+            geoCtx.fillStyle = color;
+            geoCtx.fill();
+            geoCtx.lineWidth = 2;
+            geoCtx.strokeStyle = '#ffffff';
+            geoCtx.stroke();
+
+            geoCtx.font = 'bold 14px Noto Sans TC';
+            geoCtx.fillStyle = '#1e293b';
+            geoCtx.fillText(label, pos.x - 5, pos.y - 14);
+        }
+
+        function getGridFromMouse(mx, my) {
+            let closest = null;
+            let minDist = 30;
+
+            for (let i = 0; i < gridCols; i++) {
+                for (let j = 0; j < gridRows; j++) {
+                    const pos = getCanvasPos({ x: i, y: j });
+                    const dist = Math.hypot(mx - pos.x, my - pos.y);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closest = { x: i, y: j };
+                    }
+                }
+            }
+            return closest;
+        }
+
+        geoCanvas.addEventListener('mousedown', (e) => {
+            const rect = geoCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            const cA = getCanvasPos(pA);
+            const cB = getCanvasPos(pB);
+            const cC = getCanvasPos(pC);
+
+            if (Math.hypot(mx - cA.x, my - cA.y) < 20) draggingPoint = 'A';
+            else if (Math.hypot(mx - cB.x, my - cB.y) < 20) draggingPoint = 'B';
+            else if (Math.hypot(mx - cC.x, my - cC.y) < 20) draggingPoint = 'C';
+        });
+
+        geoCanvas.addEventListener('mousemove', (e) => {
+            if (!draggingPoint) return;
+            const rect = geoCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const gridP = getGridFromMouse(mx, my);
+
+            if (gridP) {
+                if (draggingPoint === 'A') pA = gridP;
+                if (draggingPoint === 'B') pB = gridP;
+                if (draggingPoint === 'C') pC = gridP;
+                drawGeoboard();
+            }
+        });
+
+        window.addEventListener('mouseup', () => draggingPoint = null);
+
+        // Touch Support
+        geoCanvas.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            const rect = geoCanvas.getBoundingClientRect();
+            const mx = touch.clientX - rect.left;
+            const my = touch.clientY - rect.top;
+
+            const cA = getCanvasPos(pA);
+            const cB = getCanvasPos(pB);
+            const cC = getCanvasPos(pC);
+
+            if (Math.hypot(mx - cA.x, my - cA.y) < 25) draggingPoint = 'A';
+            else if (Math.hypot(mx - cB.x, my - cB.y) < 25) draggingPoint = 'B';
+            else if (Math.hypot(mx - cC.x, my - cC.y) < 25) draggingPoint = 'C';
+        });
+
+        geoCanvas.addEventListener('touchmove', (e) => {
+            if (!draggingPoint) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = geoCanvas.getBoundingClientRect();
+            const mx = touch.clientX - rect.left;
+            const my = touch.clientY - rect.top;
+            const gridP = getGridFromMouse(mx, my);
+
+            if (gridP) {
+                if (draggingPoint === 'A') pA = gridP;
+                if (draggingPoint === 'B') pB = gridP;
+                if (draggingPoint === 'C') pC = gridP;
+                drawGeoboard();
+            }
+        });
+
+        function analyzeGeoboardTriangle() {
+            // Calculate sides lengths squared
+            const dAB2 = Math.pow(pA.x - pB.x, 2) + Math.pow(pA.y - pB.y, 2);
+            const dBC2 = Math.pow(pB.x - pC.x, 2) + Math.pow(pB.y - pC.y, 2);
+            const dCA2 = Math.pow(pC.x - pA.x, 2) + Math.pow(pC.y - pA.y, 2);
+
+            const sideAB = Math.sqrt(dAB2);
+            const sideBC = Math.sqrt(dBC2);
+            const sideCA = Math.sqrt(dCA2);
+
+            // Angles using Law of Cosines
+            const getAngle = (a2, b2, c2) => Math.round(Math.acos((a2 + b2 - c2) / (2 * Math.sqrt(a2 * b2))) * 180 / Math.PI);
+            
+            const angA = getAngle(dAB2, dCA2, dBC2);
+            const angB = getAngle(dAB2, dBC2, dCA2);
+            const angC = getAngle(dBC2, dCA2, dAB2);
+
+            const maxAngle = Math.max(angA, angB, angC);
+
+            // Isosceles check
+            const isIsosceles = (Math.abs(sideAB - sideBC) < 0.01) || (Math.abs(sideBC - sideCA) < 0.01) || (Math.abs(sideCA - sideAB) < 0.01);
+
+            let sidesText = `AB=${sideAB.toFixed(1)}, BC=${sideBC.toFixed(1)}, CA=${sideCA.toFixed(1)}`;
+            document.getElementById('geo-sides-info').innerText = isIsosceles ? `${sidesText} (有等腰)` : sidesText;
+            document.getElementById('geo-angle-info').innerText = `${maxAngle}° (${maxAngle === 90 ? '直角' : maxAngle > 90 ? '鈍角' : '銳角'})`;
+
+            let badge = document.getElementById('geo-type-badge');
+            if (maxAngle === 90 && isIsosceles) {
+                badge.innerText = '等腰直角三角形';
+                badge.className = 'px-2.5 py-1 bg-pink-600 text-white rounded-md font-bold text-xs';
+            } else if (maxAngle === 90) {
+                badge.innerText = '直角三角形';
+                badge.className = 'px-2.5 py-1 bg-indigo-600 text-white rounded-md font-bold text-xs';
+            } else if (maxAngle > 90 && isIsosceles) {
+                badge.innerText = '等腰鈍角三角形';
+                badge.className = 'px-2.5 py-1 bg-purple-600 text-white rounded-md font-bold text-xs';
+            } else if (maxAngle > 90) {
+                badge.innerText = '鈍角三角形';
+                badge.className = 'px-2.5 py-1 bg-amber-600 text-white rounded-md font-bold text-xs';
+            } else if (isIsosceles) {
+                badge.innerText = '等腰銳角三角形';
+                badge.className = 'px-2.5 py-1 bg-emerald-600 text-white rounded-md font-bold text-xs';
+            } else {
+                badge.innerText = '一般銳角三角形';
+                badge.className = 'px-2.5 py-1 bg-slate-600 text-white rounded-md font-bold text-xs';
+            }
+        }
+
+        function setGeoboardPreset(type) {
+            if (type === 'right') {
+                pA = { x: 2, y: 1 };
+                pB = { x: 2, y: 5 };
+                pC = { x: 5, y: 5 };
+            } else if (type === 'isosceles-right') {
+                pA = { x: 2, y: 2 };
+                pB = { x: 2, y: 5 };
+                pC = { x: 5, y: 5 };
+            } else if (type === 'obtuse') {
+                pA = { x: 1, y: 4 };
+                pB = { x: 3, y: 5 };
+                pC = { x: 6, y: 5 };
+            }
+            drawGeoboard();
+        }
+
+        function resetGeoboard() {
+            pA = { x: 2, y: 2 };
+            pB = { x: 2, y: 5 };
+            pC = { x: 5, y: 5 };
+            drawGeoboard();
+        }
+
+        /* -------------------------------------------------------------
+           2. DYNAMIC TRIANGLE EXPLORER (SVG)
+           ------------------------------------------------------------- */
+        function updateExplorer() {
+            const angleA = parseFloat(document.getElementById('slider-angleA').value);
+            const sideAB = parseFloat(document.getElementById('slider-sideAB').value);
+            const sideAC = parseFloat(document.getElementById('slider-sideAC').value);
+
+            document.getElementById('val-angleA').innerText = `${angleA}°`;
+            document.getElementById('val-sideAB').innerText = `${sideAB.toFixed(1)} cm`;
+            document.getElementById('val-sideAC').innerText = `${sideAC.toFixed(1)} cm`;
+
+            // Canvas center vertex A
+            const ax = 150;
+            const ay = 200;
+            const scale = 32; // pixels per cm
+
+            // Vertex B extends horizontally to right
+            const bx = ax + sideAB * scale;
+            const by = ay;
+
+            // Vertex C extends at angleA relative to AB (Corrected vector calculation)
+            const radA = (angleA * Math.PI) / 180;
+            const cx = ax + sideAC * scale * Math.cos(radA);
+            const cy = ay - sideAC * scale * Math.sin(radA);
+
+            // Calculate side BC length
+            const sideBC = Math.sqrt(Math.pow(sideAB, 2) + Math.pow(sideAC, 2) - 2 * sideAB * sideAC * Math.cos(radA));
+
+            // Angles B & C
+            const radB = Math.acos((Math.pow(sideAB, 2) + Math.pow(sideBC, 2) - Math.pow(sideAC, 2)) / (2 * sideAB * sideBC));
+            const angB = Math.round((radB * 180) / Math.PI);
+            const angC = Math.round(180 - angleA - angB);
+
+            // Update UI Statistics
+            document.getElementById('exp-bc-val').innerText = `${sideBC.toFixed(1)} cm`;
+            document.getElementById('exp-angB-val').innerText = `${angB}°`;
+            document.getElementById('exp-angC-val').innerText = `${angC}°`;
+
+            // Triangle Badges
+            const isIso = Math.abs(sideAB - sideAC) < 0.1;
+            const badgeType = document.getElementById('exp-badge-type');
+            const badgeIso = document.getElementById('exp-badge-isosceles');
+
+            if (angleA === 90 && isIso) badgeType.innerText = '等腰直角三角形';
+            else if (angleA === 90) badgeType.innerText = '直角三角形';
+            else if (angleA > 90) badgeType.innerText = '鈍角三角形';
+            else badgeType.innerText = '銳角三角形';
+
+            if (isIso) {
+                badgeIso.classList.remove('hidden');
+                badgeIso.innerText = '兩腰 AB = AC (等腰三角形)';
+            } else {
+                badgeIso.classList.add('hidden');
+            }
+
+            // Draw Angle A Marker (Right angle square symbol if 90°, arc otherwise)
+            let angleMarkerSvg = '';
+            if (angleA === 90) {
+                angleMarkerSvg = `
+                    <!-- 90 Degree Right Angle Symbol (Line only, no region fill) -->
+                    <path d="M ${ax + 18} ${ay} L ${ax + 18} ${ay - 18} L ${ax} ${ay - 18}" fill="none" stroke="#ec4899" stroke-width="2" />
+                    <text x="${ax + 22}" y="${ay - 22}" font-weight="bold" fill="#ec4899" font-size="12">90° (直角)</text>
+                `;
+            } else {
+                const arcX = ax + 25 * Math.cos(radA);
+                const arcY = ay - 25 * Math.sin(radA);
+                angleMarkerSvg = `
+                    <!-- Arc Line for angle A (Line only, no region fill) -->
+                    <path d="M ${ax + 25} ${ay} A 25 25 0 0 0 ${arcX} ${arcY}" fill="none" stroke="#ec4899" stroke-width="2" />
+                    <text x="${ax - 10}" y="${ay + 25}" font-weight="bold" fill="#312e81" font-size="14">A (${angleA}°)</text>
+                `;
+            }
+
+            // Draw SVG
+            const svg = document.getElementById('explorerSvg');
+            svg.innerHTML = `
+                ${angleMarkerSvg}
+
+                <!-- Polygon -->
+                <polygon points="${ax},${ay} ${bx},${by} ${cx},${cy}" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="3" />
+
+                <!-- Vertices dots -->
+                <circle cx="${ax}" cy="${ay}" r="6" fill="#6366f1" />
+                <circle cx="${bx}" cy="${by}" r="6" fill="#ec4899" />
+                <circle cx="${cx}" cy="${cy}" r="6" fill="#10b981" />
+
+                <!-- Labels A, B, C -->
+                ${angleA === 90 ? `<text x="${ax - 15}" y="${ay + 20}" font-weight="bold" fill="#312e81" font-size="14">A</text>` : ''}
+                <text x="${bx + 10}" y="${by + 5}" font-weight="bold" fill="#ec4899" font-size="14">B</text>
+                <text x="${cx + (Math.cos(radA) < 0 ? -20 : 10)}" y="${cy - 10}" font-weight="bold" fill="#10b981" font-size="14">C</text>
+
+                <!-- Side Length Labels -->
+                <text x="${(ax + bx) / 2}" y="${ay + 18}" fill="#ec4899" font-size="12" font-weight="bold">${sideAB.toFixed(1)}cm</text>
+                <text x="${(ax + cx) / 2 - 15}" y="${(ay + cy) / 2 - 5}" fill="#10b981" font-size="12" font-weight="bold">${sideAC.toFixed(1)}cm</text>
+                <text x="${(bx + cx) / 2 + 10}" y="${(by + cy) / 2 - 5}" fill="#6366f1" font-size="12" font-weight="bold">${sideBC.toFixed(1)}cm</text>
+            `;
+        }
+
+        function setExplorerPreset(ang, ab, ac) {
+            document.getElementById('slider-angleA').value = ang;
+            document.getElementById('slider-sideAB').value = ab;
+            document.getElementById('slider-sideAC').value = ac;
+            updateExplorer();
+        }
+
+        /* -------------------------------------------------------------
+           3. STEP-BY-STEP CONSTRUCTION SIMULATION
+           ------------------------------------------------------------- */
+        let activeScenario = 1;
+        let currentStepIndex = 0;
+
+        const scenarios = {
+            1: [
+                { title: "步驟 1：畫出頂角 ∠A 的兩條射線", desc: "先確定頂點 A 的位置，利用直尺與量角器畫出指定頂角 ∠A 的兩條射線邊。", svgType: "step1-iso" },
+                { title: "步驟 2：在兩射線上量出長 2 公分的兩腰", desc: "以直尺在兩條射線上自 A 點分別量出 2 公分，標示出端點 B 與端點 C（使 AB = 2cm, AC = 2cm）。", svgType: "step2-iso" },
+                { title: "步驟 3：連接點 B、C 完成等腰三角形", desc: "用直尺連接點 B 與點 C，劃出底邊 BC，即完成以 ∠A 為頂角的等腰三角形 ABC！", svgType: "step3-iso" }
+            ],
+            2: [
+                { title: "步驟 1：用直角三角板畫出直角 ∠A", desc: "拿取直角三角板，沿著直角兩邊畫出直角頂點 A。", svgType: "step1-right" },
+                { title: "步驟 2：在直角兩邊量出 3 公分腰長", desc: "沿著兩邊分別量出長度 3 公分的點 B 與點 C (線段 AB = 3cm, AC = 3cm)。", svgType: "step2-right" },
+                { title: "步驟 3：連接點 B、點 C", desc: "連接端點 B 和 C，構成斜邊，完成「等腰直角三角形 ABC」。", svgType: "step3-right" }
+            ],
+            3: [
+                { title: "步驟 1：用量角器量出 120° 鈍角", desc: "對準頂點 A 與基準線，在量角器上找到 120° 刻度並畫出夾角線段。", svgType: "step1-obtuse" },
+                { title: "步驟 2：畫出長度 3cm 與 4cm 的兩邊", desc: "在兩邊分別截取 AB = 3 公分、AC = 4 公分。", svgType: "step2-obtuse" },
+                { title: "步驟 3：連接 B、C 完成鈍角三角形", desc: "將 B、C 兩點連起來，線段 BC 即為對應鈍角的長邊，即完成 120° 鈍角三角形繪製。", svgType: "step3-obtuse" }
+            ]
+        };
+
+        function selectConstructionScenario(scenNum) {
+            activeScenario = scenNum;
+            currentStepIndex = 0;
+
+            document.querySelectorAll('.scen-btn').forEach((btn, idx) => {
+                if (idx + 1 === scenNum) {
+                    btn.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
+                    btn.classList.remove('bg-white', 'text-slate-700');
+                } else {
+                    btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
+                    btn.classList.add('bg-white', 'text-slate-700');
+                }
+            });
+
+            renderConstructionStep();
+        }
+
+        function renderConstructionStep() {
+            const data = scenarios[activeScenario][currentStepIndex];
+            document.getElementById('step-number-tag').innerText = `步驟 ${currentStepIndex + 1} / 3`;
+            document.getElementById('step-title-text').innerText = data.title;
+            document.getElementById('step-desc-text').innerText = data.desc;
+
+            document.getElementById('btn-prev-step').disabled = (currentStepIndex === 0);
+            
+            // Toggle Next / Finish button state and style
+            const btnNext = document.getElementById('btn-next-step');
+            if (currentStepIndex === 2) {
+                btnNext.innerHTML = '完成 <i class="fa-solid fa-check ml-1"></i>';
+                btnNext.className = 'flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center';
+            } else {
+                btnNext.innerHTML = '下一步 <i class="fa-solid fa-arrow-right ml-1"></i>';
+                btnNext.className = 'flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center';
+            }
+
+            const svg = document.getElementById('constructionSvg');
+            
+            // Render specific dynamic step visualization SVG
+            if (activeScenario === 1) { // Isosceles
+                if (currentStepIndex === 0) {
+                    svg.innerHTML = `
+                        <line x1="150" y1="200" x2="250" y2="200" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="4,4" />
+                        <line x1="150" y1="200" x2="200" y2="100" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="4,4" />
+                        <path d="M 180 200 A 30 30 0 0 0 168 164" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
+                        <text x="130" y="218" font-weight="bold" fill="#1e293b">頂點 A</text>
+                        <text x="175" y="180" font-weight="bold" fill="#f59e0b" font-size="13">頂角 ∠A</text>
+                    `;
+                } else if (currentStepIndex === 1) {
+                    svg.innerHTML = `
+                        <line x1="150" y1="200" x2="230" y2="200" stroke="#8b5cf6" stroke-width="4" />
+                        <line x1="150" y1="200" x2="190" y2="120" stroke="#8b5cf6" stroke-width="4" />
+                        <path d="M 175 200 A 25 25 0 0 0 165 170" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
+                        <circle cx="230" cy="200" r="6" fill="#ec4899"/>
+                        <circle cx="190" cy="120" r="6" fill="#10b981"/>
+                        <line x1="187" y1="195" x2="193" y2="205" stroke="#ec4899" stroke-width="2" />
+                        <line x1="167" y1="157" x2="173" y2="163" stroke="#10b981" stroke-width="2" />
+                        <text x="130" y="218" font-weight="bold" fill="#1e293b">A</text>
+                        <text x="238" y="205" font-weight="bold" fill="#ec4899">B (2cm)</text>
+                        <text x="195" y="115" font-weight="bold" fill="#10b981">C (2cm)</text>
+                    `;
+                } else {
+                    svg.innerHTML = `
+                        <polygon points="150,200 230,200 190,120" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="4" />
+                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
+                        <circle cx="230" cy="200" r="6" fill="#ec4899"/>
+                        <circle cx="190" cy="120" r="6" fill="#10b981"/>
+                        <line x1="187" y1="195" x2="193" y2="205" stroke="#ec4899" stroke-width="2" />
+                        <line x1="167" y1="157" x2="173" y2="163" stroke="#10b981" stroke-width="2" />
+                        <text x="130" y="218" font-weight="bold" fill="#1e293b">A</text>
+                        <text x="238" y="205" font-weight="bold" fill="#ec4899">B</text>
+                        <text x="195" y="115" font-weight="bold" fill="#10b981">C</text>
+                        <text x="215" y="165" font-weight="bold" fill="#6366f1" font-size="12">底邊 BC</text>
+                    `;
+                }
+            } else if (activeScenario === 2) { // Isosceles Right Triangle
+                if (currentStepIndex === 0) {
+                    svg.innerHTML = `
+                        <path d="M 120 220 L 120 120 L 220 220 Z" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4"/>
+                        <rect x="120" y="200" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2"/>
+                        <text x="105" y="235" font-weight="bold" fill="#1e293b">直角頂點 A</text>
+                    `;
+                } else if (currentStepIndex === 1) {
+                    svg.innerHTML = `
+                        <line x1="120" y1="220" x2="220" y2="220" stroke="#3b82f6" stroke-width="4" />
+                        <line x1="120" y1="220" x2="120" y2="120" stroke="#3b82f6" stroke-width="4" />
+                        <rect x="120" y="200" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2"/>
+                        <circle cx="120" cy="220" r="6" fill="#ef4444"/>
+                        <circle cx="220" cy="220" r="6" fill="#3b82f6"/>
+                        <circle cx="120" cy="120" r="6" fill="#10b981"/>
+                        <text x="105" y="235" font-weight="bold">A</text>
+                        <text x="225" y="235" font-weight="bold" fill="#3b82f6">B (3cm)</text>
+                        <text x="100" y="115" font-weight="bold" fill="#10b981">C (3cm)</text>
+                    `;
+                } else {
+                    svg.innerHTML = `
+                        <polygon points="120,220 220,220 120,120" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="4" />
+                        <rect x="120" y="200" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2"/>
+                        <circle cx="120" cy="220" r="6" fill="#ef4444"/>
+                        <circle cx="220" cy="220" r="6" fill="#3b82f6"/>
+                        <circle cx="120" cy="120" r="6" fill="#10b981"/>
+                        <text x="105" y="235" font-weight="bold">A</text>
+                        <text x="225" y="235" font-weight="bold" fill="#3b82f6">B</text>
+                        <text x="100" y="115" font-weight="bold" fill="#10b981">C</text>
+                        <text x="180" y="165" font-weight="bold" fill="#ef4444" font-size="12">斜邊 BC</text>
+                    `;
+                }
+            } else { // 120 deg Obtuse
+                if (currentStepIndex === 0) {
+                    svg.innerHTML = `
+                        <!-- Protractor Arc Representation -->
+                        <path d="M 120 200 A 70 70 0 0 1 240 180" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="3,3"/>
+                        <line x1="180" y1="200" x2="270" y2="200" stroke="#64748b" stroke-width="3"/>
+                        <line x1="180" y1="200" x2="110" y2="130" stroke="#f43f5e" stroke-width="3" stroke-dasharray="4,4"/>
+                        <text x="175" y="220" font-weight="bold">A (120°)</text>
+                    `;
+                } else if (currentStepIndex === 1) {
+                    svg.innerHTML = `
+                        <line x1="180" y1="200" x2="270" y2="200" stroke="#f43f5e" stroke-width="4"/>
+                        <line x1="180" y1="200" x2="110" y2="130" stroke="#f43f5e" stroke-width="4"/>
+                        <circle cx="180" cy="200" r="6" fill="#1e293b"/>
+                        <circle cx="270" cy="200" r="6" fill="#3b82f6"/>
+                        <circle cx="110" cy="130" r="6" fill="#10b981"/>
+                        <text x="175" y="220" font-weight="bold">A</text>
+                        <text x="275" y="215" font-weight="bold" fill="#3b82f6">B (3cm)</text>
+                        <text x="85" y="125" font-weight="bold" fill="#10b981">C (4cm)</text>
+                    `;
+                } else {
+                    svg.innerHTML = `
+                        <polygon points="180,200 270,200 110,130" fill="rgba(244,63,94,0.2)" stroke="#f43f5e" stroke-width="4"/>
+                        <circle cx="180" cy="200" r="6" fill="#1e293b"/>
+                        <circle cx="270" cy="200" r="6" fill="#3b82f6"/>
+                        <circle cx="110" cy="130" r="6" fill="#10b981"/>
+                        <text x="175" y="220" font-weight="bold">A</text>
+                        <text x="275" y="215" font-weight="bold" fill="#3b82f6">B</text>
+                        <text x="85" y="125" font-weight="bold" fill="#10b981">C</text>
+                        <text x="190" y="150" font-weight="bold" fill="#f43f5e" font-size="12">最長邊 BC</text>
+                    `;
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                renderConstructionStep();
+            }
+        }
+
+        function nextStep() {
+            if (currentStepIndex < 2) {
+                currentStepIndex++;
+                renderConstructionStep();
+            }
+            // 進行至第三步時點擊「完成」按鈕不執行任何動作
+        }
+
+        /* -------------------------------------------------------------
+           4. FORMATIVE ASSESSMENT (QUIZ LOGIC)
+           ------------------------------------------------------------- */
+        const quizQuestions = [
+            {
+                id: 1,
+                question: "1. 在百點卡 (釘板) 上畫一個「等腰直角三角形」，若直角的兩邊分別拉出 3 個單位的線段，則這兩條直角邊的長度關係為何？",
+                options: ["長度必定相等", "直角邊比斜邊長", "兩邊長度隨意不需相等", "無法確定"],
+                answer: 0,
+                explanation: "「等腰直角三角形」包含直角與兩條相等長度的腰，因此兩直角邊長度必定相等。"
+            },
+            {
+                id: 2,
+                question: "2. 已知繪製三角形時，兩邊長分別為 AB = 3cm、AC = 4cm，且其夾角 ∠A = 120°。請問這個三角形屬於哪一種分類？",
+                options: ["銳角三角形", "直角三角形", "鈍角三角形", "正三角形"],
+                answer: 2,
+                explanation: "因為有一個內角 ∠A = 120° 大於 90°，所以此圖形為「鈍角三角形」。"
+            },
+            {
+                id: 3,
+                question: "3. 用直尺與量角器畫出以 A 為頂點、兩腰長度皆為 4cm 的等腰三角形，若頂角 ∠A = 90°，則此三角形同時具備什麼稱呼？",
+                options: ["鈍角三角形", "等腰直角三角形", "正三角形", "一般銳角三角形"],
+                answer: 1,
+                explanation: "同時符合頂角為 90°（直角）與兩腰相等的條件，故稱為「等腰直角三角形」。"
+            },
+            {
+                id: 4,
+                question: "4. 小明畫了一個以 A 為頂點的等腰三角形 ABC，其中 AB = 3.5cm、AC = 3.5cm。請問 AB 與 AC 在數學用語中稱為什麼？",
+                options: ["底邊", "斜邊", "腰", "高"],
+                answer: 2,
+                explanation: "在等腰三角形中，長度相等的兩條邊稱為「腰」，連接兩腰的第三條邊稱為「底邊」。"
+            },
+            {
+                id: 5,
+                question: "5. 若要準確畫出 ∠A = 150° 且兩腰長為 3cm 的鈍角三角形，哪一個工具是「測量 150° 角度」不可或缺的？",
+                options: ["直尺", "量角器", "圓規", "計算機"],
+                answer: 1,
+                explanation: "量角器是用來精準測量與繪製角度（如 150° 鈍角）的主要幾何工具。"
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = quizQuestions.map((q, idx) => `
+                <div class="bg-white/80 p-5 rounded-2xl border border-rose-100 shadow-sm" id="quiz-card-${q.id}">
+                    <h3 class="font-bold text-slate-900 text-base mb-3 leading-relaxed">${q.question}</h3>
+                    <div class="space-y-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition">
+                                <input type="radio" name="q_${q.id}" value="${oIdx}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-sm text-slate-700 font-medium">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="quiz-feedback-${q.id}" class="hidden mt-3 p-3 rounded-xl text-xs font-medium"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkQuizResults() {
+            let score = 0;
+
+            quizQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+                if (selected && parseInt(selected.value) === q.answer) {
+                    score += 20;
+                    feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> <b>回答正確！</b> ${q.explanation}`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i> <b>需要再思考喔！</b> 正確答案為：「${q.options[q.answer]}」。${q.explanation}`;
+                }
+            });
+
+            document.getElementById('quiz-score-banner').classList.remove('hidden');
+            document.getElementById('quiz-score').innerText = score;
+        }
+
+        /* -------------------------------------------------------------
+           INITIALIZATION ON LOAD
+           ------------------------------------------------------------- */
+        window.onload = function() {
+            drawGeoboard();
+            updateExplorer();
+            selectConstructionScenario(1);
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

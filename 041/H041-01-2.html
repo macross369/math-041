@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一億以內的數 - 互動學習</title>
+    <!-- 引入 Tailwind CSS 用於快速且響應式的排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts: Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* 新海誠風格背景色調與字體設定 */
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 玻璃擬態 (Glassmorphism) 效果的卡片樣式 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 按鈕hover動畫效果 */
+        .btn-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 位值格子樣式 */
+        .place-value-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 45px; /* 稍微縮小以適應手機螢幕 */
+            height: 90px;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            position: relative;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+        
+        @media (min-width: 640px) {
+            .place-value-box {
+                width: 60px;
+                height: 100px;
+            }
+        }
+
+        /* 區分「萬的家族」和「一的家族」的背景色 */
+        .family-wan { background-color: #ffe4e6; border-color: #fecdd3; color: #be123c;} /* 淺粉色 */
+        .family-yi { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1;} /* 淺藍色 */
+        
+        .digit-display {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+            color: #1e293b;
+        }
+
+        /* 測驗選項按鈕 */
+        .quiz-option {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .quiz-option:hover {
+            border-color: #93c5fd;
+            background-color: #eff6ff;
+        }
+        .quiz-option.selected {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .quiz-option.correct {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+            color: #991b1b;
+        }
+
+        /* 控制按鈕樣式 (加減) */
+        .ctrl-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #e2e8f0;
+            border: none;
+            color: #475569;
+            transition: background-color 0.15s;
+        }
+        .ctrl-btn:hover { background-color: #cbd5e1; }
+        .ctrl-btn:active { background-color: #94a3b8; }
+        
+        /* 隱藏預設數字輸入框的上下箭頭 */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        /* 頁籤按鈕樣式 */
+        .tab-btn {
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #4b5563;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-bottom: none;
+            cursor: pointer;
+        }
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .tab-btn.active {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #1e3a8a;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            z-index: 10;
+            position: relative;
+        }
+
+        /* 增加：fade-in 淡入動畫效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="max-w-4xl mx-auto">
+    
+    <!-- 新增：閒雲數學小棧 Logo 與標題 -->
+    <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <!-- 頁首標題 -->
+    <header class="text-center glass-card p-6 mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">一億以內的數</h1>
+        <p class="text-gray-700">動手操作，探索大數的世界！</p>
+    </header>
+
+    <!-- 頁籤導覽列 -->
+    <div class="flex flex-wrap justify-center gap-1 sm:gap-2 mb-[-1px] px-2 relative z-10">
+        <button onclick="switchTab('tab-table')" id="btn-tab-table" class="tab-btn active px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">互動位值表</button>
+        <button onclick="switchTab('tab-reading')" id="btn-tab-reading" class="tab-btn px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">大數報讀</button>
+        <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="tab-btn px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">牛刀小試</button>
+    </div>
+
+    <!-- 互動區塊一：動態位值表 -->
+    <section id="tab-table" class="tab-content glass-card p-6 mb-8 block relative z-0">
+        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">📝 互動位值表</h2>
+        <p class="text-gray-600 mb-4">點擊上下箭頭改變數字，觀察總數與讀法的變化。注意「萬的家族」和「一的家族」喔！</p>
+        
+        <div class="overflow-x-auto pb-4 pt-2">
+            <div class="flex justify-center gap-1 sm:gap-2 min-w-max">
+                <!-- 億位 (獨立) -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-yellow-700 mb-1">億位</span>
+                    <div class="place-value-box bg-yellow-100 border-yellow-200 text-yellow-800">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(8, 1)">+</button>
+                        <span class="digit-display" id="digit-8">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(8, -1)">-</button>
+                    </div>
+                </div>
+                
+                <!-- 分隔線 -->
+                <div class="w-2"></div>
+
+                <!-- 萬的家族 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-rose-700 mb-1">千萬位</span>
+                    <div class="place-value-box family-wan">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(7, 1)">+</button>
+                        <span class="digit-display" id="digit-7">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(7, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-rose-700 mb-1">百萬位</span>
+                    <div class="place-value-box family-wan">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(6, 1)">+</button>
+                        <span class="digit-display" id="digit-6">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(6, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-rose-700 mb-1">十萬位</span>
+                    <div class="place-value-box family-wan">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(5, 1)">+</button>
+                        <span class="digit-display" id="digit-5">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(5, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-rose-700 mb-1">萬位</span>
+                    <div class="place-value-box family-wan">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(4, 1)">+</button>
+                        <span class="digit-display" id="digit-4">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(4, -1)">-</button>
+                    </div>
+                </div>
+
+                <!-- 分隔線 -->
+                <div class="w-2"></div>
+
+                <!-- 一的家族 -->
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-sky-700 mb-1">千位</span>
+                    <div class="place-value-box family-yi">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(3, 1)">+</button>
+                        <span class="digit-display" id="digit-3">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(3, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-sky-700 mb-1">百位</span>
+                    <div class="place-value-box family-yi">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(2, 1)">+</button>
+                        <span class="digit-display" id="digit-2">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(2, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-sky-700 mb-1">十位</span>
+                    <div class="place-value-box family-yi">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(1, 1)">+</button>
+                        <span class="digit-display" id="digit-1">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(1, -1)">-</button>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-sm md:text-base font-bold text-sky-700 mb-1">個位</span>
+                    <div class="place-value-box family-yi">
+                        <button class="ctrl-btn mt-1" onclick="changeDigit(0, 1)">+</button>
+                        <span class="digit-display" id="digit-0">0</span>
+                        <button class="ctrl-btn mb-1" onclick="changeDigit(0, -1)">-</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 bg-white p-4 rounded-lg border border-gray-200">
+            <div class="mb-2">
+                <span class="text-gray-500 font-bold">數字記作：</span>
+                <span id="number-display" class="text-2xl font-bold tracking-widest text-indigo-700">0</span>
+            </div>
+            <div>
+                <span class="text-gray-500 font-bold">讀作：</span>
+                <span id="chinese-display" class="text-xl text-pink-600 font-bold">零</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+             <button onclick="randomizeNumber()" class="btn-hover bg-indigo-500 text-white px-6 py-2 rounded-full font-bold shadow-md">隨機產生數字</button>
+             <button onclick="resetNumber()" class="btn-hover bg-gray-400 text-white px-6 py-2 rounded-full font-bold shadow-md ml-2">歸零</button>
+        </div>
+    </section>
+
+    <!-- 互動區塊二：大數報讀練習 -->
+    <section id="tab-reading" class="tab-content glass-card p-6 mb-8 hidden relative z-0">
+        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">🔍 大數畫線讀讀看</h2>
+        <p class="text-gray-600 mb-4">輸入一個大數，網頁會自動幫你「由右至左，每四位畫一條底線」，讓你更容易報讀！</p>
+        
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+            <input type="number" id="custom-number-input" class="border-2 border-blue-300 rounded-lg p-3 w-full md:w-64 text-xl focus:outline-none focus:border-blue-500" placeholder="輸入數字 (最高一億)" max="100000000" min="0">
+            <button onclick="processCustomNumber()" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow-md w-full md:w-auto">幫我畫線！</button>
+        </div>
+
+        <div id="formatted-result-area" class="mt-6 hidden">
+            <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 text-center">
+                <p class="text-gray-500 mb-2">畫線結果：</p>
+                <div id="underlined-display" class="text-3xl font-mono tracking-widest mb-4 flex justify-center items-end gap-1">
+                    <!-- Javascript 將在此處插入帶底線的數字 -->
+                </div>
+                <p class="text-gray-500 mb-1">正確讀法：</p>
+                <p id="custom-chinese-display" class="text-2xl font-bold text-blue-700"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 評量區塊：牛刀小試 -->
+    <section id="tab-quiz" class="tab-content glass-card p-6 mb-8 hidden relative z-0">
+        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">🏆 牛刀小試</h2>
+        <p class="text-gray-600 mb-6">測驗看看你是否已經掌握了一億以內的數！</p>
+        
+        <div id="quiz-container">
+            <!-- 題目將由 Javascript 動態生成 -->
+        </div>
+
+        <div id="quiz-result" class="mt-6 hidden text-center p-4 rounded-lg bg-green-100 border border-green-300">
+            <p class="text-xl font-bold text-green-800" id="quiz-score-msg"></p>
+            <button onclick="initQuiz()" class="mt-4 btn-hover bg-green-600 text-white px-6 py-2 rounded-full font-bold">再測驗一次</button>
+        </div>
+    </section>
+    
+    <!-- 頁尾 -->
+    <footer class="text-center text-gray-500 text-sm mt-8 pb-4">
+        <p>本互動網頁專為協助理解「一億以內的數」所設計。</p>
+    </footer>
+
+</div>
+
+<script>
+    // === 狀態變數：紀錄每個位數的值 (索引 0: 個位, 1: 十位 ... 8: 億位) ===
+    let digits = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    // === 頁籤切換邏輯 ===
+    function switchTab(tabId) {
+        // 隱藏所有內容
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('block');
+        });
+        // 移除所有按鈕的 active 狀態
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // 顯示選擇的內容
+        document.getElementById(tabId).classList.remove('hidden');
+        document.getElementById(tabId).classList.add('block');
+        
+        // 設定選擇的按鈕為 active
+        document.getElementById(`btn-${tabId}`).classList.add('active');
+    }
+
+    // === 中文數字對照表 ===
+    const numChar = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    const unitChar = ['', '十', '百', '千'];
+    const sectionChar = ['', '萬', '億'];
+
+    // === 初始化與更新畫面 ===
+    function updateDisplay() {
+        let totalValue = 0;
+        
+        // 更新每個格子上的數字，並計算總值
+        for (let i = 0; i <= 8; i++) {
+            document.getElementById(`digit-${i}`).innerText = digits[i];
+            totalValue += digits[i] * Math.pow(10, i);
+        }
+        
+        // 更新總數字顯示 (加上千分位逗號方便閱讀)
+        document.getElementById('number-display').innerText = totalValue.toLocaleString('en-US');
+        
+        // 更新中文讀法
+        document.getElementById('chinese-display').innerText = numberToChinese(totalValue);
+    }
+
+    // === 改變單一位數的值 ===
+    function changeDigit(index, delta) {
+        let newVal = digits[index] + delta;
+        // 限制數字在 0~9 之間 (最高位可特例處理，但這裡簡單設定為0-9，除了億位)
+        if (index === 8) { // 億位限制0-1
+             if (newVal >= 0 && newVal <= 1) { digits[index] = newVal; }
+             // 若億位為1，其他位數強制歸零 (符合"一億以內"的主題)
+             if (digits[8] === 1) {
+                 for(let i=0; i<8; i++) digits[i] = 0;
+             }
+        } else {
+             if (digits[8] === 1) return; // 如果已經是1億，不允許修改其他位數
+             if (newVal >= 0 && newVal <= 9) { digits[index] = newVal; }
+        }
+        updateDisplay();
+    }
+
+    // === 隨機產生數字 ===
+    function randomizeNumber() {
+        // 10% 機率直接產生 100000000
+        if (Math.random() < 0.1) {
+            digits = [0,0,0,0,0,0,0,0,1];
+        } else {
+            digits[8] = 0; // 億位為0
+            for(let i=0; i<8; i++){
+                digits[i] = Math.floor(Math.random() * 10);
+            }
+            // 避免最高位都是0，嘗試確保至少是萬以上的數
+            if(digits[7]===0 && digits[6]===0 && digits[5]===0 && digits[4]===0) {
+                 digits[4] = Math.floor(Math.random() * 9) + 1; 
+            }
+        }
+        updateDisplay();
+    }
+    
+    function resetNumber() {
+        digits = [0,0,0,0,0,0,0,0,0];
+        updateDisplay();
+    }
+
+    // === 阿拉伯數字轉中文讀法 (關鍵教學邏輯) ===
+    function numberToChinese(num) {
+        if (num === 0) return '零';
+        if (num === 100000000) return '一億';
+
+        let strNum = num.toString();
+        let result = '';
+        let section = 0; // 記錄目前處理到哪個區段 (0: 個區, 1: 萬區)
+
+        // 將數字字串反轉，每四位切一塊處理
+        let reversedStr = strNum.split('').reverse().join('');
+        
+        for (let i = 0; i < reversedStr.length; i += 4) {
+            let chunk = reversedStr.slice(i, i + 4);
+            let chunkResult = '';
+            let zeroFlag = false; // 處理連續的零
+            
+            for (let j = 0; j < chunk.length; j++) {
+                let digit = parseInt(chunk[j]);
+                
+                if (digit !== 0) {
+                    if (zeroFlag) {
+                        chunkResult = '零' + chunkResult;
+                        zeroFlag = false;
+                    }
+                    chunkResult = numChar[digit] + unitChar[j] + chunkResult;
+                } else {
+                    zeroFlag = true;
+                }
+            }
+            
+            // 如果這個區塊（例如萬的區塊）有值，加上區塊單位
+            if (chunkResult !== '') {
+                result = chunkResult + sectionChar[section] + result;
+            } else if (section === 1 && result !== '') {
+                // 如果萬區全是0，但後面(個區)有值，需要補零
+                result = '零' + result; 
+            }
+            
+            section++;
+        }
+        
+        // 處理一些特殊讀法習慣，例如「一十萬」通常讀作「十萬」 (視教材版本而定，這裡保留一十萬較為嚴謹)
+        // 去除結尾多餘的零
+        result = result.replace(/零+$/, '');
+        
+        return result;
+    }
+
+    // === 大數畫線讀讀看處理 ===
+    function processCustomNumber() {
+        const inputEle = document.getElementById('custom-number-input');
+        let val = parseInt(inputEle.value);
+        
+        if (isNaN(val) || val < 0 || val > 100000000) {
+            alert('請輸入 0 到 100,000,000 之間的有效整數！');
+            return;
+        }
+
+        const resultArea = document.getElementById('formatted-result-area');
+        const underlineDisplay = document.getElementById('underlined-display');
+        const chineseDisplay = document.getElementById('custom-chinese-display');
+        
+        resultArea.classList.remove('hidden');
+        chineseDisplay.innerText = numberToChinese(val);
+        
+        // 產生畫線HTML
+        let strVal = val.toString();
+        // 補齊位數方便分組 (向左補空白)
+        let html = '';
+        
+        // 由右至左，每4位一組
+        let chunks = [];
+        for (let i = strVal.length; i > 0; i -= 4) {
+            chunks.unshift(strVal.substring(Math.max(0, i - 4), i));
+        }
+
+        chunks.forEach((chunk, index) => {
+            // 決定底線顏色：根據題意，通常萬的家族和一的家族用不同顏色區分
+            let borderClass = 'border-b-2 border-gray-800'; // 預設
+            if (chunks.length > 1) {
+                if (index === chunks.length - 2) borderClass = 'border-b-2 border-red-500'; // 萬的家族
+                if (index === chunks.length - 1) borderClass = 'border-b-2 border-blue-500'; // 一的家族
+            }
+            
+            html += `<span class="${borderClass} px-1 pb-1 inline-block">${chunk}</span>`;
+        });
+        
+        underlineDisplay.innerHTML = html;
+    }
+
+    // === 測驗題庫設定 ===
+    const quizData = [
+        {
+            question: "「10 個一萬」合起來是多少？",
+            options: ["十萬", "一百萬", "一千萬", "一萬"],
+            answer: 0
+        },
+        {
+            question: "數字「32013201」中，最左邊的 '3' 代表什麼位值？",
+            options: ["三百萬", "三千萬", "三十萬", "三億"],
+            answer: 1
+        },
+        {
+            question: "請選出正確的讀法：「60054003」",
+            options: ["六千萬零五萬四千零三", "六千零五萬四千零三", "六千零五十萬四千零三", "六千萬五萬四千三"],
+            answer: 1
+        },
+        {
+            question: "「七百八十萬零四十二」記作什麼？",
+            options: ["7800042", "780042", "78000042", "780420"],
+            answer: 0
+        },
+        {
+            question: "1疊有10張千元鈔票，100疊是多少元？",
+            options: ["10000元 (1萬)", "100000元 (10萬)", "1000000元 (100萬)", "10000000元 (1000萬)"],
+            answer: 2
+        }
+    ];
+
+    let currentQuizAnswers = [];
+
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = '';
+        currentQuizAnswers = new Array(quizData.length).fill(null);
+        document.getElementById('quiz-result').classList.add('hidden');
+
+        quizData.forEach((q, qIndex) => {
+            const qDiv = document.createElement('div');
+            qDiv.className = 'mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50';
+            
+            const qTitle = document.createElement('h3');
+            qTitle.className = 'font-bold text-lg mb-3 text-gray-800';
+            qTitle.innerText = `${qIndex + 1}. ${q.question}`;
+            qDiv.appendChild(qTitle);
+
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'flex flex-col gap-2';
+            
+            q.options.forEach((opt, optIndex) => {
+                const btn = document.createElement('button');
+                btn.className = `quiz-option w-full`;
+                btn.innerText = opt;
+                btn.id = `q${qIndex}-opt${optIndex}`;
+                btn.onclick = () => selectOption(qIndex, optIndex, btn);
+                optionsDiv.appendChild(btn);
+            });
+            
+            qDiv.appendChild(optionsDiv);
+            container.appendChild(qDiv);
+        });
+        
+        const submitBtn = document.createElement('button');
+        submitBtn.className = 'btn-hover w-full bg-blue-600 text-white font-bold py-3 rounded-lg mt-4';
+        submitBtn.innerText = '交卷對答案';
+        submitBtn.onclick = checkQuizAnswers;
+        container.appendChild(submitBtn);
+    }
+
+    function selectOption(qIndex, optIndex, btnEle) {
+        currentQuizAnswers[qIndex] = optIndex;
+        
+        // 清除該題其他選項的選取狀態
+        for(let i=0; i<quizData[qIndex].options.length; i++) {
+            document.getElementById(`q${qIndex}-opt${i}`).classList.remove('selected');
+        }
+        // 標記當前選取
+        btnEle.classList.add('selected');
+    }
+
+    function checkQuizAnswers() {
+        // 檢查是否全答
+        if (currentQuizAnswers.includes(null)) {
+            alert("請回答完所有問題再交卷喔！");
+            return;
+        }
+
+        let score = 0;
+        
+        quizData.forEach((q, qIndex) => {
+            const userAns = currentQuizAnswers[qIndex];
+            const correctAns = q.answer;
+            
+            // 標示正確與錯誤
+            const userBtn = document.getElementById(`q${qIndex}-opt${userAns}`);
+            const correctBtn = document.getElementById(`q${qIndex}-opt${correctAns}`);
+            
+            if (userAns === correctAns) {
+                score += 20;
+                userBtn.classList.add('correct');
+            } else {
+                userBtn.classList.add('incorrect');
+                correctBtn.classList.add('correct'); // 顯示正確答案給學生看
+            }
+            
+            // 停用所有按鈕
+            for(let i=0; i<q.options.length; i++) {
+                document.getElementById(`q${qIndex}-opt${i}`).disabled = true;
+                document.getElementById(`q${qIndex}-opt${i}`).style.cursor = 'default';
+            }
+        });
+        
+        const resultDiv = document.getElementById('quiz-result');
+        const scoreMsg = document.getElementById('quiz-score-msg');
+        
+        resultDiv.classList.remove('hidden');
+        if (score === 100) {
+            scoreMsg.innerText = `太棒了！滿分 ${score} 分！你已經完全掌握大數了！`;
+        } else if (score >= 60) {
+            scoreMsg.innerText = `不錯喔！得到 ${score} 分。看看錯的地方，再接再厲！`;
+        } else {
+            scoreMsg.innerText = `獲得 ${score} 分。沒關係，多練習幾次，你一定會進步的！`;
+        }
+        
+        // 隱藏交卷按鈕
+        event.target.classList.add('hidden');
+    }
+
+    // 網頁載入完成後執行初始化
+    window.onload = () => {
+        updateDisplay();
+        initQuiz();
+    };
+
+</script>
+</body>
+</html>

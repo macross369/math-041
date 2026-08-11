@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四位數除以一位數 - 互動探究學習網頁</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans TC & Kiwi Maru -->
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #e0c3fc 70%, #8ec5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        .shinkai-font {
+            font-family: 'Kiwi Maru', 'Noto Sans TC', serif;
+        }
+
+        /* Ambient glowing overlays */
+        .sky-bg {
+            position: relative;
+        }
+        .sky-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 60%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 223, 186, 0.3) 0%, rgba(255, 255, 255, 0) 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border-radius: 1.25rem;
+        }
+
+        .glass-card-accent {
+            background: rgba(255, 248, 240, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 180, 0.7);
+            box-shadow: 0 6px 24px 0 rgba(255, 150, 100, 0.12);
+            border-radius: 1.25rem;
+        }
+
+        /* Buttons */
+        .btn-shinkai {
+            background: linear-gradient(135deg, #4fa8ed 0%, #3a7bd5 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(58, 123, 213, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-shinkai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 123, 213, 0.5);
+            background: linear-gradient(135deg, #60b4f3 0%, #4a8be8 100%);
+        }
+
+        .btn-sunset {
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-sunset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 126, 95, 0.5);
+            background: linear-gradient(135deg, #ff8c70 0%, #ffc18e 100%);
+        }
+
+        /* Active navigation tab */
+        .tab-active {
+            background: #3a7bd5;
+            color: white;
+            box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+        }
+    </style>
+</head>
+<body class="sky-bg p-3 md:p-6 text-slate-800">
+
+    <div class="max-w-6xl mx-auto relative z-10">
+
+        <!-- 頁面頂部 Logo 與品牌標題 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header Banner -->
+        <header class="glass-card p-6 mb-6 text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-300 rounded-full blur-2xl opacity-40"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-300 rounded-full blur-2xl opacity-40"></div>
+            
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學互動探究館
+            </span>
+            <h1 class="text-2xl md:text-4xl font-black text-slate-800 shinkai-font tracking-wide mb-2">
+                四位數除以一位數：位值平分與直式探究
+            </h1>
+            <p class="text-slate-600 text-sm md:text-base max-w-2xl mx-auto">
+                透過具體的「千元、百元、十元、一元」平分過程，觀察直式記法的步驟與原理，探索位值換算與補 0 的奧秘！
+            </p>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <div class="flex flex-wrap justify-center gap-3 mb-6">
+            <button id="tab-explore" onclick="switchTab('explore')" class="tab-active px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
+                <i class="fa-solid fa-compass"></i> 課本範例與動態實驗室
+            </button>
+            <button id="tab-custom" onclick="switchTab('custom')" class="bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
+                <i class="fa-solid fa-sliders"></i> 自訂數字出題機
+            </button>
+            <button id="tab-quiz" onclick="switchTab('quiz')" class="bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
+                <i class="fa-solid fa-square-check"></i> 歷程性小測驗 (5題)
+            </button>
+        </div>
+
+        <!-- SECTION 1: Explore & Dynamic Visualizer -->
+        <main id="section-explore" class="space-y-6">
+
+            <!-- Preset Buttons -->
+            <div class="glass-card p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-blue-500"></i> 快速切換課本經典情境：
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="loadPreset(8972, 6, '分錢幣情境 (商為四位數)')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs md:text-sm font-medium transition">
+                        例1: 8972 ÷ 6 (分錢幣)
+                    </button>
+                    <button onclick="loadPreset(1845, 9, '柚子皮乾裝箱 (商中間補0)')" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-xs md:text-sm font-medium transition">
+                        例2: 1845 ÷ 9 (商中間有0)
+                    </button>
+                    <button onclick="loadPreset(2725, 8, '金桔平分裝箱 (商末尾補0)')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs md:text-sm font-medium transition">
+                        例3: 2725 ÷ 8 (商末尾有0)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Controls Panel -->
+            <div id="custom-controls" class="glass-card p-5 hidden">
+                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-500"></i> 設定自由實驗參數
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="flex justify-between text-sm font-semibold mb-1">
+                            <label for="input-dividend">被除數 (錢幣/物品總數):</label>
+                            <span id="val-dividend" class="text-blue-600 font-bold">8972</span>
+                        </div>
+                        <input type="range" id="input-dividend" min="1000" max="9999" value="8972" class="w-full accent-blue-500 cursor-pointer" oninput="updateInputs()">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>1000</span>
+                            <span>5000</span>
+                            <span>9999</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-semibold mb-1">
+                            <label for="input-divisor">除數 (平分人數/箱數):</label>
+                            <span id="val-divisor" class="text-indigo-600 font-bold">6</span>
+                        </div>
+                        <input type="range" id="input-divisor" min="2" max="9" value="6" class="w-full accent-indigo-500 cursor-pointer" oninput="updateInputs()">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1">
+                            <span>2人/箱</span>
+                            <span>5人/箱</span>
+                            <span>9人/箱</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Visual Playground (2 Columns) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Column: Step Story & Distribution Visual (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+
+                    <!-- Scenario Header Card -->
+                    <div class="glass-card-accent p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <span id="scenario-tag" class="px-2.5 py-1 bg-amber-200 text-amber-800 rounded-md text-xs font-bold">
+                                課本情境一
+                            </span>
+                            <span class="text-xs text-slate-500 font-medium">平分算式：<span id="formula-text" class="font-bold text-slate-700">8972 ÷ 6</span></span>
+                        </div>
+                        <h2 id="scenario-title" class="text-lg md:text-xl font-bold text-slate-800 shinkai-font mb-2">
+                            將 8972 元平均分給 6 個人，每人最多分幾元？剩下幾元？
+                        </h2>
+                        <div id="step-story" class="text-sm text-slate-700 bg-white/80 p-3.5 rounded-xl border border-amber-100 shadow-sm leading-relaxed">
+                            點選下方的「下一步」或「自動播放」，一起按位值（千、百、十、個）觀察平分過程！
+                        </div>
+                    </div>
+
+                    <!-- Concrete Visual Area (Place Values) -->
+                    <div class="glass-card p-5">
+                        <h3 class="text-sm font-bold text-slate-600 uppercase tracking-wider mb-3 flex items-center justify-between">
+                            <span><i class="fa-solid fa-coins text-yellow-500 mr-1"></i> 位值鈔票與硬幣平分狀態</span>
+                            <span id="visual-step-badge" class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-normal">準備開始</span>
+                        </h3>
+
+                        <!-- Grid for 4 Place Values -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                            <div id="card-1000" class="p-3 bg-blue-50/80 rounded-xl border border-blue-200 text-center transition-all">
+                                <div class="text-xs font-bold text-blue-600 mb-1">千位 (1000)</div>
+                                <div id="cnt-1000" class="text-xl font-black text-blue-800">8 張</div>
+                                <div class="text-[10px] text-slate-500 mt-1">1000元大鈔</div>
+                            </div>
+
+                            <div id="card-100" class="p-3 bg-pink-50/80 rounded-xl border border-pink-200 text-center transition-all">
+                                <div class="text-xs font-bold text-pink-600 mb-1">百位 (100)</div>
+                                <div id="cnt-100" class="text-xl font-black text-pink-800">9 張</div>
+                                <div class="text-[10px] text-slate-500 mt-1">100元百鈔</div>
+                            </div>
+
+                            <div id="card-10" class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 text-center transition-all">
+                                <div class="text-xs font-bold text-amber-600 mb-1">十位 (10)</div>
+                                <div id="cnt-10" class="text-xl font-black text-amber-800">7 個</div>
+                                <div class="text-[10px] text-slate-500 mt-1">10元硬幣</div>
+                            </div>
+
+                            <div id="card-1" class="p-3 bg-emerald-50/80 rounded-xl border border-emerald-200 text-center transition-all">
+                                <div class="text-xs font-bold text-emerald-600 mb-1">個位 (1)</div>
+                                <div id="cnt-1" class="text-xl font-black text-emerald-800">2 個</div>
+                                <div class="text-[10px] text-slate-500 mt-1">1元硬幣</div>
+                            </div>
+                        </div>
+
+                        <!-- Person/Box Result Distribution Grid -->
+                        <div class="mt-4 border-t border-slate-200/60 pt-3">
+                            <div class="text-xs font-semibold text-slate-500 mb-2 flex items-center justify-between">
+                                <span>每人/每箱目前分得結果：</span>
+                                <span class="text-slate-400 text-[11px]">共 <span id="people-count-label">6</span> 份</span>
+                            </div>
+                            <div id="people-boxes-container" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                <!-- Dynamic Box HTML -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Standard Long Division Visualizer (5 cols) -->
+                <div class="lg:col-span-5 space-y-6">
+
+                    <!-- Standard Division Board Card -->
+                    <div class="glass-card p-6 flex flex-col items-center justify-between min-h-[420px]">
+                        <div class="w-full flex justify-between items-center mb-4 border-b pb-2">
+                            <span class="font-bold text-slate-700 text-sm flex items-center gap-1.5">
+                                <span class="text-indigo-600 font-bold text-lg leading-none">÷</span> 直式算式對照
+                            </span>
+                            <span id="step-indicator-text" class="text-xs font-bold px-2.5 py-1 bg-indigo-100 text-indigo-700 rounded-full">
+                                步驟 0 / 4
+                            </span>
+                        </div>
+
+                        <!-- Long Division Interactive Graphic (Grid Aligned) -->
+                        <div class="my-auto py-2 w-full flex justify-center">
+                            <div class="inline-block bg-white/90 p-5 rounded-2xl shadow-md border border-slate-200/80 min-w-[280px]">
+                                
+                                <!-- Top Place Value Headers (6 cols: spacer, bracket, 1000, 100, 10, 1) -->
+                                <div class="grid grid-cols-6 text-center font-bold text-xs text-slate-400 mb-1">
+                                    <div></div>
+                                    <div></div>
+                                    <div class="text-blue-500">千</div>
+                                    <div class="text-pink-500">百</div>
+                                    <div class="text-amber-500">十</div>
+                                    <div class="text-emerald-500">個</div>
+                                </div>
+
+                                <!-- Quotient Line & Row -->
+                                <div class="grid grid-cols-6 text-center text-2xl font-black font-mono tracking-wider items-center pb-1">
+                                    <div></div>
+                                    <div></div>
+                                    <div id="q-1000" class="w-8 h-8 flex items-center justify-center mx-auto rounded transition-colors"></div>
+                                    <div id="q-100" class="w-8 h-8 flex items-center justify-center mx-auto rounded transition-colors"></div>
+                                    <div id="q-10" class="w-8 h-8 flex items-center justify-center mx-auto rounded transition-colors"></div>
+                                    <div id="q-1" class="w-8 h-8 flex items-center justify-center mx-auto rounded transition-colors"></div>
+                                </div>
+
+                                <!-- Divisor, Bracket & Dividend Row -->
+                                <div class="grid grid-cols-6 text-center text-2xl font-black font-mono tracking-wider items-center my-1">
+                                    <!-- Divisor -->
+                                    <div id="div-divisor" class="text-indigo-600 text-right pr-1">6</div>
+                                    <!-- Half-width bracket ) shifted to meet the exact left endpoint of dividend top border line -->
+                                    <div class="flex justify-end items-start h-full text-slate-800 font-sans font-bold text-2xl leading-none pt-0 pr-0 relative">
+                                        <span class="inline-block transform translate-x-1.5 translate-y-0.5">)</span>
+                                    </div>
+                                    <!-- Dividend digits with horizontal top bar starting exactly from dividend -->
+                                    <div id="d-1000" class="text-slate-800 border-t-2 border-slate-800 pt-0.5">8</div>
+                                    <div id="d-100" class="text-slate-800 border-t-2 border-slate-800 pt-0.5">9</div>
+                                    <div id="d-10" class="text-slate-800 border-t-2 border-slate-800 pt-0.5">7</div>
+                                    <div id="d-1" class="text-slate-800 border-t-2 border-slate-800 pt-0.5">2</div>
+                                </div>
+
+                                <!-- Step Calculation Rows Container (Grid Aligned) -->
+                                <div id="division-steps-container" class="space-y-1 font-mono text-xl font-bold text-slate-800">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Final Summary Pill -->
+                        <div id="final-summary-pill" class="w-full text-center mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm font-bold hidden">
+                            <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i>
+                            計算完成：<span id="summary-text">商為 1495，餘數為 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Playback Control Panel (Fixed below long division visualizer) -->
+                    <div class="glass-card p-4 flex flex-col gap-3">
+                        <!-- Row 1: Action Buttons -->
+                        <div class="flex flex-wrap items-center justify-center gap-2">
+                            <button id="btn-prev" onclick="prevStep()" class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold text-sm transition flex items-center gap-1">
+                                <i class="fa-solid fa-chevron-left"></i> 上一步
+                            </button>
+                            <button id="btn-next" onclick="nextStep()" class="btn-shinkai px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-1">
+                                下一步 <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                            <button id="btn-auto" onclick="toggleAutoPlay()" class="btn-sunset px-3.5 py-2 rounded-xl font-bold text-sm flex items-center gap-1">
+                                <i id="auto-icon" class="fa-solid fa-play"></i> <span id="auto-text">自動播放</span>
+                            </button>
+                            <button onclick="resetSteps()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs transition">
+                                <i class="fa-solid fa-rotate-left"></i> 重設
+                            </button>
+                        </div>
+
+                        <!-- Row 2: Progress Bar (Next Line) -->
+                        <div class="w-full pt-2 border-t border-slate-200/60">
+                            <div class="flex justify-between text-xs font-semibold text-slate-500 mb-1">
+                                <span>探究進度</span>
+                                <span id="progress-percent">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="bg-gradient-to-r from-blue-400 to-indigo-600 h-full w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- SECTION 2: Quiz & Progressive Assessment -->
+        <section id="section-quiz" class="space-y-6 hidden">
+            
+            <div class="glass-card p-6 text-center">
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mb-2">
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> 歷程性自主評量
+                </span>
+                <h2 class="text-2xl font-bold text-slate-800 shinkai-font mb-2">
+                    「四位數除以一位數」學習觀念挑戰
+                </h2>
+                <p class="text-sm text-slate-600 max-w-xl mx-auto">
+                    請回答下列 5 道精心設計的觀念與計算題，即時獲得解題回饋與導正指引！
+                </p>
+                <div id="quiz-score-banner" class="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-xl inline-block text-indigo-900 font-bold text-sm hidden">
+                    🎯 目前得分：<span id="quiz-score-val" class="text-xl text-indigo-600 font-black">0</span> / 100 分
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div class="space-y-4" id="quiz-container">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Quiz Submit Button -->
+            <div class="text-center py-4">
+                <button onclick="checkAllQuiz()" class="btn-shinkai px-8 py-3 rounded-2xl font-bold text-base shadow-lg hover:scale-105 transition">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> 送出所有答案並核對
+                </button>
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State variables
+        let dividend = 8972;
+        let divisor = 6;
+        let currentStep = 0;
+        let autoPlayTimer = null;
+        let activeTab = 'explore';
+        let currentScenarioTitle = "將 8972 元平均分給 6 個人，每人最多分幾元？剩下幾元？";
+
+        // Quiz Questions Data (5 Questions)
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 算式 8972 ÷ 6 的直式計算中，最先進行平分的是哪一個位值？",
+                options: ["個位 (2)", "十位 (7)", "百位 (9)", "千位 (8)"],
+                answer: 3,
+                explanation: "四位數除以一位數的直式計算時，應從最高的「千位」開始進行平分與計算。"
+            },
+            {
+                id: 2,
+                question: "2. 在工廠裝箱問題「1845 ÷ 9」中，千位的 1 不夠除以 9 時，下一步應該怎麼做？",
+                options: [
+                    "直接在商的千位寫 1",
+                    "將 1 個千換成 10 個百，與百位的 8 合起來變成 18 個百再平分",
+                    "把千位的 1 直接丟掉不計算",
+                    "先算個位的 5"
+                ],
+                answer: 1,
+                explanation: "當千位數字小於除數不夠分時，會將千位化為百位（1千=10百），與原本百位合起來變成 18 個百繼續進行平分。"
+            },
+            {
+                id: 3,
+                question: "3. 採集金桔 2725 顆平分裝成 8 箱，每箱最多有幾顆？還剩下幾顆？",
+                options: [
+                    "340 顆，剩下 5 顆",
+                    "34 顆，剩下 5 顆",
+                    "304 顆，剩下 5 顆",
+                    "340 顆，剩下 0 顆"
+                ],
+                answer: 0,
+                explanation: "2725 ÷ 8 = 340 ... 5。最後個位剩下 5 顆不夠平分成 8 箱，因此商的個位上記 0，餘數為 5。"
+            },
+            {
+                id: 4,
+                question: "4. 計算 4050 ÷ 9 時，商的中間是否有 0？商是多少？",
+                options: [
+                    "商為 45，中間無 0",
+                    "商為 450，中間無 0，末尾有 0",
+                    "商為 405，中間有 0",
+                    "商為 4500"
+                ],
+                answer: 1,
+                explanation: "4050 ÷ 9 = 450。千位不夠除，百位 40÷9=4 餘 4，十位 45÷9=5 餘 0，個位 0÷9=0，故商為 450。"
+            },
+            {
+                id: 5,
+                question: "5. 關於「餘數」的規則，下列敘述何者永遠正確？",
+                options: [
+                    "餘數可以比除數大",
+                    "餘數一定要等於除數",
+                    "餘數必須嚴格小於除數",
+                    "餘數一定要是 0"
+                ],
+                answer: 2,
+                explanation: "在整數除法中，餘數代表「不夠再平分一份」所剩下的量，因此餘數必須嚴格小於除數。"
+            }
+        ];
+
+        function calculateDivisionSteps(num, div) {
+            const numStr = String(num).padStart(4, '0');
+            const digits = numStr.split('').map(Number);
+            
+            let steps = [];
+            let currentRemainder = 0;
+            let quotientDigits = [];
+
+            const placeNames = ["千位", "百位", "十位", "個位"];
+            const placeUnits = ["千", "百", "十", "個"];
+
+            for (let i = 0; i < 4; i++) {
+                let currentDigit = digits[i];
+                let currentVal = (i === 0) ? currentDigit : (currentRemainder * 10 + currentDigit);
+                let qDigit = Math.floor(currentVal / div);
+                let product = qDigit * div;
+                let newRemainder = currentVal - product;
+
+                quotientDigits.push(qDigit);
+
+                steps.push({
+                    stepIndex: i + 1,
+                    placeName: placeNames[i],
+                    placeUnit: placeUnits[i],
+                    digit: currentDigit,
+                    combinedValue: currentVal,
+                    prevRemainder: currentRemainder,
+                    qDigit: qDigit,
+                    product: product,
+                    remainder: newRemainder,
+                    accumulatedQuotient: [...quotientDigits]
+                });
+
+                currentRemainder = newRemainder;
+            }
+
+            return {
+                dividend: num,
+                divisor: div,
+                quotient: Math.floor(num / div),
+                remainder: currentRemainder,
+                steps: steps
+            };
+        }
+
+        function renderCurrentStep() {
+            const data = calculateDivisionSteps(dividend, divisor);
+            const totalSteps = 4;
+
+            // Progress bar
+            const percent = Math.round((currentStep / totalSteps) * 100);
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-percent').innerText = percent + '%';
+            document.getElementById('step-indicator-text').innerText = `步驟 ${currentStep} / ${totalSteps}`;
+
+            // Sync controls
+            document.getElementById('val-dividend').innerText = dividend;
+            document.getElementById('val-divisor').innerText = divisor;
+            document.getElementById('formula-text').innerText = `${dividend} ÷ ${divisor}`;
+
+            document.getElementById('div-divisor').innerText = divisor;
+            document.getElementById('people-count-label').innerText = divisor;
+
+            // Dividend digits setup
+            const dStr = String(dividend).padStart(4, '0');
+            document.getElementById('d-1000').innerText = dStr[0];
+            document.getElementById('d-100').innerText = dStr[1];
+            document.getElementById('d-10').innerText = dStr[2];
+            document.getElementById('d-1').innerText = dStr[3];
+
+            // Reset Quotients
+            ['q-1000', 'q-100', 'q-10', 'q-1'].forEach(id => {
+                const el = document.getElementById(id);
+                el.innerText = '';
+                el.className = "w-8 h-8 flex items-center justify-center mx-auto rounded transition-colors text-slate-300";
+            });
+
+            // Reset Card Highlights
+            ['card-1000', 'card-100', 'card-10', 'card-1'].forEach(id => {
+                document.getElementById(id).classList.remove('ring-4', 'ring-yellow-400', 'scale-105');
+            });
+
+            const stepsContainer = document.getElementById('division-steps-container');
+            stepsContainer.innerHTML = '';
+
+            // Step 0: Initial State
+            if (currentStep === 0) {
+                document.getElementById('visual-step-badge').innerText = "準備開始";
+                document.getElementById('scenario-title').innerText = currentScenarioTitle;
+                document.getElementById('step-story').innerHTML = `
+                    <p class="font-semibold text-indigo-700 mb-1"><i class="fa-solid fa-play-circle mr-1"></i> 準備進行平分：</p>
+                    被除數為 <strong>${dividend}</strong>，平分成 <strong>${divisor}</strong> 份。請點擊「下一步」開始從最高位（千位）進行平分！
+                `;
+                document.getElementById('final-summary-pill').classList.add('hidden');
+
+                document.getElementById('cnt-1000').innerText = dStr[0] + ' 張';
+                document.getElementById('cnt-100').innerText = dStr[1] + ' 張';
+                document.getElementById('cnt-10').innerText = dStr[2] + ' 個';
+                document.getElementById('cnt-1').innerText = dStr[3] + ' 個';
+
+                renderPeopleBoxes(divisor, [0, 0, 0, 0]);
+                return;
+            }
+
+            // Step 1 to 4: Active steps
+            const stepInfo = data.steps[currentStep - 1];
+            const qIds = ['q-1000', 'q-100', 'q-10', 'q-1'];
+            const cardIds = ['card-1000', 'card-100', 'card-10', 'card-1'];
+
+            // Fill Quotients up to current step
+            for (let i = 0; i < currentStep; i++) {
+                const qEl = document.getElementById(qIds[i]);
+                const qVal = data.steps[i].qDigit;
+                
+                if (i === 0 && qVal === 0) {
+                    qEl.innerText = ''; // Hide leading zero
+                } else {
+                    qEl.innerText = qVal;
+                    qEl.classList.add('text-indigo-700', 'font-black');
+                }
+            }
+
+            // Highlight current quotient digit
+            const activeQEl = document.getElementById(qIds[currentStep - 1]);
+            activeQEl.classList.add('bg-yellow-300', 'text-slate-900', 'scale-110');
+
+            // Highlight corresponding Place Card
+            document.getElementById(cardIds[currentStep - 1]).classList.add('ring-4', 'ring-yellow-400', 'scale-105');
+
+            // Render Division Subtraction Steps into Grid (Columns: 0=Divisor, 1=Bracket/Minus, 2=千, 3=百, 4=十, 5=個)
+            let stepsHTML = '';
+
+            for (let s = 0; s < currentStep; s++) {
+                const st = data.steps[s];
+                const colIdx = s + 2; // Column index for Thousand=2, Hundred=3, Ten=4, Unit=5
+
+                if (st.qDigit > 0) {
+                    const pStr = String(st.product);
+                    const pLen = pStr.length;
+
+                    // Product Row (6 columns)
+                    let prodCols = Array(6).fill('');
+                    
+                    if (pLen === 1) {
+                        prodCols[colIdx] = `<span class="block text-center">${pStr[0]}</span>`;
+                        prodCols[colIdx - 1] = `<span class="text-slate-400 font-bold">-</span>`;
+                    } else if (pLen === 2) {
+                        prodCols[colIdx] = `<span class="block text-center">${pStr[1]}</span>`;
+                        prodCols[colIdx - 1] = `<span class="block text-center">${pStr[0]}</span>`;
+                        const minusPos = (colIdx - 2 >= 0) ? colIdx - 2 : 0;
+                        prodCols[minusPos] = `<span class="text-slate-400 font-bold">-</span>`;
+                    }
+
+                    stepsHTML += `<div class="grid grid-cols-6 text-center text-xl font-bold font-mono tracking-wider items-center">`;
+                    for (let c = 0; c < 6; c++) {
+                        // 為千、百、十、個欄位（欄位 2 至 5）統一加入底部橫線，使其與被除數頂線等長一線到底
+                        const borderClass = (c >= 2 && c <= 5) ? 'border-b-2 border-slate-800' : '';
+                        stepsHTML += `<div class="${borderClass} h-8 flex items-center justify-center">${prodCols[c]}</div>`;
+                    }
+                    stepsHTML += `</div>`;
+
+                    // Remainder Row (6 columns)
+                    let remCols = Array(6).fill('');
+                    const rStr = String(st.remainder);
+                    
+                    if (st.remainder === 0) {
+                        if (s === 3) {
+                            remCols[colIdx] = `0`;
+                        }
+                    } else {
+                        if (rStr.length === 1) {
+                            remCols[colIdx] = rStr[0];
+                        } else if (rStr.length === 2) {
+                            remCols[colIdx] = rStr[1];
+                            remCols[colIdx - 1] = rStr[0];
+                        }
+                    }
+
+                    // Pull down next digit if available and currently being stepped through
+                    if (s < 3 && currentStep > s + 1) {
+                        const nextDigit = data.steps[s + 1].digit;
+                        remCols[colIdx + 1] = String(nextDigit);
+                    }
+
+                    if (remCols.some(c => c !== '')) {
+                        stepsHTML += `<div class="grid grid-cols-6 text-center text-xl font-bold font-mono tracking-wider items-center">`;
+                        for (let c = 0; c < 6; c++) {
+                            stepsHTML += `<div>${remCols[c]}</div>`;
+                        }
+                        stepsHTML += `</div>`;
+                    }
+                } else {
+                    // qDigit === 0
+                    if (s === 3) {
+                        // End zero (e.g. 2725 ÷ 8), display final remainder at Unit (Col 5)
+                        let remCols = Array(6).fill('');
+                        remCols[5] = String(st.remainder);
+                        stepsHTML += `<div class="grid grid-cols-6 text-center text-xl font-bold font-mono tracking-wider items-center">`;
+                        for (let c = 0; c < 6; c++) {
+                            stepsHTML += `<div>${remCols[c]}</div>`;
+                        }
+                        stepsHTML += `</div>`;
+                    }
+                }
+            }
+
+            stepsContainer.innerHTML = stepsHTML;
+
+            // Explanation Story Text
+            let storyContent = ``;
+            if (stepInfo.placeName === "千位") {
+                if (stepInfo.qDigit === 0) {
+                    storyContent = `<strong>【千位平分】</strong> ${stepInfo.digit} 個千不夠分給 ${divisor} 人/箱。千位記 0（或不寫），將 ${stepInfo.digit} 個千換成 ${stepInfo.digit * 10} 個百，結合原本百位繼續平分！`;
+                } else {
+                    storyContent = `<strong>【千位平分】</strong> ${stepInfo.digit} 個千平分給 ${divisor} 人/箱，每人分到 <strong>${stepInfo.qDigit}</strong> 個千（1000元）。用掉 ${stepInfo.product} 個千，剩下 <strong>${stepInfo.remainder}</strong> 個千。`;
+                }
+            } else if (stepInfo.placeName === "百位") {
+                storyContent = `<strong>【百位平分】</strong> 前面剩下的千換成百，共有 <strong>${stepInfo.combinedValue}</strong> 個百。平分給 ${divisor} 人/箱，每人分到 <strong>${stepInfo.qDigit}</strong> 個百（100元）。用掉 ${stepInfo.product} 個百，剩下 <strong>${stepInfo.remainder}</strong> 個百。`;
+            } else if (stepInfo.placeName === "十位") {
+                if (stepInfo.qDigit === 0) {
+                    storyContent = `<strong>【十位平分・補0技巧】</strong> 共有 <strong>${stepInfo.combinedValue}</strong> 個十，不夠平分給 ${divisor} 人/箱！<strong>商的十位一定要記 0</strong>。剩下 ${stepInfo.remainder} 個十換成 0 個一繼續！`;
+                } else {
+                    storyContent = `<strong>【十位平分】</strong> 共有 <strong>${stepInfo.combinedValue}</strong> 個十平分給 ${divisor} 人/箱，每人分到 <strong>${stepInfo.qDigit}</strong> 個十（10元）。用掉 ${stepInfo.product} 個十，剩下 <strong>${stepInfo.remainder}</strong> 個十。`;
+                }
+            } else if (stepInfo.placeName === "個位") {
+                if (stepInfo.qDigit === 0) {
+                    storyContent = `<strong>【個位平分・末尾補0】</strong> 共有 <strong>${stepInfo.combinedValue}</strong> 個一，不夠分給 ${divisor} 人/箱。<strong>商的個位記 0</strong>，最後剩下 <strong>${stepInfo.remainder}</strong> 為餘數。`;
+                } else {
+                    storyContent = `<strong>【個位平分】</strong> 共有 <strong>${stepInfo.combinedValue}</strong> 個一平分給 ${divisor} 人/箱，每人分到 <strong>${stepInfo.qDigit}</strong> 個一（1元）。用掉 ${stepInfo.product} 個一，最後剩下 <strong>${stepInfo.remainder}</strong> 為餘數！`;
+                }
+            }
+
+            document.getElementById('step-story').innerHTML = storyContent;
+            document.getElementById('visual-step-badge').innerText = `進行中：${stepInfo.placeName}`;
+
+            renderPeopleBoxes(divisor, stepInfo.accumulatedQuotient);
+
+            if (currentStep === totalSteps) {
+                const summaryEl = document.getElementById('final-summary-pill');
+                summaryEl.classList.remove('hidden');
+                document.getElementById('summary-text').innerText = `商為 ${data.quotient}，餘數為 ${data.remainder}`;
+            } else {
+                document.getElementById('final-summary-pill').classList.add('hidden');
+            }
+        }
+
+        // Render people or box containers
+        function renderPeopleBoxes(count, quotientArray) {
+            const container = document.getElementById('people-boxes-container');
+            container.innerHTML = '';
+
+            const qThousand = quotientArray[0] || 0;
+            const qHundred = quotientArray[1] || 0;
+            const qTen = quotientArray[2] || 0;
+            const qUnit = quotientArray[3] || 0;
+
+            for (let i = 1; i <= count; i++) {
+                const box = document.createElement('div');
+                box.className = "p-2 bg-white/90 rounded-lg border border-slate-200 text-xs shadow-sm flex flex-col justify-between";
+                box.innerHTML = `
+                    <div class="font-bold text-slate-600 mb-1 flex justify-between">
+                        <span><i class="fa-solid fa-user-circle text-blue-400"></i> 第 ${i} 份</span>
+                    </div>
+                    <div class="space-y-0.5 text-[11px]">
+                        ${qThousand > 0 ? `<div class="text-blue-600 font-medium">千: +${qThousand}</div>` : ''}
+                        ${qHundred > 0 ? `<div class="text-pink-600 font-medium">百: +${qHundred}</div>` : ''}
+                        ${qTen > 0 ? `<div class="text-amber-600 font-medium">十: +${qTen}</div>` : ''}
+                        ${qUnit > 0 ? `<div class="text-emerald-600 font-medium">個: +${qUnit}</div>` : ''}
+                        ${qThousand === 0 && qHundred === 0 && qTen === 0 && qUnit === 0 ? `<div class="text-slate-300 italic">尚未平分</div>` : ''}
+                    </div>
+                `;
+                container.appendChild(box);
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                renderCurrentStep();
+            } else {
+                stopAutoPlay();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderCurrentStep();
+            }
+        }
+
+        function resetSteps() {
+            stopAutoPlay();
+            currentStep = 0;
+            renderCurrentStep();
+        }
+
+        function toggleAutoPlay() {
+            if (autoPlayTimer) {
+                stopAutoPlay();
+            } else {
+                if (currentStep === 4) currentStep = 0;
+                document.getElementById('auto-icon').className = "fa-solid fa-pause";
+                document.getElementById('auto-text').innerText = "暫停播放";
+                autoPlayTimer = setInterval(() => {
+                    if (currentStep < 4) {
+                        nextStep();
+                    } else {
+                        stopAutoPlay();
+                    }
+                }, 2200);
+            }
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayTimer) {
+                clearInterval(autoPlayTimer);
+                autoPlayTimer = null;
+            }
+            document.getElementById('auto-icon').className = "fa-solid fa-play";
+            document.getElementById('auto-text').innerText = "自動播放";
+        }
+
+        function loadPreset(num, div, title) {
+            stopAutoPlay();
+            dividend = num;
+            divisor = div;
+            currentScenarioTitle = title;
+            document.getElementById('input-dividend').value = num;
+            document.getElementById('input-divisor').value = div;
+            currentStep = 0;
+            renderCurrentStep();
+        }
+
+        function updateInputs() {
+            dividend = parseInt(document.getElementById('input-dividend').value);
+            divisor = parseInt(document.getElementById('input-divisor').value);
+            currentScenarioTitle = `自訂實驗：${dividend} ÷ ${divisor}`;
+            currentStep = 0;
+            renderCurrentStep();
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            stopAutoPlay();
+
+            document.getElementById('tab-explore').className = "bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2";
+            document.getElementById('tab-custom').className = "bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2";
+            document.getElementById('tab-quiz').className = "bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2";
+
+            document.getElementById(`tab-${tab}`).className = "tab-active px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2";
+
+            if (tab === 'explore') {
+                document.getElementById('section-explore').classList.remove('hidden');
+                document.getElementById('section-quiz').classList.add('hidden');
+                document.getElementById('custom-controls').classList.add('hidden');
+            } else if (tab === 'custom') {
+                document.getElementById('section-explore').classList.remove('hidden');
+                document.getElementById('section-quiz').classList.add('hidden');
+                document.getElementById('custom-controls').classList.remove('hidden');
+            } else if (tab === 'quiz') {
+                document.getElementById('section-explore').classList.add('hidden');
+                document.getElementById('section-quiz').classList.remove('hidden');
+            }
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q) => {
+                const qCard = document.createElement('div');
+                qCard.className = "glass-card p-5 space-y-3";
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, oIdx) => {
+                    optionsHTML += `
+                        <label class="flex items-center gap-3 p-3 bg-white/80 hover:bg-white rounded-xl border border-slate-200/80 cursor-pointer transition">
+                            <input type="radio" name="quiz-q-${q.id}" value="${oIdx}" class="w-4 h-4 text-indigo-600 accent-indigo-600">
+                            <span class="text-sm font-medium text-slate-700">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                qCard.innerHTML = `
+                    <div class="font-bold text-slate-800 text-base flex items-start gap-2">
+                        <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs mt-0.5 font-bold">Q${q.id}</span>
+                        <span>${q.question}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pl-2">
+                        ${optionsHTML}
+                    </div>
+                    <div id="quiz-feedback-${q.id}" class="mt-3 p-3 rounded-xl text-xs font-semibold hidden"></div>
+                `;
+                container.appendChild(qCard);
+            });
+        }
+
+        function checkAllQuiz() {
+            let score = 0;
+
+            quizData.forEach((q) => {
+                const selected = document.querySelector(`input[name="quiz-q-${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+
+                if (selected) {
+                    const userAns = parseInt(selected.value);
+                    if (userAns === q.answer) {
+                        score += 20;
+                        feedbackEl.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> 答對了！ ${q.explanation}`;
+                    } else {
+                        feedbackEl.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> 答錯囉！ ${q.explanation}`;
+                    }
+                } else {
+                    feedbackEl.classList.add('bg-amber-50', 'text-amber-800', 'border', 'border-amber-200');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-600 mr-1"></i> 請選擇一個答案！`;
+                }
+            });
+
+            const scoreBanner = document.getElementById('quiz-score-banner');
+            scoreBanner.classList.remove('hidden');
+            document.getElementById('quiz-score-val').innerText = score;
+        }
+
+        window.onload = function() {
+            renderCurrentStep();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

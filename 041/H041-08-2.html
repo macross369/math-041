@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兩步驟四則運算與併式紀錄</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 40%, #fdf2f8 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* 雲朵飄動背景氣氛 */
+        .shinkai-bg {
+            background-image: 
+                radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
+                radial-gradient(circle at 80% 30%, rgba(254, 243, 199, 0.5) 0%, transparent 35%),
+                radial-gradient(circle at 50% 80%, rgba(224, 231, 255, 0.6) 0%, transparent 50%);
+        }
+
+        .tab-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* 括號先算高亮卡片核心樣式 */
+        .formula-bracket-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-weight: 900;
+        }
+        .formula-bracket {
+            color: #d97706;
+            font-weight: 900;
+            font-size: 1.3em;
+            line-height: 1;
+            margin: 0 1px;
+        }
+        .formula-highlight {
+            background-color: #fef08a;
+            color: #713f12;
+            padding: 3px 12px;
+            border-radius: 12px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(250, 204, 21, 0.2);
+            font-weight: 900;
+            border: 1px solid #fde047;
+            display: inline-block;
+        }
+
+        /* 頁籤專屬顏色與啟用狀態 */
+        .tab-btn-red { background-color: #ffe4e6; color: #9f1239; }
+        .tab-btn-red.active { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); color: white; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35); }
+
+        .tab-btn-orange { background-color: #ffedd5; color: #9a3412; }
+        .tab-btn-orange.active { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35); }
+
+        .tab-btn-yellow { background-color: #fef9c3; color: #854d0e; }
+        .tab-btn-yellow.active { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); color: white; box-shadow: 0 4px 14px rgba(202, 138, 4, 0.35); }
+
+        .tab-btn-green { background-color: #dcfce7; color: #166534; }
+        .tab-btn-green.active { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); }
+
+        .tab-btn-blue { background-color: #e0f2fe; color: #075985; }
+        .tab-btn-blue.active { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: white; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); }
+
+        /* 魔法揭曉動畫 */
+        .highlight-glow {
+            animation: glowPulse 1.2s ease-out;
+        }
+
+        @keyframes glowPulse {
+            0% { transform: scale(0.92); opacity: 0.3; filter: brightness(1.5); }
+            50% { transform: scale(1.08); filter: brightness(1.2); }
+            100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+        }
+
+        /* 自訂漂亮的 Range 滑桿 */
+        input[type=range] {
+            accent-color: #0284c7;
+        }
+    </style>
+</head>
+<body class="shinkai-bg p-3 md:p-6 pb-16">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 標題 Banner -->
+        <header class="bg-white/80 backdrop-blur-md rounded-3xl p-5 mb-6 shadow-sm border border-sky-100/80 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500 text-white flex items-center justify-center text-2xl shadow-md">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black text-sky-900 tracking-wide">兩步驟四則運算與併式紀錄</h1>
+                    <p class="text-xs md:text-sm text-sky-600 font-medium">觀察「先算」與「再算」，掌握括號併式的神奇魔力！</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 導覽頁籤 (Tabs) -->
+        <nav class="flex flex-wrap gap-2 mb-6 bg-white/60 backdrop-blur-md p-2 rounded-2xl border border-sky-100 shadow-sm">
+            <button onclick="switchTab('scene1')" id="tab-scene1" class="tab-btn tab-btn-red active flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-pencil"></i> 場景一：文具採購
+            </button>
+            <button onclick="switchTab('scene2')" id="tab-scene2" class="tab-btn tab-btn-orange flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-apple-whole"></i> 場景二：水果特賣
+            </button>
+            <button onclick="switchTab('scene3')" id="tab-scene3" class="tab-btn tab-btn-yellow flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-scale-balanced"></i> 場景三：天平秤重
+            </button>
+            <button onclick="switchTab('magic')" id="tab-magic" class="tab-btn tab-btn-green flex-1 min-w-[140px] py-2.5 px-3 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 併式拆解魔法陣
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn tab-btn-blue flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs md:text-sm font-bold flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-clipboard-question"></i> 歷程性評量
+            </button>
+        </nav>
+
+        <!-- 場景一：文具採購 -->
+        <main id="content-scene1" class="tab-content bg-white/80 backdrop-blur-md rounded-3xl p-5 md:p-7 shadow-sm border border-sky-100">
+            <div class="flex items-center justify-between mb-4 border-b pb-3 border-gray-100">
+                <div>
+                    <h2 class="text-lg font-bold text-sky-900 flex items-center gap-2">
+                        <span>✏️ 場景一：皮皮與美美的文具店</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">學習先算乘法/加法，並用括號併成一個算式</p>
+                </div>
+                <!-- 模式切換按鈕 -->
+                <div class="flex bg-sky-100/70 p-1 rounded-xl">
+                    <button onclick="setScene1Mode('modeA')" id="s1-mA" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700">模式 A (乘加)</button>
+                    <button onclick="setScene1Mode('modeB')" id="s1-mB" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500">模式 B (打包加乘)</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制面板 -->
+                <div class="lg:col-span-5 bg-sky-50/50 p-4 rounded-2xl border border-sky-100 space-y-4">
+                    <div id="s1-controls" class="space-y-4 text-sm">
+                        <!-- 動態由 JS 渲染控制器 -->
+                    </div>
+                </div>
+
+                <!-- 右側算式與圖解 -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                    <!-- 圖像視覺卡片 -->
+                    <div class="bg-gradient-to-r from-sky-50 to-indigo-50/50 p-4 rounded-2xl border border-sky-100 flex flex-col items-center justify-center min-h-[140px]" id="s1-visual-container">
+                        <!-- 視覺內容由 JS 動態生成 -->
+                    </div>
+
+                    <!-- 步驟解構 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="bg-amber-50/70 border border-amber-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">第一步 (先算)</span>
+                            <div id="s1-step1-text" class="text-base font-black text-amber-900 mt-1">12 × 6 = 72</div>
+                            <div id="s1-step1-desc" class="text-xs text-amber-700">6 枝鉛筆的價格</div>
+                        </div>
+                        <div class="bg-sky-50/70 border border-sky-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-sky-200 text-sky-900 px-2 py-0.5 rounded-full">第二步 (再算)</span>
+                            <div id="s1-step2-text" class="text-base font-black text-sky-900 mt-1">72 + 8 = 80</div>
+                            <div id="s1-step2-desc" class="text-xs text-sky-700">加上橡皮擦的價格</div>
+                        </div>
+                    </div>
+
+                    <!-- 併式結果展示 -->
+                    <div class="bg-emerald-50/80 border-2 border-emerald-200 p-4 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">合併成一個算式</span>
+                        <div id="s1-combined-formula" class="text-xl md:text-2xl font-black text-emerald-950 flex items-center justify-center gap-1 my-1">
+                            <!-- 動態括號卡片 -->
+                        </div>
+                        <p class="text-xs text-emerald-600 font-medium" id="s1-final-ans">答：80 元</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 場景二：水果特賣 -->
+        <main id="content-scene2" class="tab-content hidden bg-white/80 backdrop-blur-md rounded-3xl p-5 md:p-7 shadow-sm border border-sky-100">
+            <div class="flex items-center justify-between mb-4 border-b pb-3 border-gray-100">
+                <div>
+                    <h2 class="text-lg font-bold text-rose-900 flex items-center gap-2">
+                        <span>🍎 場景二：熊媽媽水果行買水果</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">多種水果優惠與找零，體會「減乘」、「乘加」與「乘減」併式</p>
+                </div>
+                <!-- 模式切換 -->
+                <div class="flex bg-rose-100/70 p-1 rounded-xl">
+                    <button onclick="setScene2Mode('guava')" id="s2-m1" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-rose-700">特價芭樂(減乘)</button>
+                    <button onclick="setScene2Mode('apple')" id="s2-m2" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-gray-500">蘋果與楊桃(乘加)</button>
+                    <button onclick="setScene2Mode('orange')" id="s2-m3" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-gray-500">橘子找零(乘減)</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 控制面板 -->
+                <div class="lg:col-span-5 bg-rose-50/40 p-4 rounded-2xl border border-rose-100 space-y-4">
+                    <div id="s2-controls" class="space-y-4 text-sm">
+                        <!-- 動態渲染 -->
+                    </div>
+                </div>
+
+                <!-- 算式與圖解 -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                    <div class="bg-gradient-to-r from-rose-50 to-amber-50/50 p-4 rounded-2xl border border-rose-100 flex flex-col items-center justify-center min-h-[140px]" id="s2-visual-container">
+                        <!-- 視覺內容 -->
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="bg-amber-50/70 border border-amber-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">第一步 (先算)</span>
+                            <div id="s2-step1-text" class="text-base font-black text-amber-900 mt-1">32 - 5 = 27</div>
+                            <div id="s2-step1-desc" class="text-xs text-amber-700">特價後一顆芭樂的價格</div>
+                        </div>
+                        <div class="bg-rose-50/70 border border-rose-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full">第二步 (再算)</span>
+                            <div id="s2-step2-text" class="text-base font-black text-rose-900 mt-1">27 × 4 = 108</div>
+                            <div id="s2-step2-desc" class="text-xs text-rose-700">買 4 顆芭樂的總金額</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50/80 border-2 border-emerald-200 p-4 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">合併成一個算式</span>
+                        <div id="s2-combined-formula" class="text-xl md:text-2xl font-black text-emerald-950 flex items-center justify-center gap-1 my-1">
+                            <!-- 動態併式卡片 -->
+                        </div>
+                        <p class="text-xs text-emerald-600 font-medium" id="s2-final-ans">答：108 元</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 場景三：天平秤重 -->
+        <main id="content-scene3" class="tab-content hidden bg-white/80 backdrop-blur-md rounded-3xl p-5 md:p-7 shadow-sm border border-sky-100">
+            <div class="flex items-center justify-between mb-4 border-b pb-3 border-gray-100">
+                <div>
+                    <h2 class="text-lg font-bold text-indigo-900 flex items-center gap-2">
+                        <span>⚖️ 場景三：磅秤與球體秤重探究</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">先除算出單顆重量，再計算增加或減少後的總重</p>
+                </div>
+                <div class="flex bg-indigo-100/70 p-1 rounded-xl">
+                    <button onclick="setScene3Op('add')" id="s3-op-add-btn" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700">除加 (再放1顆)</button>
+                    <button onclick="setScene3Op('sub')" id="s3-op-sub-btn" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500">除減 (拿走1顆)</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 控制面板 -->
+                <div class="lg:col-span-5 bg-indigo-50/40 p-4 rounded-2xl border border-indigo-100 space-y-4">
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <div class="flex justify-between font-bold text-gray-700 mb-1">
+                                <span>⚖️ 初始總重量：<span id="s3-weight-val" class="text-indigo-600">90</span> g</span>
+                            </div>
+                            <input type="range" id="s3-weight" min="30" max="300" step="15" value="90" class="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene3()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between font-bold text-gray-700 mb-1">
+                                <span>🔵 球的總數量：<span id="s3-balls-val" class="text-indigo-600">3</span> 顆</span>
+                            </div>
+                            <input type="range" id="s3-balls" min="2" max="6" value="3" class="w-full h-2 bg-indigo-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene3()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 算式與圖解 -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                    <div class="bg-gradient-to-r from-sky-50 to-indigo-50/50 p-4 rounded-2xl border border-indigo-100 flex flex-col items-center justify-center min-h-[140px]" id="s3-scale-visual">
+                        <!-- 動態天平/磅秤 visual -->
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div class="bg-amber-50/70 border border-amber-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full">第一步 (先算 1 顆重)</span>
+                            <div id="s3-step1-text" class="text-base font-black text-amber-900 mt-1">90 ÷ 3 = 30</div>
+                        </div>
+                        <div class="bg-sky-50/70 border border-sky-200/80 p-3 rounded-2xl">
+                            <span class="text-[11px] font-bold bg-sky-200 text-sky-900 px-2 py-0.5 rounded-full">第二步 (再算新重量)</span>
+                            <div id="s3-step2-text" class="text-base font-black text-sky-900 mt-1">90 + 30 = 120</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50/80 border-2 border-emerald-200 p-4 rounded-2xl text-center">
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block mb-1">合併成一個算式</span>
+                        <div id="s3-combined-formula" class="text-xl md:text-2xl font-black text-emerald-950 flex items-center justify-center gap-1 my-1">
+                            <!-- 動態併式卡片 -->
+                        </div>
+                        <p class="text-xs text-emerald-600 font-medium" id="s3-final-ans">答：120 公克</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 併式拆解魔法陣 (放置於評量之前) -->
+        <main id="content-magic" class="tab-content hidden bg-white/80 backdrop-blur-md rounded-3xl p-5 md:p-7 shadow-sm border border-emerald-100">
+            <div class="mb-5 pb-3 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-emerald-900 flex items-center gap-2">
+                        <span>✨ 併式替換互動魔法陣</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">點擊選擇題目，體驗將「先算算式」神奇替換掉中間數字的過程！</p>
+                </div>
+            </div>
+
+            <!-- 題目選擇卡片 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" id="magic-topic-cards">
+                <!-- 由 JS 動態生成 4 個經典題型卡片 -->
+            </div>
+
+            <!-- 魔法拆解過程區域 -->
+            <div class="bg-emerald-50/40 border border-emerald-100 p-5 rounded-2xl space-y-6">
+                <!-- 拆解步驟 Display -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-sky-100 shadow-sm relative overflow-hidden">
+                        <span class="absolute right-3 top-3 text-[10px] font-bold bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">第一步 (先算)</span>
+                        <div class="text-xs text-gray-500 font-bold mb-1" id="magic-s1-title">先算蘋果價錢：</div>
+                        <div class="text-lg font-black text-sky-900" id="magic-s1-formula">35 × 5 = 175</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-amber-100 shadow-sm relative overflow-hidden">
+                        <span class="absolute right-3 top-3 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">第二步 (再算)</span>
+                        <div class="text-xs text-gray-500 font-bold mb-1" id="magic-s2-title">再算加上楊桃總價：</div>
+                        <div class="text-lg font-black text-amber-900" id="magic-s2-formula">175 + 25 = 200</div>
+                    </div>
+                </div>
+
+                <!-- 魔法發動按鈕 -->
+                <div class="text-center">
+                    <button onclick="triggerMagicAnimation()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black px-7 py-3 rounded-2xl shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95 text-base flex items-center gap-2 mx-auto">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-xl"></i>
+                        <span>發動「併式替換」魔法！</span>
+                    </button>
+                </div>
+
+                <!-- 最終合併結果區塊 (按按鈕才顯示) -->
+                <div class="bg-white p-6 rounded-2xl border-2 border-emerald-300 shadow-sm text-center min-h-[120px] flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-widest block mb-2">合併後的最終算式</span>
+                    <div id="magic-combined-display" class="text-xl md:text-3xl font-black text-emerald-950 my-1">
+                        <!-- 按按鈕前隱藏，按後呈現併式 -->
+                    </div>
+                    <p id="magic-explain-text" class="text-xs text-emerald-700 font-medium mt-2">請點擊上方按鈕發動魔法替換！</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- 歷程性評量 (5 題) -->
+        <main id="content-quiz" class="tab-content hidden bg-white/80 backdrop-blur-md rounded-3xl p-5 md:p-7 shadow-sm border border-sky-100">
+            <div class="flex items-center justify-between mb-5 pb-3 border-b border-gray-100">
+                <div>
+                    <h2 class="text-lg font-bold text-sky-900 flex items-center gap-2">
+                        <span>📝 歷程性評量 (觀念測驗 5 題)</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-0.5">即時檢測是否真正掌握兩步驟併式的核心意義！</p>
+                </div>
+                <button onclick="resetQuiz()" class="text-xs text-sky-600 hover:text-sky-800 font-bold bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-200">
+                    <i class="fa-solid fa-rotate-left"></i> 重新作答
+                </button>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- 由 JS 動態生成 5 題評量 -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        /* ------------------ 全局狀態與變數 ------------------ */
+        const state = {
+            s1: { mode: 'modeA', pencilPrice: 12, pencilCount: 6, eraserPrice: 8, bundleCount: 5 },
+            s2: { mode: 'guava', price: 32, discount: 5, count: 4, applePrice: 35, appleCount: 5, starfruitPrice: 25, orangePrice: 22, orangeCount: 18, pay: 1000 },
+            s3: { op: 'add', weight: 90, balls: 3 }
+        };
+
+        // 頁籤切換
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            const targetContent = document.getElementById(`content-${tabId}`);
+
+            if (targetBtn && targetContent) {
+                targetBtn.classList.add('active');
+                targetContent.classList.remove('hidden');
+            }
+
+            if (tabId === 'magic') {
+                renderMagicCards();
+            } else if (tabId === 'quiz') {
+                renderQuiz();
+            }
+        }
+
+        /* ------------------ 場景一邏輯 ------------------ */
+        function setScene1Mode(mode) {
+            state.s1.mode = mode;
+            const btnA = document.getElementById('s1-mA');
+            const btnB = document.getElementById('s1-mB');
+            const controls = document.getElementById('s1-controls');
+
+            if (mode === 'modeA') {
+                btnA.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700";
+                btnB.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500";
+                controls.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>✏️ 鉛筆單價：<span id="s1-pencil-price-val" class="text-sky-600">12</span> 元</span>
+                        </div>
+                        <input type="range" id="s1-pencil-price" min="5" max="30" value="${state.s1.pencilPrice}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>✏️ 鉛筆數量：<span id="s1-pencil-count-val" class="text-sky-600">6</span> 枝</span>
+                        </div>
+                        <input type="range" id="s1-pencil-count" min="1" max="10" value="${state.s1.pencilCount}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🧼 橡皮擦單價 (買 1 個)：<span id="s1-eraser-price-val" class="text-sky-600">8</span> 元</span>
+                        </div>
+                        <input type="range" id="s1-eraser-price" min="2" max="20" value="${state.s1.eraserPrice}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                `;
+            } else {
+                btnB.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700";
+                btnA.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500";
+                controls.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>✏️ 組合包內鉛筆價錢：<span id="s1-pencil-price-val" class="text-sky-600">12</span> 元</span>
+                        </div>
+                        <input type="range" id="s1-pencil-price" min="5" max="30" value="${state.s1.pencilPrice}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🧼 組合包內橡皮擦價錢：<span id="s1-eraser-price-val" class="text-sky-600">8</span> 元</span>
+                        </div>
+                        <input type="range" id="s1-eraser-price" min="2" max="20" value="${state.s1.eraserPrice}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🎁 購買組合包組數：<span id="s1-bundle-count-val" class="text-sky-600">5</span> 組</span>
+                        </div>
+                        <input type="range" id="s1-bundle-count" min="1" max="10" value="${state.s1.bundleCount}" class="w-full h-2 bg-sky-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene1()">
+                    </div>
+                `;
+            }
+            updateScene1();
+        }
+
+        function updateScene1() {
+            const mode = state.s1.mode;
+            const visContainer = document.getElementById('s1-visual-container');
+            const s1Text = document.getElementById('s1-step1-text');
+            const s1Desc = document.getElementById('s1-step1-desc');
+            const s2Text = document.getElementById('s1-step2-text');
+            const s2Desc = document.getElementById('s1-step2-desc');
+            const combined = document.getElementById('s1-combined-formula');
+            const finalAns = document.getElementById('s1-final-ans');
+
+            if (mode === 'modeA') {
+                const pencilPrice = parseInt(document.getElementById('s1-pencil-price').value);
+                const pencilCount = parseInt(document.getElementById('s1-pencil-count').value);
+                const eraserPrice = parseInt(document.getElementById('s1-eraser-price').value);
+
+                state.s1.pencilPrice = pencilPrice;
+                state.s1.pencilCount = pencilCount;
+                state.s1.eraserPrice = eraserPrice;
+
+                document.getElementById('s1-pencil-price-val').textContent = pencilPrice;
+                document.getElementById('s1-pencil-count-val').textContent = pencilCount;
+                document.getElementById('s1-eraser-price-val').textContent = eraserPrice;
+
+                const step1Res = pencilPrice * pencilCount;
+                const total = step1Res + eraserPrice;
+
+                visContainer.innerHTML = `
+                    <div class="flex flex-wrap gap-2 items-center justify-center">
+                        <div class="flex flex-wrap gap-1 bg-amber-100/60 p-2.5 rounded-xl border border-amber-200 justify-center">
+                            ${'<span class="text-xl">✏️</span>'.repeat(Math.min(pencilCount, 10))}
+                            <span class="text-xs font-bold text-amber-800 self-center ml-1">(${pencilCount} 枝)</span>
+                        </div>
+                        <span class="font-black text-sky-400 text-lg">+</span>
+                        <div class="bg-sky-100/60 p-2.5 rounded-xl border border-sky-200 flex items-center gap-1">
+                            <span class="text-xl">🧼</span>
+                            <span class="text-xs font-bold text-sky-800">(1 個)</span>
+                        </div>
+                    </div>
+                `;
+
+                s1Text.textContent = `${pencilPrice} × ${pencilCount} = ${step1Res}`;
+                s1Desc.textContent = `${pencilCount} 枝鉛筆的價格`;
+                s2Text.textContent = `${step1Res} + ${eraserPrice} = ${total}`;
+                s2Desc.textContent = `加上 1 個橡皮擦的價錢`;
+
+                combined.innerHTML = `<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${pencilPrice} × ${pencilCount}</span><span class="formula-bracket">)</span></span> + ${eraserPrice} = ${total}`;
+                finalAns.textContent = `答：${total} 元`;
+
+            } else {
+                const pencilPrice = parseInt(document.getElementById('s1-pencil-price').value);
+                const eraserPrice = parseInt(document.getElementById('s1-eraser-price').value);
+                const bundleCount = parseInt(document.getElementById('s1-bundle-count').value);
+
+                state.s1.pencilPrice = pencilPrice;
+                state.s1.eraserPrice = eraserPrice;
+                state.s1.bundleCount = bundleCount;
+
+                document.getElementById('s1-pencil-price-val').textContent = pencilPrice;
+                document.getElementById('s1-eraser-price-val').textContent = eraserPrice;
+                document.getElementById('s1-bundle-count-val').textContent = bundleCount;
+
+                const bundlePrice = pencilPrice + eraserPrice;
+                const total = bundlePrice * bundleCount;
+
+                let bundlesHtml = `<div class="flex flex-wrap gap-2 justify-center max-w-md">`;
+                for (let i = 0; i < Math.min(bundleCount, 6); i++) {
+                    bundlesHtml += `
+                        <div class="p-2 bg-gradient-to-br from-indigo-50 to-sky-50 border-2 border-indigo-200 rounded-2xl shadow-sm flex flex-col items-center">
+                            <div class="flex gap-1 text-base">✏️🧼</div>
+                            <span class="text-[10px] text-indigo-800 font-bold mt-1">第 ${i+1} 組</span>
+                        </div>
+                    `;
+                }
+                bundlesHtml += `</div>`;
+                visContainer.innerHTML = bundlesHtml;
+
+                s1Text.textContent = `${pencilPrice} + ${eraserPrice} = ${bundlePrice}`;
+                s1Desc.textContent = `1 組組合包 (鉛筆+橡皮擦) 的價錢`;
+                s2Text.textContent = `${bundlePrice} × ${bundleCount} = ${total}`;
+                s2Desc.textContent = `買 ${bundleCount} 組組合包共要付的錢`;
+
+                combined.innerHTML = `<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${pencilPrice} + ${eraserPrice}</span><span class="formula-bracket">)</span></span> × ${bundleCount} = ${total}`;
+                finalAns.textContent = `答：${total} 元`;
+            }
+        }
+
+        /* ------------------ 場景二邏輯 ------------------ */
+        function getGuavaSVG(size = 36) {
+            const uid = 'g_' + Math.random().toString(36).substr(2, 5);
+            return `
+                <svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="inline-block drop-shadow-md transition-transform hover:scale-110">
+                    <defs>
+                        <linearGradient id="${uid}" x1="16" y1="16" x2="48" y2="58" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#bef264"/>
+                            <stop offset="45%" stop-color="#84cc16"/>
+                            <stop offset="100%" stop-color="#4d7c0f"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- 樹枝與葉子 -->
+                    <path d="M35 13C43 9 49 11 49 11C49 11 47 17 39 19Z" fill="#15803D"/>
+                    <path d="M32 16C32 10 35 6 38 4" stroke="#3f6212" stroke-width="3" stroke-linecap="round"/>
+                    
+                    <!-- 完整芭樂外觀 (綠皮、凸起果實形狀) -->
+                    <path d="M32 15C20 15 12 25 12 40C12 52 20 60 32 60C44 60 52 52 52 40C52 25 44 15 32 15Z" fill="url(#${uid})" stroke="#3f6212" stroke-width="1.5"/>
+                    
+                    <!-- 芭樂表面光澤與立體線條 -->
+                    <path d="M21 22C17 27 15 34 15 42" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+                    <path d="M26 18C22 22 20 28 20 34" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                    <path d="M41 26C45 32 46 39 44 46" stroke="#3f6212" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+                    
+                    <!-- 芭樂底部花萼細節 -->
+                    <path d="M28 58.5C30 57.5 34 57.5 36 58.5C34 60.5 30 60.5 28 58.5Z" fill="#3f6212"/>
+                </svg>
+            `;
+        }
+
+        function setScene2Mode(mode) {
+            state.s2.mode = mode;
+            const m1 = document.getElementById('s2-m1');
+            const m2 = document.getElementById('s2-m2');
+            const m3 = document.getElementById('s2-m3');
+            const controls = document.getElementById('s2-controls');
+
+            m1.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-gray-500";
+            m2.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-gray-500";
+            m3.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-gray-500";
+
+            if (mode === 'guava') {
+                m1.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-rose-700";
+                controls.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1 flex items-center">
+                            <span class="flex items-center gap-1">${getGuavaSVG(22)} 芭樂原價：<span id="s2-p-val" class="text-rose-600">32</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-p" min="10" max="60" value="${state.s2.price}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🏷️ 今日特價每顆折：<span id="s2-d-val" class="text-rose-600">5</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-d" min="0" max="30" value="${state.s2.discount}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🛒 購買數量：<span id="s2-c-val" class="text-rose-600">4</span> 顆</span>
+                        </div>
+                        <input type="range" id="s2-c" min="1" max="10" value="${state.s2.count}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                `;
+            } else if (mode === 'apple') {
+                m2.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-rose-700";
+                controls.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🍎 蘋果單價：<span id="s2-ap-val" class="text-rose-600">35</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-ap" min="15" max="80" value="${state.s2.applePrice}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🍎 蘋果數量：<span id="s2-ac-val" class="text-rose-600">5</span> 顆</span>
+                        </div>
+                        <input type="range" id="s2-ac" min="1" max="10" value="${state.s2.appleCount}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>⭐️ 楊桃單價 (買 1 顆)：<span id="s2-sp-val" class="text-rose-600">25</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-sp" min="10" max="60" value="${state.s2.starfruitPrice}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                `;
+            } else {
+                m3.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-rose-700";
+                controls.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🍊 橘子單價：<span id="s2-op-val" class="text-rose-600">22</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-op" min="10" max="50" value="${state.s2.orangePrice}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>🍊 橘子數量：<span id="s2-oc-val" class="text-rose-600">18</span> 顆</span>
+                        </div>
+                        <input type="range" id="s2-oc" min="1" max="30" value="${state.s2.orangeCount}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-700 mb-1">
+                            <span>💵 支付金額：<span id="s2-pay-val" class="text-rose-600">1000</span> 元</span>
+                        </div>
+                        <input type="range" id="s2-pay" min="100" max="2000" step="100" value="${state.s2.pay}" class="w-full h-2 bg-rose-100 rounded-lg appearance-none cursor-pointer" oninput="updateScene2()">
+                    </div>
+                `;
+            }
+            updateScene2();
+        }
+
+        function updateScene2() {
+            const mode = state.s2.mode;
+            const vis = document.getElementById('s2-visual-container');
+            const s1Text = document.getElementById('s2-step1-text');
+            const s1Desc = document.getElementById('s2-step1-desc');
+            const s2Text = document.getElementById('s2-step2-text');
+            const s2Desc = document.getElementById('s2-step2-desc');
+            const combined = document.getElementById('s2-combined-formula');
+            const finalAns = document.getElementById('s2-final-ans');
+
+            if (mode === 'guava') {
+                let p = parseInt(document.getElementById('s2-p').value);
+                let d = parseInt(document.getElementById('s2-d').value);
+                let c = parseInt(document.getElementById('s2-c').value);
+
+                // 防止折後出現負數
+                if (d > p) {
+                    d = p;
+                    document.getElementById('s2-d').value = d;
+                }
+
+                state.s2.price = p;
+                state.s2.discount = d;
+                state.s2.count = c;
+
+                document.getElementById('s2-p-val').textContent = p;
+                document.getElementById('s2-d-val').textContent = d;
+                document.getElementById('s2-c-val').textContent = c;
+
+                const discountedPrice = p - d;
+                const total = discountedPrice * c;
+
+                let guavaIconsHtml = '';
+                for (let i = 0; i < Math.min(c, 10); i++) {
+                    guavaIconsHtml += getGuavaSVG(32);
+                }
+
+                vis.innerHTML = `
+                    <div class="p-3 bg-lime-50/80 border border-lime-200 rounded-2xl flex flex-col items-center">
+                        <div class="flex flex-wrap gap-1.5 justify-center max-w-[260px]">
+                            ${guavaIconsHtml}
+                        </div>
+                        <span class="text-xs font-bold text-lime-800 mt-2">特價每顆 ${discountedPrice} 元 (原價 ${p} 折 ${d} 元)</span>
+                    </div>
+                `;
+
+                s1Text.textContent = `${p} - ${d} = ${discountedPrice}`;
+                s1Desc.textContent = `特價後 1 顆芭樂的價格`;
+                s2Text.textContent = `${discountedPrice} × ${c} = ${total}`;
+                s2Desc.textContent = `買 ${c} 顆芭樂共要付的金額`;
+
+                combined.innerHTML = `<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${p} - ${d}</span><span class="formula-bracket">)</span></span> × ${c} = ${total}`;
+                finalAns.textContent = `答：${total} 元`;
+
+            } else if (mode === 'apple') {
+                let ap = parseInt(document.getElementById('s2-ap').value);
+                let ac = parseInt(document.getElementById('s2-ac').value);
+                let sp = parseInt(document.getElementById('s2-sp').value);
+
+                state.s2.applePrice = ap;
+                state.s2.appleCount = ac;
+                state.s2.starfruitPrice = sp;
+
+                document.getElementById('s2-ap-val').textContent = ap;
+                document.getElementById('s2-ac-val').textContent = ac;
+                document.getElementById('s2-sp-val').textContent = sp;
+
+                const appleTotal = ap * ac;
+                const total = appleTotal + sp;
+
+                vis.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 bg-red-50 border border-red-200 rounded-xl text-center">
+                            <div class="text-xl">${'🍎'.repeat(Math.min(ac, 8))}</div>
+                            <span class="text-[11px] text-red-600 font-bold">${ac} 顆蘋果</span>
+                        </div>
+                        <span class="font-bold text-rose-400">+</span>
+                        <div class="p-2 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                            <div class="text-xl">⭐️</div>
+                            <span class="text-[11px] text-amber-600 font-bold">1 顆楊桃 (${sp}元)</span>
+                        </div>
+                    </div>
+                `;
+
+                s1Text.textContent = `${ap} × ${ac} = ${appleTotal}`;
+                s1Desc.textContent = `${ac} 顆蘋果的價錢`;
+                s2Text.textContent = `${appleTotal} + ${sp} = ${total}`;
+                s2Desc.textContent = `加上 1 顆楊桃的價錢`;
+
+                combined.innerHTML = `<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${ap} × ${ac}</span><span class="formula-bracket">)</span></span> + ${sp} = ${total}`;
+                finalAns.textContent = `答：${total} 元`;
+
+            } else if (mode === 'orange') {
+                let op = parseInt(document.getElementById('s2-op').value);
+                let oc = parseInt(document.getElementById('s2-oc').value);
+                let pay = parseInt(document.getElementById('s2-pay').value);
+
+                const totalCost = op * oc;
+
+                // 防止找零出現負數
+                if (pay < totalCost) {
+                    pay = Math.ceil(totalCost / 100) * 100;
+                    document.getElementById('s2-pay').value = pay;
+                }
+
+                state.s2.orangePrice = op;
+                state.s2.orangeCount = oc;
+                state.s2.pay = pay;
+
+                document.getElementById('s2-op-val').textContent = op;
+                document.getElementById('s2-oc-val').textContent = oc;
+                document.getElementById('s2-pay-val').textContent = pay;
+
+                const change = pay - totalCost;
+
+                vis.innerHTML = `
+                    <div class="p-3 bg-orange-50 border border-orange-200 rounded-2xl text-center">
+                        <div class="text-lg flex flex-wrap gap-0.5 justify-center max-w-[220px]">${'🍊'.repeat(Math.min(oc, 18))}</div>
+                        <div class="text-xs font-bold text-orange-700 mt-1.5">總價：${totalCost} 元 | 支付：${pay} 元</div>
+                    </div>
+                `;
+
+                s1Text.textContent = `${op} × ${oc} = ${totalCost}`;
+                s1Desc.textContent = `買 ${oc} 顆橘子的總金額`;
+                s2Text.textContent = `${pay} - ${totalCost} = ${change}`;
+                s2Desc.textContent = `用 ${pay} 元付款後找回的零錢`;
+
+                combined.innerHTML = `${pay} - <span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${op} × ${oc}</span><span class="formula-bracket">)</span></span> = ${change}`;
+                finalAns.textContent = `答：找回 ${change} 元`;
+            }
+        }
+
+        /* ------------------ 場景三邏輯 ------------------ */
+        function setScene3Op(op) {
+            state.s3.op = op;
+            const btn1 = document.getElementById('s3-op-add-btn');
+            const btn2 = document.getElementById('s3-op-sub-btn');
+
+            if (op === 'add') {
+                btn1.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700";
+                btn2.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500";
+            } else {
+                btn2.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-sky-700";
+                btn1.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500";
+            }
+            updateScene3();
+        }
+
+        function updateScene3() {
+            const weight = parseInt(document.getElementById('s3-weight').value);
+            const balls = parseInt(document.getElementById('s3-balls').value);
+            const op = state.s3.op;
+
+            document.getElementById('s3-weight-val').textContent = weight;
+            document.getElementById('s3-balls-val').textContent = balls;
+
+            const singleWeight = Math.round(weight / balls);
+            const s1Text = document.getElementById('s3-step1-text');
+            const s2Text = document.getElementById('s3-step2-text');
+            const combined = document.getElementById('s3-combined-formula');
+            const finalAns = document.getElementById('s3-final-ans');
+            const vis = document.getElementById('s3-scale-visual');
+
+            s1Text.textContent = `${weight} ÷ ${balls} = ${singleWeight}`;
+
+            if (op === 'add') {
+                const newTotal = weight + singleWeight;
+                s2Text.textContent = `${weight} + ${singleWeight} = ${newTotal}`;
+                combined.innerHTML = `${weight} + <span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${weight} ÷ ${balls}</span><span class="formula-bracket">)</span></span> = ${newTotal}`;
+                finalAns.textContent = `答：${newTotal} 公克`;
+
+                vis.innerHTML = `
+                    <div class="relative flex flex-col items-center">
+                        <div class="flex gap-1 mb-2">
+                            ${'<span class="text-2xl animate-pulse">🔵</span>'.repeat(balls)}
+                            <span class="text-2xl opacity-50 border-2 border-dashed border-sky-400 rounded-full">🔵</span>
+                        </div>
+                        <div class="w-48 h-3.5 bg-sky-300 rounded-full shadow-inner"></div>
+                        <div class="w-24 h-11 bg-white border-2 border-sky-400 rounded-b-2xl mt-1 flex items-center justify-center font-black text-sky-800 text-base shadow-sm">
+                            ${newTotal} g
+                        </div>
+                    </div>
+                `;
+            } else {
+                const newTotal = weight - singleWeight;
+                s2Text.textContent = `${weight} - ${singleWeight} = ${newTotal}`;
+                combined.innerHTML = `${weight} - <span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">${weight} ÷ ${balls}</span><span class="formula-bracket">)</span></span> = ${newTotal}`;
+                finalAns.textContent = `答：${newTotal} 公克`;
+
+                vis.innerHTML = `
+                    <div class="relative flex flex-col items-center">
+                        <div class="flex gap-1 mb-2">
+                            ${'<span class="text-2xl">🔴</span>'.repeat(Math.max(1, balls - 1))}
+                            <span class="text-2xl line-through opacity-40">🔴</span>
+                        </div>
+                        <div class="w-48 h-3.5 bg-rose-300 rounded-full shadow-inner"></div>
+                        <div class="w-24 h-11 bg-white border-2 border-rose-400 rounded-b-2xl mt-1 flex items-center justify-center font-black text-rose-800 text-base shadow-sm">
+                            ${newTotal} g
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        /* ------------------ 併式拆解魔法陣邏輯 ------------------ */
+        const magicTopics = [
+            {
+                id: 'apple',
+                icon: '🍎',
+                title: '蘋果與楊桃',
+                sub: '(乘加) 35×5=175',
+                s1Title: '先算 5 顆蘋果的價錢：',
+                s1Formula: '35 × 5 = <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">175</span>',
+                s2Title: '再算加上楊桃後的總金額：',
+                s2Formula: '<span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">175</span> + 25 = 200',
+                combinedHtml: '<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">35 × 5</span><span class="formula-bracket">)</span></span> + 25 = 200',
+                explain: '將先算的「35 × 5」替換掉 175，輕鬆得出總金額！'
+            },
+            {
+                id: 'guava',
+                icon: getGuavaSVG(24),
+                title: '特價芭樂',
+                sub: '(減乘) 32-5=27',
+                s1Title: '先算特價後 1 顆芭樂的價錢：',
+                s1Formula: '32 - 5 = <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">27</span>',
+                s2Title: '再算買 4 顆芭樂共要付的錢：',
+                s2Formula: '<span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">27</span> × 4 = 108',
+                combinedHtml: '<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">32 - 5</span><span class="formula-bracket">)</span></span> × 4 = 108',
+                explain: '將先算的「32 - 5」替換掉 27，因為要先算減法，所以必須加上括號！'
+            },
+            {
+                id: 'orange',
+                icon: '🍊',
+                title: '熊媽媽找零',
+                sub: '(乘減) 22×18=396',
+                s1Title: '先算買 18 顆橘子的總價錢：',
+                s1Formula: '22 × 18 = <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">396</span>',
+                s2Title: '再算用 1000 元付款後找回的錢：',
+                s2Formula: '1000 - <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">396</span> = 604',
+                combinedHtml: '1000 - <span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">22 × 18</span><span class="formula-bracket">)</span></span> = 604',
+                explain: '將先算的「22 × 18」替換掉 396，從 1000 元中扣除！'
+            },
+            {
+                id: 'tomato',
+                icon: '📦',
+                title: '番茄裝箱賣出',
+                sub: '(除減) 432÷6=72',
+                s1Title: '先算採收番茄的總箱數：',
+                s1Formula: '432 ÷ 6 = <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">72</span>',
+                s2Title: '再算賣掉 56 箱後剩下的箱數：',
+                s2Formula: '<span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded-lg font-black">72</span> - 56 = 16',
+                combinedHtml: '<span class="formula-bracket-box"><span class="formula-bracket">(</span><span class="formula-highlight">432 ÷ 6</span><span class="formula-bracket">)</span></span> - 56 = 16',
+                explain: '將先算的「432 ÷ 6」替換掉 72，輕鬆得出剩餘箱數！'
+            }
+        ];
+
+        let currentMagicIndex = 3;
+        let isMagicRevealed = false;
+
+        function renderMagicCards() {
+            const container = document.getElementById('magic-topic-cards');
+            if (!container) return;
+            container.innerHTML = '';
+
+            magicTopics.forEach((t, idx) => {
+                const isActive = idx === currentMagicIndex;
+                container.innerHTML += `
+                    <button onclick="selectMagicTopic(${idx})" class="p-3.5 rounded-2xl text-left transition-all border ${
+                        isActive 
+                        ? 'bg-emerald-500 text-white border-emerald-600 shadow-md scale-[1.02]' 
+                        : 'bg-white text-gray-700 border-gray-200/80 hover:bg-emerald-50/60'
+                    }">
+                        <div class="font-bold text-sm flex items-center gap-1.5">
+                            <span>${t.icon}</span> <span>${t.title}</span>
+                        </div>
+                        <div class="text-[11px] ${isActive ? 'text-emerald-100' : 'text-gray-400'} mt-1 font-medium">${t.sub}</div>
+                    </button>
+                `;
+            });
+            isMagicRevealed = false;
+            updateMagicDisplay(false);
+        }
+
+        function selectMagicTopic(index) {
+            currentMagicIndex = index;
+            isMagicRevealed = false;
+            renderMagicCards();
+        }
+
+        function updateMagicDisplay(animated = false) {
+            const topic = magicTopics[currentMagicIndex];
+            document.getElementById('magic-s1-title').textContent = topic.s1Title;
+            document.getElementById('magic-s1-formula').innerHTML = topic.s1Formula;
+            document.getElementById('magic-s2-title').textContent = topic.s2Title;
+            document.getElementById('magic-s2-formula').innerHTML = topic.s2Formula;
+            document.getElementById('magic-explain-text').textContent = isMagicRevealed ? topic.explain : '請點擊上方按鈕發動魔法替換！';
+
+            const combinedBox = document.getElementById('magic-combined-display');
+
+            if (isMagicRevealed) {
+                combinedBox.innerHTML = topic.combinedHtml;
+                if (animated) {
+                    combinedBox.classList.add('highlight-glow');
+                    setTimeout(() => combinedBox.classList.remove('highlight-glow'), 1200);
+                }
+            } else {
+                combinedBox.innerHTML = `
+                    <div class="text-base text-emerald-700/70 font-bold flex items-center justify-center gap-2 py-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500 animate-pulse text-xl"></i>
+                        <span>點擊上方按鈕，揭曉併式替換結果！</span>
+                    </div>
+                `;
+            }
+        }
+
+        function triggerMagicAnimation() {
+            isMagicRevealed = true;
+            updateMagicDisplay(true);
+        }
+
+        /* ------------------ 歷程性評量 (5題) ------------------ */
+        const quizQuestions = [
+            {
+                q: "1. 小美買了 6 枝鉛筆（每枝 12 元）和 1 個 8 元的橡皮擦，要求總價金額，合併後的算式應該怎麼記？",
+                options: [
+                    "(12 + 8) × 6 = 120",
+                    "(12 × 6) + 8 = 80",
+                    "12 × (6 + 8) = 168",
+                    "12 + 6 + 8 = 26"
+                ],
+                answer: 1,
+                explain: "先算 6 枝鉛筆的價格：<span class='formula-bracket-box'><span class='formula-bracket'>(</span><span class='formula-highlight'>12 × 6</span><span class='formula-bracket'>)</span></span> = 72，再加上橡皮擦 8 元得到 80 元。"
+            },
+            {
+                q: "2. 芭樂原價 1 顆 32 元，今日特價每顆便宜 5 元。熊媽媽買了 4 顆，併式紀錄為下列何者？",
+                options: [
+                    "32 - (5 × 4) = 12",
+                    "(32 - 5) × 4 = 108",
+                    "32 × 4 - 5 = 123",
+                    "(32 × 4) - 5 = 123"
+                ],
+                answer: 1,
+                explain: "要先算出特價後 1 顆芭樂的價格：<span class='formula-bracket-box'><span class='formula-bracket'>(</span><span class='formula-highlight'>32 - 5</span><span class='formula-bracket'>)</span></span> = 27 元，因為要先算減法，所以必須加上括號再乘以 4。"
+            },
+            {
+                q: "3. 熊媽媽拿 1000 元買了 18 顆橘子（每顆 22 元），請問應找回多少元？合併算式為何？",
+                options: [
+                    "(1000 - 22) × 18 = 17604",
+                    "1000 - (22 × 18) = 604",
+                    "(22 × 18) - 1000 = -604",
+                    "1000 - 22 - 18 = 960"
+                ],
+                answer: 1,
+                explain: "先算買 18 顆橘子的總花費：<span class='formula-bracket-box'><span class='formula-bracket'>(</span><span class='formula-highlight'>22 × 18</span><span class='formula-bracket'>)</span></span> = 396，再從 1000 元中扣除得到 604 元。"
+            },
+            {
+                q: "4. 秤上有 3 顆重量相同的藍球共重 90 公克，若再放上 1 顆相同的藍球，秤上總重幾公克？",
+                options: [
+                    "90 + (90 ÷ 3) = 120",
+                    "(90 + 1) ÷ 3 = 30.3",
+                    "(90 ÷ 3) + 1 = 31",
+                    "90 × 3 + 1 = 271"
+                ],
+                answer: 0,
+                explain: "先算 1 顆藍球的重量：<span class='formula-bracket-box'><span class='formula-bracket'>(</span><span class='formula-highlight'>90 ÷ 3</span><span class='formula-bracket'>)</span></span> = 30，再加回原本的 90 公克得到 120 公克。"
+            },
+            {
+                q: "5. 美美有 77 元，想買 4 枝一樣的冰棒還不夠 3 元，請問 1 枝冰棒是多少元？併式如何記錄？",
+                options: [
+                    "(77 - 3) ÷ 4 = 18.5",
+                    "(77 + 3) ÷ 4 = 20",
+                    "77 + (3 ÷ 4) = 77.75",
+                    "77 ÷ 4 + 3 = 22.25"
+                ],
+                answer: 1,
+                explain: "不夠 3 元代表買 4 枝冰棒總共需要 <span class='formula-bracket-box'><span class='formula-bracket'>(</span><span class='formula-highlight'>77 + 3</span><span class='formula-bracket'>)</span></span> = 80 元，再平分給 4 枝得到每枝 20 元。"
+            }
+        ];
+
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, qIdx) => {
+                const userAns = userAnswers[qIdx];
+                let optionsHtml = '';
+
+                q.options.forEach((opt, optIdx) => {
+                    let btnStyle = "bg-gray-50 border-gray-200 text-gray-700 hover:bg-sky-50";
+                    if (userAns !== undefined) {
+                        if (optIdx === q.answer) {
+                            btnStyle = "bg-emerald-100 border-emerald-400 text-emerald-900 font-bold";
+                        } else if (userAns === optIdx) {
+                            btnStyle = "bg-rose-100 border-rose-400 text-rose-900 font-bold";
+                        }
+                    }
+
+                    optionsHtml += `
+                        <button onclick="selectOption(${qIdx}, ${optIdx})" class="w-full text-left p-3 rounded-xl border text-xs md:text-sm transition-all ${btnStyle}">
+                            ${opt}
+                        </button>
+                    `;
+                });
+
+                let feedbackHtml = '';
+                if (userAns !== undefined) {
+                    const isCorrect = userAns === q.answer;
+                    feedbackHtml = `
+                        <div class="mt-3 p-3 rounded-xl border text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}">
+                            <div class="font-bold mb-1 flex items-center gap-1">
+                                ${isCorrect ? '<i class="fa-solid fa-circle-check text-emerald-600"></i> 回答正確！' : '<i class="fa-solid fa-circle-xmark text-rose-600"></i> 再思考看看！'}
+                            </div>
+                            <div>${q.explain}</div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl border border-sky-100 shadow-sm space-y-3">
+                        <div class="font-bold text-sm text-sky-900">${q.q}</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${optionsHtml}
+                        </div>
+                        ${feedbackHtml}
+                    </div>
+                `;
+            });
+        }
+
+        function selectOption(qIdx, optIdx) {
+            userAnswers[qIdx] = optIdx;
+            renderQuiz();
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            renderQuiz();
+        }
+
+        /* ------------------ 初始化 ------------------ */
+        window.onload = function() {
+            setScene1Mode('modeA');
+            setScene2Mode('guava');
+            setScene3Op('add');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>十萬以內的數 - 互動探究學習網</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans TC', 'sans-serif'],
+          },
+          colors: {
+            shinkai: {
+              blue: '#2b580c',
+              sky: '#3a86ff',
+              sunset: '#ff006e',
+              glow: '#ffbe0b',
+              deep: '#1a1a3a',
+              cloud: '#e2f1ff'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 新海誠風格天空背景與光束 */
+    body {
+      background: linear-gradient(180deg, #182848 0%, #2980b9 35%, #8e44ad 70%, #fd79a8 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #2d3748;
+      overflow-x: hidden;
+    }
+
+    /* 雲朵動畫與星光效果 */
+    .shinkai-cloud {
+      position: fixed;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(8px);
+      border-radius: 100px;
+      pointer-events: none;
+      animation: floatCloud 25s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes floatCloud {
+      0% { transform: translateX(-200px); }
+      100% { transform: translateX(100vw); }
+    }
+
+    .shinkai-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .digit-card {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .digit-card:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    /* 自訂滑桿軌道 */
+    input[type=range] {
+      accent-color: #3a86ff;
+    }
+
+    /* 鈔票與硬幣擺放動態效果 */
+    .money-badge {
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .money-badge:hover {
+      transform: scale(1.1) rotate(-3deg);
+    }
+
+    /* 脈衝光亮提醒 */
+    .glow-pulse {
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 5px #ffbe0b, 0 0 10px #ffbe0b; }
+      to { box-shadow: 0 0 15px #ff006e, 0 0 25px #ff006e; }
+    }
+  </style>
+</head>
+<body class="relative pb-16 font-sans">
+
+  <!-- 背景天空裝飾雲朵 -->
+  <div class="shinkai-cloud w-64 h-16 top-10 left-0" style="animation-duration: 35s;"></div>
+  <div class="shinkai-cloud w-96 h-24 top-40 left-10" style="animation-duration: 45s; opacity: 0.6;"></div>
+  <div class="shinkai-cloud w-72 h-20 top-80 right-0" style="animation-duration: 30s; animation-delay: -10s;"></div>
+
+  <!-- 主容器 -->
+  <div class="relative z-10 max-w-6xl mx-auto px-4 pt-6">
+
+    <!-- 頁面頂部品牌 Logo 與標題 -->
+    <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+      <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+      <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <!-- 頂部標題與導覽區 -->
+    <header class="shinkai-card rounded-3xl p-6 mb-8 text-center text-slate-800">
+      <h1 class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-purple-700 to-pink-600 tracking-wide mb-2">
+        ✨ 十萬以內的數：魔法位值與進位探索
+      </h1>
+      <p class="text-slate-600 font-medium text-sm md:text-base max-w-2xl mx-auto">
+        滑動數值、觀察錢幣組合、探索連續「零」的讀法，並動態體驗存錢簿累加進位！
+      </p>
+
+      <!-- 頁籤選單 -->
+      <nav class="flex flex-wrap justify-center gap-2 mt-6">
+        <button onclick="switchTab('explorer')" id="tab-explorer" class="tab-btn px-5 py-2.5 rounded-2xl font-bold transition-all shadow-sm bg-blue-600 text-white shadow-blue-300">
+          <i class="fa-solid fa-sliders mr-2"></i>位值與錢幣探究
+        </button>
+        <button onclick="switchTab('zero-rules')" id="tab-zero-rules" class="tab-btn px-5 py-2.5 rounded-2xl font-bold transition-all shadow-sm bg-white/80 text-slate-700 hover:bg-white">
+          <i class="fa-solid fa-book-open mr-2"></i>「零」的讀法特區
+        </button>
+        <button onclick="switchTab('bankbook')" id="tab-bankbook" class="tab-btn px-5 py-2.5 rounded-2xl font-bold transition-all shadow-sm bg-white/80 text-slate-700 hover:bg-white">
+          <i class="fa-solid fa-piggy-bank mr-2"></i>存錢簿進位模擬
+        </button>
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-5 py-2.5 rounded-2xl font-bold transition-all shadow-sm bg-white/80 text-slate-700 hover:bg-white">
+          <i class="fa-solid fa-graduation-cap mr-2"></i>歷程評量測驗 (5題)
+        </button>
+      </nav>
+    </header>
+
+    <!-- TAB 1: 位值與錢幣探究區 -->
+    <div id="section-explorer" class="tab-content space-y-6">
+      
+      <!-- 主數值總覽面板 -->
+      <div class="shinkai-card rounded-3xl p-6 text-center border-2 border-indigo-200">
+        <div class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">當前代表總數值</div>
+        <div class="flex items-center justify-center space-x-3 mb-2">
+          <span id="total-number-display" class="text-5xl md:text-6xl font-black text-indigo-900 tracking-wider">83,245</span>
+          <span class="text-2xl font-bold text-slate-600">元</span>
+          <button onclick="speakNumber()" title="語音朗讀" class="w-12 h-12 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full flex items-center justify-center shadow transition-all active:scale-95">
+            <i class="fa-solid fa-volume-high text-xl"></i>
+          </button>
+        </div>
+        <!-- 中文讀法 -->
+        <div class="bg-amber-100/90 text-amber-900 rounded-xl py-2 px-6 inline-block font-bold text-lg md:text-xl border border-amber-200 shadow-sm">
+          讀作：<span id="chinese-read-display" class="text-pink-700 font-black">八萬三千二百四十五</span>
+        </div>
+      </div>
+
+      <!-- 五位數位值表與滑桿互動控制 -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        
+        <!-- 萬位 -->
+        <div class="digit-card shinkai-card rounded-2xl p-4 border-t-4 border-purple-500 text-center flex flex-col justify-between">
+          <div>
+            <div class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-full inline-block mb-2">萬位</div>
+            <div class="text-4xl font-black text-purple-900 mb-2" id="val-w">8</div>
+            <div class="text-xs text-slate-500 mb-3">代表 <span id="rep-w" class="font-bold text-purple-700">80000</span></div>
+          </div>
+          <div>
+            <input type="range" id="slider-w" min="0" max="9" value="8" oninput="updateFromSliders()" class="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between items-center mt-3">
+              <button onclick="changeDigit('w', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-purple-200 font-bold text-slate-700">-</button>
+              <span class="text-xs text-slate-400 font-bold">10000元鈔</span>
+              <button onclick="changeDigit('w', 1)" class="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 千位 -->
+        <div class="digit-card shinkai-card rounded-2xl p-4 border-t-4 border-blue-500 text-center flex flex-col justify-between">
+          <div>
+            <div class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full inline-block mb-2">千位</div>
+            <div class="text-4xl font-black text-blue-900 mb-2" id="val-q">3</div>
+            <div class="text-xs text-slate-500 mb-3">代表 <span id="rep-q" class="font-bold text-blue-700">3000</span></div>
+          </div>
+          <div>
+            <input type="range" id="slider-q" min="0" max="9" value="3" oninput="updateFromSliders()" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between items-center mt-3">
+              <button onclick="changeDigit('q', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-blue-200 font-bold text-slate-700">-</button>
+              <span class="text-xs text-slate-400 font-bold">1000元鈔</span>
+              <button onclick="changeDigit('q', 1)" class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 百位 -->
+        <div class="digit-card shinkai-card rounded-2xl p-4 border-t-4 border-teal-500 text-center flex flex-col justify-between">
+          <div>
+            <div class="bg-teal-100 text-teal-800 text-xs font-bold px-2.5 py-1 rounded-full inline-block mb-2">百位</div>
+            <div class="text-4xl font-black text-teal-900 mb-2" id="val-b">2</div>
+            <div class="text-xs text-slate-500 mb-3">代表 <span id="rep-b" class="font-bold text-teal-700">200</span></div>
+          </div>
+          <div>
+            <input type="range" id="slider-b" min="0" max="9" value="2" oninput="updateFromSliders()" class="w-full h-2 bg-teal-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between items-center mt-3">
+              <button onclick="changeDigit('b', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-teal-200 font-bold text-slate-700">-</button>
+              <span class="text-xs text-slate-400 font-bold">100元鈔</span>
+              <button onclick="changeDigit('b', 1)" class="w-8 h-8 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 十位 -->
+        <div class="digit-card shinkai-card rounded-2xl p-4 border-t-4 border-amber-500 text-center flex flex-col justify-between">
+          <div>
+            <div class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full inline-block mb-2">十位</div>
+            <div class="text-4xl font-black text-amber-900 mb-2" id="val-s">4</div>
+            <div class="text-xs text-slate-500 mb-3">代表 <span id="rep-s" class="font-bold text-amber-700">40</span></div>
+          </div>
+          <div>
+            <input type="range" id="slider-s" min="0" max="9" value="4" oninput="updateFromSliders()" class="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between items-center mt-3">
+              <button onclick="changeDigit('s', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-amber-200 font-bold text-slate-700">-</button>
+              <span class="text-xs text-slate-400 font-bold">10元硬幣</span>
+              <button onclick="changeDigit('s', 1)" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 個位 -->
+        <div class="digit-card shinkai-card rounded-2xl p-4 border-t-4 border-rose-500 text-center flex flex-col justify-between">
+          <div>
+            <div class="bg-rose-100 text-rose-800 text-xs font-bold px-2.5 py-1 rounded-full inline-block mb-2">個位</div>
+            <div class="text-4xl font-black text-rose-900 mb-2" id="val-g">5</div>
+            <div class="text-xs text-slate-500 mb-3">代表 <span id="rep-g" class="font-bold text-rose-700">5</span></div>
+          </div>
+          <div>
+            <input type="range" id="slider-g" min="0" max="9" value="5" oninput="updateFromSliders()" class="w-full h-2 bg-rose-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between items-center mt-3">
+              <button onclick="changeDigit('g', -1)" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-rose-200 font-bold text-slate-700">-</button>
+              <span class="text-xs text-slate-400 font-bold">1元硬幣</span>
+              <button onclick="changeDigit('g', 1)" class="w-8 h-8 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold">+</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 錢幣組合圖像化呈現 (對應課本實體教具) -->
+      <div class="shinkai-card rounded-3xl p-6">
+        <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center">
+          <i class="fa-solid fa-coins text-amber-500 mr-2"></i>具體錢幣組合（視覺化教具）
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- 10000元區 -->
+          <div class="bg-purple-50/80 rounded-2xl p-3 border border-purple-100 min-h-[140px]">
+            <div class="text-xs font-bold text-purple-700 mb-2">10000元鈔 (<span id="count-w">8</span>張)</div>
+            <div id="money-box-w" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- 1000元區 -->
+          <div class="bg-blue-50/80 rounded-2xl p-3 border border-blue-100 min-h-[140px]">
+            <div class="text-xs font-bold text-blue-700 mb-2">1000元鈔 (<span id="count-q">3</span>張)</div>
+            <div id="money-box-q" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- 100元區 -->
+          <div class="bg-teal-50/80 rounded-2xl p-3 border border-teal-100 min-h-[140px]">
+            <div class="text-xs font-bold text-teal-700 mb-2">100元鈔 (<span id="count-b">2</span>張)</div>
+            <div id="money-box-b" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- 10元區 -->
+          <div class="bg-amber-50/80 rounded-2xl p-3 border border-amber-100 min-h-[140px]">
+            <div class="text-xs font-bold text-amber-700 mb-2">10元硬幣 (<span id="count-s">4</span>個)</div>
+            <div id="money-box-s" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- 1元區 -->
+          <div class="bg-rose-50/80 rounded-2xl p-3 border border-rose-100 min-h-[140px]">
+            <div class="text-xs font-bold text-rose-700 mb-2">1元硬幣 (<span id="count-g">5</span>個)</div>
+            <div id="money-box-g" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: 「零」的讀法特區 -->
+    <div id="section-zero-rules" class="tab-content hidden space-y-6">
+      <div class="shinkai-card rounded-3xl p-6">
+        <h2 class="text-2xl font-black text-indigo-900 mb-2">
+          <i class="fa-solid fa-magnifying-glass mr-2 text-pink-500"></i>「零」的讀法特訓診所
+        </h2>
+        <p class="text-slate-600 text-sm mb-6">
+          在十萬以內的數中，當中間或末尾出現「0」時，該怎麼讀？點選課本典型範例進行探究：
+        </p>
+
+        <!-- 典型範例快速按鈕 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <button onclick="loadExample(80500)" class="p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-2xl font-bold text-left transition shadow-sm">
+            <div class="text-xs text-indigo-500">末尾零範例</div>
+            <div class="text-xl text-indigo-900">80500</div>
+          </button>
+          <button onclick="loadExample(90098)" class="p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-2xl font-bold text-left transition shadow-sm">
+            <div class="text-xs text-pink-500">連續零範例</div>
+            <div class="text-xl text-indigo-900">90098</div>
+          </button>
+          <button onclick="loadExample(30018)" class="p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-2xl font-bold text-left transition shadow-sm">
+            <div class="text-xs text-amber-500">課本練習題</div>
+            <div class="text-xl text-indigo-900">30018</div>
+          </button>
+          <button onclick="loadExample(70856)" class="p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-2xl font-bold text-left transition shadow-sm">
+            <div class="text-xs text-teal-500">中間零範例</div>
+            <div class="text-xl text-indigo-900">70856</div>
+          </button>
+        </div>
+
+        <!-- 深度拆解展示面板 -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            <div>
+              <span class="text-xs font-bold text-blue-600 uppercase">當前分析數值</span>
+              <div id="zero-num-title" class="text-4xl font-black text-slate-800">90098</div>
+            </div>
+            <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-indigo-100 text-center">
+              <span class="text-xs font-bold text-slate-400 block">標準國字讀作</span>
+              <span id="zero-read-title" class="text-2xl font-black text-pink-600">九萬零九十八</span>
+            </div>
+          </div>
+
+          <!-- 口訣重點法則 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white/80 rounded-xl p-4 border border-blue-100">
+              <div class="font-bold text-indigo-800 mb-1 flex items-center">
+                <i class="fa-solid fa-circle-check text-green-500 mr-2"></i>規則 1：中間連續有 0
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                一個數中間無論有連續幾個「0」（例如 9<span class="text-pink-600 font-bold">00</span>98），在讀數時<span class="font-bold text-indigo-700">只要讀出一個「零」</span>即可。
+              </p>
+            </div>
+            <div class="bg-white/80 rounded-xl p-4 border border-blue-100">
+              <div class="font-bold text-indigo-800 mb-1 flex items-center">
+                <i class="fa-solid fa-circle-check text-green-500 mr-2"></i>規則 2：末尾有 0
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                位值末尾的「0」（例如 805<span class="text-pink-600 font-bold">00</span> 中的個位與十位），<span class="font-bold text-indigo-700">完全不需要讀出來</span>。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: 存錢簿進位模擬區 -->
+    <div id="section-bankbook" class="tab-content hidden space-y-6">
+      <div class="shinkai-card rounded-3xl p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-indigo-900">
+              <i class="fa-solid fa-book-bookmark text-blue-500 mr-2"></i>存錢簿累加與位值進位模擬器
+            </h2>
+            <p class="text-slate-600 text-sm">
+              模擬課本第8頁「哥哥與妹妹的存款紀錄」，體會每次增加 1000、100 或 1 元時位值的跨位變化！
+            </p>
+          </div>
+          <button onclick="resetBankbook()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold text-sm">
+            <i class="fa-solid fa-rotate-left mr-1"></i>重新開始
+          </button>
+        </div>
+
+        <!-- 操作按鈕列 -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button onclick="deposit(1000)" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-bold shadow transition active:scale-95">
+            + 存入 1000 元 (千位累加)
+          </button>
+          <button onclick="deposit(100)" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white rounded-xl font-bold shadow transition active:scale-95">
+            + 存入 100 元 (百位累加)
+          </button>
+          <button onclick="deposit(1)" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white rounded-xl font-bold shadow transition active:scale-95">
+            + 存入 1 元 (關鍵進位體驗!)
+          </button>
+        </div>
+
+        <!-- 存錢簿表格 -->
+        <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-inner">
+          <table class="w-full text-center border-collapse">
+            <thead>
+              <tr class="bg-indigo-900 text-white text-xs">
+                <th class="py-3 px-2 border-r border-indigo-800" rowspan="2">月份</th>
+                <th class="py-3 px-2 border-r border-indigo-800" rowspan="2">摘要</th>
+                <th class="py-2 px-2 border-r border-indigo-800" colspan="5">存入金額 (元)</th>
+                <th class="py-2 px-2" colspan="5">結餘 (元)</th>
+              </tr>
+              <tr class="bg-indigo-800 text-indigo-100 text-[11px]">
+                <th class="py-1 px-1 border-r border-indigo-700">萬</th>
+                <th class="py-1 px-1 border-r border-indigo-700">千</th>
+                <th class="py-1 px-1 border-r border-indigo-700">百</th>
+                <th class="py-1 px-1 border-r border-indigo-700">十</th>
+                <th class="py-1 px-1 border-r border-indigo-700">個</th>
+                <th class="py-1 px-1 border-r border-indigo-700">萬</th>
+                <th class="py-1 px-1 border-r border-indigo-700">千</th>
+                <th class="py-1 px-1 border-r border-indigo-700">百</th>
+                <th class="py-1 px-1 border-r border-indigo-700">十</th>
+                <th class="py-1 px-1">個</th>
+              </tr>
+            </thead>
+            <tbody id="bankbook-rows" class="text-sm font-bold text-slate-700">
+              <!-- 動態生成行 -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 4: 歷程評量測驗區 -->
+    <div id="section-quiz" class="tab-content hidden space-y-6">
+      <div class="shinkai-card rounded-3xl p-6">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-indigo-900">
+              <i class="fa-solid fa-clipboard-check text-purple-600 mr-2"></i>學習成果挑戰賽
+            </h2>
+            <p class="text-slate-600 text-sm">請閱讀題目後選擇正確解答，系統將即時給予反饋說明！</p>
+          </div>
+          <div class="bg-purple-100 text-purple-800 font-bold px-4 py-2 rounded-2xl text-sm">
+            得分：<span id="quiz-score" class="text-xl font-black text-purple-900">0</span> / 100
+          </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-6">
+          <!-- 題目卡片由 JS 動態渲染 -->
+        </div>
+
+        <div class="mt-8 text-center">
+          <button onclick="resetQuiz()" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:opacity-95 transition">
+            <i class="fa-solid fa-arrows-rotate mr-2"></i>重新測驗
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ----------------------------------------------------
+    // 1. 全域狀態與數值
+    // ----------------------------------------------------
+    let currentDigits = { w: 8, q: 3, b: 2, s: 4, g: 5 }; // 83245
+
+    const digitsList = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
+
+    // 頁籤切換
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white');
+        btn.classList.add('bg-white/80', 'text-slate-700');
+      });
+
+      document.getElementById('section-' + tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('tab-' + tabId);
+      activeBtn.classList.remove('bg-white/80', 'text-slate-700');
+      activeBtn.classList.add('bg-blue-600', 'text-white');
+    }
+
+    // ----------------------------------------------------
+    // 2. 國小數學標準數字轉中文讀法演算法 (台灣教材規範)
+    // ----------------------------------------------------
+    function numberToChinese(num) {
+      if (num === 0) return "零";
+      let str = num.toString().padStart(5, '0');
+      let w = parseInt(str[0]), q = parseInt(str[1]), b = parseInt(str[2]), s = parseInt(str[3]), g = parseInt(str[4]);
+      
+      let res = "";
+      
+      // 萬位
+      if (w > 0) res += digitsList[w] + "萬";
+
+      // 千位
+      if (q > 0) {
+        res += digitsList[q] + "千";
+      } else if (w > 0 && (b > 0 || s > 0 || g > 0)) {
+        res += "零";
+      }
+
+      // 百位
+      if (b > 0) {
+        res += digitsList[b] + "百";
+      } else if (q > 0 && (s > 0 || g > 0) && !res.endsWith("零")) {
+        res += "零";
+      }
+
+      // 十位
+      if (s > 0) {
+        if (s === 1 && (w > 0 || q > 0 || b > 0)) {
+          res += "一十"; // 國小教材規範，如 30018 讀作 三萬零一十八
+        } else if (s === 1 && w === 0 && q === 0 && b === 0) {
+          res += "十";
+        } else {
+          res += digitsList[s] + "十";
+        }
+      } else if (b > 0 && g > 0 && !res.endsWith("零")) {
+        res += "零";
+      }
+
+      // 個位
+      if (g > 0) {
+        res += digitsList[g];
+      }
+
+      // 清理連續複數個零
+      res = res.replace(/零+/g, "零");
+      if (res.endsWith("零")) res = res.slice(0, -1);
+
+      return res;
+    }
+
+    // ----------------------------------------------------
+    // 3. 位值與滑桿 UI 連動更新
+    // ----------------------------------------------------
+    function updateFromSliders() {
+      currentDigits.w = parseInt(document.getElementById('slider-w').value);
+      currentDigits.q = parseInt(document.getElementById('slider-q').value);
+      currentDigits.b = parseInt(document.getElementById('slider-b').value);
+      currentDigits.s = parseInt(document.getElementById('slider-s').value);
+      currentDigits.g = parseInt(document.getElementById('slider-g').value);
+
+      renderAll();
+    }
+
+    function changeDigit(key, delta) {
+      let val = currentDigits[key] + delta;
+      if (val >= 0 && val <= 9) {
+        currentDigits[key] = val;
+        document.getElementById('slider-' + key).value = val;
+        renderAll();
+      }
+    }
+
+    function renderAll() {
+      // 數字卡
+      document.getElementById('val-w').innerText = currentDigits.w;
+      document.getElementById('val-q').innerText = currentDigits.q;
+      document.getElementById('val-b').innerText = currentDigits.b;
+      document.getElementById('val-s').innerText = currentDigits.s;
+      document.getElementById('val-g').innerText = currentDigits.g;
+
+      // 數值代表意義
+      document.getElementById('rep-w').innerText = currentDigits.w * 10000;
+      document.getElementById('rep-q').innerText = currentDigits.q * 1000;
+      document.getElementById('rep-b').innerText = currentDigits.b * 100;
+      document.getElementById('rep-s').innerText = currentDigits.s * 10;
+      document.getElementById('rep-g').innerText = currentDigits.g;
+
+      // 總數值計算
+      const total = currentDigits.w * 10000 + currentDigits.q * 1000 + currentDigits.b * 100 + currentDigits.s * 10 + currentDigits.g;
+      document.getElementById('total-number-display').innerText = total.toLocaleString('en-US');
+      
+      // 中文讀音
+      const chineseStr = numberToChinese(total);
+      document.getElementById('chinese-read-display').innerText = chineseStr;
+
+      // 錢幣數量標籤
+      document.getElementById('count-w').innerText = currentDigits.w;
+      document.getElementById('count-q').innerText = currentDigits.q;
+      document.getElementById('count-b').innerText = currentDigits.b;
+      document.getElementById('count-s').innerText = currentDigits.s;
+      document.getElementById('count-g').innerText = currentDigits.g;
+
+      // 繪製視覺化錢幣
+      renderMoneyBox('money-box-w', currentDigits.w, 'bg-purple-600 text-white', '10000');
+      renderMoneyBox('money-box-q', currentDigits.q, 'bg-blue-600 text-white', '1000');
+      renderMoneyBox('money-box-b', currentDigits.b, 'bg-teal-600 text-white', '100');
+      renderMoneyBox('money-box-s', currentDigits.s, 'bg-amber-500 text-white rounded-full', '10');
+      renderMoneyBox('money-box-g', currentDigits.g, 'bg-rose-500 text-white rounded-full', '1');
+    }
+
+    function renderMoneyBox(containerId, count, colorClass, text) {
+      const box = document.getElementById(containerId);
+      box.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const item = document.createElement('div');
+        const isCoin = text === '10' || text === '1';
+        item.className = `money-badge text-[10px] font-black shadow-sm flex items-center justify-center ${colorClass} ${isCoin ? 'w-7 h-7' : 'px-2 py-1 rounded-md'}`;
+        item.innerText = text;
+        box.appendChild(item);
+      }
+    }
+
+    // Web Speech API 朗讀語音
+    function speakNumber() {
+      const total = currentDigits.w * 10000 + currentDigits.q * 1000 + currentDigits.b * 100 + currentDigits.s * 10 + currentDigits.g;
+      const text = numberToChinese(total);
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-TW';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function loadExample(num) {
+      let str = num.toString().padStart(5, '0');
+      currentDigits.w = parseInt(str[0]);
+      currentDigits.q = parseInt(str[1]);
+      currentDigits.b = parseInt(str[2]);
+      currentDigits.s = parseInt(str[3]);
+      currentDigits.g = parseInt(str[4]);
+
+      document.getElementById('slider-w').value = currentDigits.w;
+      document.getElementById('slider-q').value = currentDigits.q;
+      document.getElementById('slider-b').value = currentDigits.b;
+      document.getElementById('slider-s').value = currentDigits.s;
+      document.getElementById('slider-g').value = currentDigits.g;
+
+      renderAll();
+
+      document.getElementById('zero-num-title').innerText = num;
+      document.getElementById('zero-read-title').innerText = numberToChinese(num);
+    }
+
+    // ----------------------------------------------------
+    // 4. 存錢簿模擬器邏輯
+    // ----------------------------------------------------
+    let bankbookData = [
+      { month: '6/30', desc: '前期結餘', deposit: 0, balance: 19999 }
+    ];
+
+    function resetBankbook() {
+      bankbookData = [
+        { month: '6/30', desc: '前期結餘', deposit: 0, balance: 19999 }
+      ];
+      renderBankbook();
+    }
+
+    function deposit(amount) {
+      const lastBal = bankbookData[bankbookData.length - 1].balance;
+      const newBal = lastBal + amount;
+      const dateStr = `7/${bankbookData.length}`;
+      bankbookData.push({
+        month: dateStr,
+        desc: `存入 ${amount} 元`,
+        deposit: amount,
+        balance: newBal
+      });
+      renderBankbook();
+    }
+
+    function renderBankbook() {
+      const tbody = document.getElementById('bankbook-rows');
+      tbody.innerHTML = '';
+
+      bankbookData.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = idx % 2 === 0 ? 'bg-slate-50' : 'bg-white';
+
+        const depStr = row.deposit > 0 ? row.deposit.toString().padStart(5, ' ') : '';
+        const balStr = row.balance.toString().padStart(5, '0');
+
+        let depCells = '';
+        for (let i = 0; i < 5; i++) {
+          depCells += `<td class="py-2 border-r border-slate-200 text-slate-400 font-mono">${depStr[i] || ''}</td>`;
+        }
+
+        let balCells = '';
+        for (let i = 0; i < 5; i++) {
+          // 若最後一次存款導致連動進位，標亮變化的數位
+          const isHighlight = idx === bankbookData.length - 1 && idx > 0;
+          balCells += `<td class="py-2 border-r border-slate-200 font-mono ${isHighlight ? 'text-pink-600 font-black bg-pink-50' : ''}">${balStr[i]}</td>`;
+        }
+
+        tr.innerHTML = `
+          <td class="py-2 px-2 border-r border-slate-200">${row.month}</td>
+          <td class="py-2 px-2 border-r border-slate-200 text-left">${row.desc}</td>
+          ${depCells}
+          ${balCells}
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 5. 歷程評量 5 題測驗資料與引擎
+    // ----------------------------------------------------
+    const quizQuestions = [
+      {
+        q: "1. 數字「83245」中，萬位的數字『8』代表多少元？",
+        options: ["80 元", "800 元", "8000 元", "80000 元"],
+        answer: 3,
+        explanation: "『8』在萬位，代表有 8 個一萬，也就是 80000 元。"
+      },
+      {
+        q: "2. 數字「90098」的正確國字讀法是什麼？",
+        options: ["九萬零零九十八", "九萬零九十八", "九萬九十八", "九千零九十八"],
+        answer: 1,
+        explanation: "中間連續有兩個『0』時，只需要讀出一個『零』，因此讀作『九萬零九十八』。"
+      },
+      {
+        q: "3. 妹妹的存款原本有 19999 元，再存入 1 元後，存款會變成多少元？",
+        options: ["19990 元", "19991 元", "20000 元", "29999 元"],
+        answer: 2,
+        explanation: "19999 + 1 = 20000 元。個位 9+1 進位到十位，十位滿十再進位到百位、千位、萬位！"
+      },
+      {
+        q: "4. 下列哪一個數中的『0』完全不需要讀出來？",
+        options: ["80500", "90098", "30018", "70856"],
+        answer: 0,
+        explanation: "80500 的兩個『0』都在末尾（十位與個位），位值末尾的 0 不需要讀出來，讀作『八萬零五百』(中間千位的0有讀，但末尾0不讀)。"
+      },
+      {
+        q: "5. 5個萬、2個千、0個百、4個十和2個一合起來是多少？",
+        options: ["5242", "52042", "50242", "52420"],
+        answer: 1,
+        explanation: "萬位是5、千位是2、百位是0、十位是4、個位是2，合起來記作 52042。"
+      }
+    ];
+
+    let userQuizAnswers = Array(quizQuestions.length).fill(null);
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      quizQuestions.forEach((item, qIdx) => {
+        const card = document.createElement('div');
+        card.className = "bg-white/90 rounded-2xl p-5 border border-slate-200 shadow-sm";
+        
+        let optsHtml = '';
+        item.options.forEach((opt, oIdx) => {
+          const isSelected = userQuizAnswers[qIdx] === oIdx;
+          optsHtml += `
+            <button onclick="selectAnswer(${qIdx}, ${oIdx})" class="w-full text-left px-4 py-3 rounded-xl border transition-all text-sm font-bold flex items-center justify-between ${
+              isSelected ? 'border-purple-500 bg-purple-50 text-purple-900 shadow-sm' : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+            }">
+              <span>${String.fromCharCode(65 + oIdx)}. ${opt}</span>
+              ${isSelected ? '<i class="fa-solid fa-circle-check text-purple-600"></i>' : ''}
+            </button>
+          `;
+        });
+
+        // 答題反饋顯示
+        let feedbackHtml = '';
+        if (userQuizAnswers[qIdx] !== null) {
+          const isCorrect = userQuizAnswers[qIdx] === item.answer;
+          feedbackHtml = `
+            <div class="mt-4 p-3 rounded-xl text-xs font-bold ${isCorrect ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}">
+              <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'} mr-1"></i>
+              ${isCorrect ? '回答正確！' : '回答錯誤！'} ${item.explanation}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="font-bold text-slate-800 text-base mb-3">${item.q}</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            ${optsHtml}
+          </div>
+          ${feedbackHtml}
+        `;
+        container.appendChild(card);
+      });
+
+      calculateScore();
+    }
+
+    function selectAnswer(qIdx, oIdx) {
+      userQuizAnswers[qIdx] = oIdx;
+      renderQuiz();
+    }
+
+    function calculateScore() {
+      let score = 0;
+      quizQuestions.forEach((item, idx) => {
+        if (userQuizAnswers[idx] === item.answer) {
+          score += 20;
+        }
+      });
+      document.getElementById('quiz-score').innerText = score;
+    }
+
+    function resetQuiz() {
+      userQuizAnswers = Array(quizQuestions.length).fill(null);
+      renderQuiz();
+    }
+
+    // 頁面初始化
+    window.onload = function() {
+      renderAll();
+      renderBankbook();
+      renderQuiz();
+    };
+  </script>
+</body>
+</html>

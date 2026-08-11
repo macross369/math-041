@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角形探索家 - 新海誠風互動學習網頁</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        shinkai: {
+                            blue: '#3a7bd5',
+                            sky: '#3a6073',
+                            accent: '#ff7e5f',
+                            cloud: '#f0f4f8',
+                            sunset: '#feb47b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            font-family: 'Noto Sans TC', sans-serif;
+            color: #2d3748;
+        }
+
+        /* 玻璃擬態風格卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* 數學頂線標記 (Overbar for line segments) */
+        .math-segment {
+            display: inline-block;
+            position: relative;
+            padding-top: 0.25rem;
+        }
+        .math-segment::before {
+            content: "";
+            position: absolute;
+            top: 0.1rem;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: currentColor;
+        }
+
+        /* 自訂按鈕動效 */
+        .btn-hover-effect {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 123, 213, 0.3);
+        }
+
+        /* 拖放震動提示 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* Canvas 防觸控捲動 */
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- 最上方標題：閒雲數學小棧 Logo 與名稱 -->
+    <div class="w-full max-w-7xl mx-auto pt-3 px-4 flex items-center justify-start">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <!-- 頂部導覽列 -->
+    <header class="glass-nav sticky top-0 z-50 px-4 py-3 shadow-sm mt-2">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl shadow-md">
+                    <i class="fa-solid font-bold fa-shapes"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800">
+                        三角形探索家
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">國小數學 7-1 幾何互動網頁</p>
+                </div>
+            </div>
+
+            <!-- 分頁切換按鈕 -->
+            <nav class="flex flex-wrap gap-2">
+                <button onclick="switchTab('explore')" id="nav-explore" class="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-blue-600 text-white shadow-md">
+                    <i class="fa-solid fa-compass mr-1.5"></i>動態探索實驗室
+                </button>
+                <button onclick="switchTab('concepts')" id="nav-concepts" class="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-white/80 text-slate-700 hover:bg-white shadow-sm">
+                    <i class="fa-solid fa-book-open mr-1.5 text-indigo-500"></i>分類圖解觀念
+                </button>
+                <button onclick="switchTab('game')" id="nav-game" class="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-white/80 text-slate-700 hover:bg-white shadow-sm">
+                    <i class="fa-solid fa-gamepad mr-1.5 text-amber-500"></i>分類挑戰賽
+                </button>
+                <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-white/80 text-slate-700 hover:bg-white shadow-sm">
+                    <i class="fa-solid fa-pen-to-square mr-1.5 text-emerald-500"></i>觀念評量測驗
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主內容區域 -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- TAB 1: 動態探索實驗室 -->
+        <section id="tab-explore" class="tab-content block space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側：畫布與控制項 (8 Columns) -->
+                <div class="lg:col-span-8 flex flex-col space-y-4">
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 relative overflow-hidden flex flex-col items-center">
+                        <div class="w-full flex justify-between items-center mb-3">
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+                                <i class="fa-solid fa-hand-pointer mr-1"></i>拖曳 A、B、C 頂點改變形狀
+                            </span>
+                            <div class="flex gap-2">
+                                <button onclick="toggleSnapGrid()" id="btn-snap-grid" class="text-xs px-3 py-1.5 rounded-lg bg-slate-500 text-white font-medium hover:bg-slate-600 transition-colors shadow-sm">
+                                    <i class="fa-solid fa-magnet mr-1"></i>磁吸網格 (關)
+                                </button>
+                                <button onclick="toggleProtractor()" id="btn-protractor" class="text-xs px-3 py-1.5 rounded-lg bg-amber-500 text-white font-medium hover:bg-amber-600 transition-colors shadow-sm">
+                                    <i class="fa-solid fa-compass-drafting mr-1"></i>顯示輔助量角器
+                                </button>
+                                <button onclick="resetTriangle()" class="text-xs px-3 py-1.5 rounded-lg bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition-colors">
+                                    <i class="fa-solid fa-rotate-left mr-1"></i>重置位置
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 幾何畫布 -->
+                        <div class="relative w-full aspect-[4/3] max-h-[500px] bg-slate-900/5 rounded-xl border border-slate-200/80 overflow-hidden shadow-inner flex justify-center items-center">
+                            <canvas id="geometryCanvas" class="w-full h-full cursor-crosshair"></canvas>
+                        </div>
+
+                        <!-- 快速圖形對齊範本按鈕 -->
+                        <div class="w-full mt-4 flex flex-wrap justify-center gap-2">
+                            <span class="text-xs text-slate-500 self-center mr-2 font-medium">快速載入：</span>
+                            <button onclick="loadTemplate('acute')" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg border border-blue-200 transition">銳角三角形</button>
+                            <button onclick="loadTemplate('right')" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-lg border border-emerald-200 transition">直角三角形 (3-4-5)</button>
+                            <button onclick="loadTemplate('obtuse')" class="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold rounded-lg border border-purple-200 transition">鈍角三角形 (120°)</button>
+                            <button onclick="loadTemplate('isosceles_right')" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-semibold rounded-lg border border-amber-200 transition">等腰直角三角形</button>
+                            <button onclick="loadTemplate('equilateral')" class="px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-semibold rounded-lg border border-pink-200 transition">正三角形</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右側：即時數據與屬性分析 (4 Columns) -->
+                <div class="lg:col-span-4 flex flex-col space-y-4">
+                    <!-- 分類結果徽章 -->
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-blue-500">
+                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">即時分類判讀</h2>
+                        <div id="classification-badge" class="text-2xl font-black text-blue-700 my-1">
+                            -- 三角形
+                        </div>
+                        <p id="classification-desc" class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            請在左側拖動頂點來探索角度與邊長關係。
+                        </p>
+                    </div>
+
+                    <!-- 角度與邊長數據顯示卡片 -->
+                    <div class="glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center border-b pb-2">
+                            <i class="fa-solid fa-ruler-combined text-blue-600 mr-2"></i>即時幾何數據
+                        </h3>
+                        
+                        <!-- 三角角度卡片 -->
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-blue-50/80 p-2.5 rounded-xl border border-blue-100">
+                                <span class="text-xs font-bold text-blue-600 block">角 A</span>
+                                <span id="angle-A" class="text-lg font-black text-slate-800">60°</span>
+                            </div>
+                            <div class="bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="text-xs font-bold text-emerald-600 block">角 B</span>
+                                <span id="angle-B" class="text-lg font-black text-slate-800">60°</span>
+                            </div>
+                            <div class="bg-purple-50/80 p-2.5 rounded-xl border border-purple-100">
+                                <span class="text-xs font-bold text-purple-600 block">角 C</span>
+                                <span id="angle-C" class="text-lg font-black text-slate-800">60°</span>
+                            </div>
+                        </div>
+
+                        <!-- 邊長數據 (附正確 Overbar 數學符號) -->
+                        <div class="space-y-2 text-sm pt-1">
+                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-medium text-slate-700">線段 <span class="math-segment font-bold text-slate-900">AB</span>：</span>
+                                <span id="side-AB" class="font-bold text-slate-800">10.0 cm</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-medium text-slate-700">線段 <span class="math-segment font-bold text-slate-900">BC</span>：</span>
+                                <span id="side-BC" class="font-bold text-slate-800">10.0 cm</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-medium text-slate-700">線段 <span class="math-segment font-bold text-slate-900">CA</span>：</span>
+                                <span id="side-CA" class="font-bold text-slate-800">10.0 cm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 等腰三角形元件解析 (高行高，不遮擋頂橫線) -->
+                    <div id="isosceles-panel" class="glass-card rounded-2xl p-5 border-l-4 border-amber-500 hidden">
+                        <h3 class="text-sm font-bold text-amber-800 mb-3 flex items-center">
+                            <i class="fa-solid fa-star text-amber-500 mr-2"></i>等腰元件重點解析
+                        </h3>
+                        <div class="space-y-3 text-xs leading-relaxed">
+                            <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200/60 flex items-center flex-wrap gap-1">
+                                <span class="text-amber-900 font-bold">腰長 (兩條相等邊)：</span>
+                                <span id="isosceles-legs" class="text-slate-800 font-medium">--</span>
+                            </div>
+                            <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200/60 flex items-center flex-wrap gap-1">
+                                <span class="text-amber-900 font-bold">底邊：</span>
+                                <span id="isosceles-base" class="text-slate-800 font-medium">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: 分類圖解觀念 -->
+        <section id="tab-concepts" class="tab-content hidden space-y-8">
+            <!-- 標題區 -->
+            <div class="glass-card rounded-2xl p-6 text-center max-w-3xl mx-auto space-y-2">
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    觀念導讀
+                </span>
+                <h2 class="text-2xl font-black text-slate-800">三角形分類圖解與關鍵性質</h2>
+                <p class="text-sm text-slate-600">透過「觀察最大角」與「邊長特徵」，精準掌握各類三角形的核心幾何規律！</p>
+            </div>
+
+            <!-- 重點 1：以角的特徵分類三角形 (觀察最大角) -->
+            <div class="glass-card rounded-2xl p-6 space-y-6 border-t-4 border-indigo-500">
+                <div class="flex items-center space-x-3 border-b border-slate-200/80 pb-3">
+                    <span class="px-3 py-1 bg-indigo-600 text-white font-black text-sm rounded-lg shadow-sm">重點 1</span>
+                    <h3 class="text-lg font-bold text-slate-800">以角的特徵分類三角形（觀察最大角）</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 銳角三角形 -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-indigo-100 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between">
+                        <div>
+                            <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full inline-block mb-3">3 個銳角</span>
+                            <h4 class="text-lg font-black text-slate-800 mb-2">銳角三角形</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                三個角都比直角（90°）還要小，三個角都是銳角。
+                            </p>
+                        </div>
+                        <div class="h-36 bg-indigo-50/50 rounded-xl flex items-center justify-center p-3">
+                            <svg class="w-full h-full max-h-28" viewBox="0 0 100 80">
+                                <polygon points="50,15 15,70 85,70" fill="rgba(99, 102, 241, 0.08)" stroke="#6366f1" stroke-width="3" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 直角三角形 -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-emerald-100 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between">
+                        <div>
+                            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full inline-block mb-3">2 銳角 + 1 直角</span>
+                            <h4 class="text-lg font-black text-slate-800 mb-2">直角三角形</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                恰有一個角是直角（90°），最大角就是這個直角！
+                            </p>
+                        </div>
+                        <div class="h-36 bg-emerald-50/50 rounded-xl flex items-center justify-center p-3">
+                            <svg class="w-full h-full max-h-28" viewBox="0 0 100 80">
+                                <polygon points="20,15 20,70 85,70" fill="rgba(16, 185, 129, 0.08)" stroke="#10b981" stroke-width="3" stroke-linejoin="round"/>
+                                <rect x="20" y="60" width="10" height="10" fill="none" stroke="#10b981" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 鈍角三角形 (精準 120 度) -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-rose-100 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between">
+                        <div>
+                            <span class="px-2.5 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full inline-block mb-3">2 銳角 + 1 鈍角</span>
+                            <h4 class="text-lg font-black text-slate-800 mb-2">鈍角三角形</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                恰有一個角比直角大（鈍角），例如下方最大角為 <span class="font-bold text-rose-600">120°</span> 的鈍角！
+                            </p>
+                        </div>
+                        <div class="h-36 bg-rose-50/50 rounded-xl flex items-center justify-center p-3 relative">
+                            <svg class="w-full h-full max-h-28" viewBox="0 0 100 80">
+                                <!-- 精準 120 度頂點 (35,47) 連接 (13.55,65) 與 (84.45,65) -->
+                                <polygon points="35,47 13.55,65 84.45,65" fill="rgba(244, 63, 94, 0.08)" stroke="#f43f5e" stroke-width="3" stroke-linejoin="round"/>
+                                <!-- 120 度夾角弧線標記 -->
+                                <path d="M 28,52 A 12 12 0 0 0 45,51" fill="none" stroke="#f43f5e" stroke-width="1.8" stroke-dasharray="2,2"/>
+                                <text x="35" y="38" fill="#e11d48" font-size="9" font-weight="900" text-anchor="middle">120°</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重點 2：以邊的特徵分類與角度關鍵性質 -->
+            <div class="glass-card rounded-2xl p-6 space-y-6 border-t-4 border-amber-500">
+                <div class="flex items-center space-x-3 border-b border-slate-200/80 pb-3">
+                    <span class="px-3 py-1 bg-amber-600 text-white font-black text-sm rounded-lg shadow-sm">重點 2</span>
+                    <h3 class="text-lg font-bold text-slate-800">以邊的特徵分類與角度關鍵性質</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 等腰三角形 -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-purple-100 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-xl font-black text-slate-800">等腰三角形</h4>
+                                <span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full">底角相等</span>
+                            </div>
+                            <span class="text-xs font-bold text-purple-600 block">有兩條邊一樣長，且兩個底角一樣大</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                相等的兩條邊稱為<span class="font-bold text-purple-700">「腰」</span>，第三條邊稱為<span class="font-bold text-purple-700">「底邊」</span>。兩腰夾角為<span class="font-bold text-purple-700">「頂角」</span>，腰與底邊夾角為<span class="font-bold text-purple-700">「底角」</span>。等腰三角形必定同時符合「兩邊等長」與「兩底角相等」！
+                            </p>
+                        </div>
+
+                        <!-- 特殊款等腰直角卡片 -->
+                        <div class="bg-purple-50/70 p-3.5 rounded-xl border border-purple-200/80 space-y-1">
+                            <div class="flex items-center text-xs font-bold text-purple-900">
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-1.5"></i>特殊款：等腰直角三角形
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                又有直角，又有兩邊一樣長！它的兩個底角必定都是 <span class="font-bold text-purple-700">45度</span>。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 正三角形 -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-amber-100 shadow-sm hover:shadow-md transition space-y-4 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-xl font-black text-slate-800">正三角形 <span class="text-sm font-medium text-slate-500">(正三邊形)</span></h4>
+                                <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">三角皆 60°</span>
+                            </div>
+                            <span class="text-xs font-bold text-amber-600 block">三條邊都一樣長</span>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                三條邊完全相等，它的三個角也完全一樣大！因為三角形內角和是 180°，所以每個角都是 <span class="font-bold text-amber-700">180° ÷ 3 = 60°</span>。正三角形也是一種特殊的等腰三角形！
+                            </p>
+                        </div>
+
+                        <!-- 思考題 -->
+                        <div class="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200/80 space-y-1">
+                            <div class="flex items-center text-xs font-bold text-amber-900">
+                                <i class="fa-regular fa-lightbulb text-amber-600 mr-1.5"></i>思考題：正三角形有可能包含直角嗎？
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                答案是<span class="font-bold text-rose-600">不可能</span>！因為正三角形三個角都是 60°，絕對不會有 90° 的直角！
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: 分類挑戰賽 -->
+        <section id="tab-game" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 text-center max-w-2xl mx-auto space-y-2">
+                <h2 class="text-2xl font-black text-slate-800">三角形分類大挑戰</h2>
+                <p class="text-xs text-slate-600">根據卡片上的幾何特徵與圖示，將卡片拖放或點選歸類至正確的分類桶中！</p>
+                <div class="pt-2 flex justify-center gap-6 text-sm font-bold">
+                    <span class="text-emerald-600">得分：<span id="game-score">0</span> / 6</span>
+                </div>
+            </div>
+
+            <!-- 分類桶 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="drop-acute" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'acute')" onclick="handleBucketClick('acute')" class="glass-card rounded-2xl p-4 border-2 border-dashed border-blue-300 min-h-[160px] flex flex-col items-center justify-start space-y-2 transition-all cursor-pointer hover:border-blue-500">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">銳角三角形</span>
+                    <div class="cards-container w-full space-y-2"></div>
+                </div>
+                <div id="drop-right" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'right')" onclick="handleBucketClick('right')" class="glass-card rounded-2xl p-4 border-2 border-dashed border-emerald-300 min-h-[160px] flex flex-col items-center justify-start space-y-2 transition-all cursor-pointer hover:border-emerald-500">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">直角三角形</span>
+                    <div class="cards-container w-full space-y-2"></div>
+                </div>
+                <div id="drop-obtuse" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'obtuse')" onclick="handleBucketClick('obtuse')" class="glass-card rounded-2xl p-4 border-2 border-dashed border-rose-300 min-h-[160px] flex flex-col items-center justify-start space-y-2 transition-all cursor-pointer hover:border-rose-500">
+                    <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full">鈍角三角形</span>
+                    <div class="cards-container w-full space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- 卡片集錦 -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="text-xs font-bold text-slate-500 uppercase mb-3">待分類卡片 (點擊卡片再點目標區，或直接拖曳)</h3>
+                <div id="cards-pool" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <!-- JavaScript 動態生成精準 SVG 卡片 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: 觀念評量測驗 -->
+        <section id="tab-quiz" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 max-w-3xl mx-auto space-y-6">
+                <div class="border-b pb-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800">幾何觀念歷程測驗</h2>
+                        <p class="text-xs text-slate-500">檢測您對三角形邊角特徵的掌握程度 (共 5 題)</p>
+                    </div>
+                    <span id="quiz-score-badge" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-sm border border-indigo-100">
+                        目前得分: --
+                    </span>
+                </div>
+
+                <div id="quiz-container" class="space-y-6">
+                    <!-- 動態渲染 5 題測驗 -->
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                    <button onclick="resetQuiz()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition shadow-md">
+                        重新進行測驗
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JavaScript 核心邏輯 -->
+    <script>
+        /* 1. 分頁切換系統 */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            const tabs = ['explore', 'concepts', 'game', 'quiz'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    btn.className = "px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-blue-600 text-white shadow-md";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-white/80 text-slate-700 hover:bg-white shadow-sm";
+                }
+            });
+
+            if (tabId === 'explore') {
+                resizeCanvas();
+            }
+        }
+
+        /* 2. Canvas 動態幾何畫布與拖曳系統 */
+        const canvas = document.getElementById('geometryCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 頂點狀態定義
+        let vertices = [
+            { x: 200, y: 100, label: 'A', isDragging: false },
+            { x: 100, y: 320, label: 'B', isDragging: false },
+            { x: 380, y: 320, label: 'C', isDragging: false }
+        ];
+
+        // 磁吸網格狀態
+        let enableSnapGrid = false;
+        const GRID_SNAP_STEP = 10; // 10px 網格磁吸間隔
+
+        // 開啟/關閉磁吸網格
+        function toggleSnapGrid() {
+            enableSnapGrid = !enableSnapGrid;
+            const btn = document.getElementById('btn-snap-grid');
+            if (enableSnapGrid) {
+                btn.classList.replace('bg-slate-500', 'bg-indigo-600');
+                btn.classList.replace('hover:bg-slate-600', 'hover:bg-indigo-700');
+                btn.innerHTML = `<i class="fa-solid fa-magnet mr-1"></i>磁吸網格 (開)`;
+            } else {
+                btn.classList.replace('bg-indigo-600', 'bg-slate-500');
+                btn.classList.replace('hover:bg-indigo-700', 'hover:bg-slate-600');
+                btn.innerHTML = `<i class="fa-solid fa-magnet mr-1"></i>磁吸網格 (關)`;
+            }
+            drawScene();
+        }
+
+        // 輔助量角器狀態
+        let showProtractor = false;
+        let protractorRotations = { A: 0, B: 0, C: 0 };
+        let activeRotatingKey = null;
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            drawScene();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // 重置頂點
+        function resetTriangle() {
+            const w = canvas.width || 400;
+            const h = canvas.height || 350;
+            vertices = [
+                { x: w * 0.5, y: h * 0.25, label: 'A', isDragging: false },
+                { x: w * 0.25, y: h * 0.75, label: 'B', isDragging: false },
+                { x: w * 0.75, y: h * 0.75, label: 'C', isDragging: false }
+            ];
+            drawScene();
+        }
+
+        // 開啟/關閉輔助量角器
+        function toggleProtractor() {
+            showProtractor = !showProtractor;
+            const btn = document.getElementById('btn-protractor');
+            if (showProtractor) {
+                btn.classList.replace('bg-amber-500', 'bg-amber-600');
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash mr-1"></i>隱藏輔助量角器`;
+            } else {
+                btn.classList.replace('bg-amber-600', 'bg-amber-500');
+                btn.innerHTML = `<i class="fa-solid fa-compass-drafting mr-1"></i>顯示輔助量角器`;
+            }
+            drawScene();
+        }
+
+        /* 3. 繪圖核心：背景雙層網格、黃色半透明量角器(層級在後)、三角形 */
+        function drawScene() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // A. 繪製對齊網格 (50px / 10px)
+            drawGrid();
+
+            // B. 在三角形後方繪製 3 個黃色半透明獨立量角器 (若開啟)
+            if (showProtractor) {
+                vertices.forEach(v => {
+                    drawYellowProtractor(v.x, v.y, protractorRotations[v.label], v.label);
+                });
+            }
+
+            // C. 繪製三角形本體與頂點
+            drawTriangle();
+
+            // D. 計算並更新數據分析面板
+            updateMathAnalysis();
+        }
+
+        // 繪製背景雙層幾何網格
+        function drawGrid() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 微網格 10px
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(226, 232, 240, 0.4)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < w; x += 10) {
+                ctx.moveTo(x, 0); ctx.lineTo(x, h);
+            }
+            for (let y = 0; y < h; y += 10) {
+                ctx.moveTo(0, y); ctx.lineTo(w, y);
+            }
+            ctx.stroke();
+
+            // 主網格 50px
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(203, 213, 225, 0.7)';
+            ctx.lineWidth = 1.5;
+            for (let x = 0; x < w; x += 50) {
+                ctx.moveTo(x, 0); ctx.lineTo(x, h);
+            }
+            for (let y = 0; y < h; y += 50) {
+                ctx.moveTo(0, y); ctx.lineTo(w, y);
+            }
+            ctx.stroke();
+        }
+
+        // 繪製位於圖形後方的黃色半透明 360° 量角器
+        function drawYellowProtractor(cx, cy, rotationRad, label) {
+            const r = 70; // 量角器半徑
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(rotationRad);
+
+            // 圓形黃色半透明底圖
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(254, 240, 138, 0.55)'; // 黃色半透明
+            ctx.fill();
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 刻度
+            ctx.fillStyle = '#854d0e';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '9px Noto Sans TC, sans-serif';
+
+            for (let deg = 0; deg < 360; deg += 10) {
+                const rad = (deg * Math.PI) / 180;
+                const isMajor = (deg % 30 === 0);
+                const tickLen = isMajor ? 10 : 5;
+
+                const x1 = Math.cos(rad) * (r - tickLen);
+                const y1 = Math.sin(rad) * (r - tickLen);
+                const x2 = Math.cos(rad) * r;
+                const y2 = Math.sin(rad) * r;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = isMajor ? '#a16207' : '#ca8a04';
+                ctx.lineWidth = isMajor ? 1.5 : 1;
+                ctx.stroke();
+
+                if (isMajor) {
+                    const tx = Math.cos(rad) * (r - 18);
+                    const ty = Math.sin(rad) * (r - 18);
+                    ctx.fillText(deg, tx, ty);
+                }
+            }
+
+            // 十字中心點
+            ctx.beginPath();
+            ctx.moveTo(-6, 0); ctx.lineTo(6, 0);
+            ctx.moveTo(0, -6); ctx.lineTo(0, 6);
+            ctx.strokeStyle = '#a16207';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // 旋轉控制鈕 (外圈 ↻)
+            ctx.beginPath();
+            ctx.arc(r + 14, 0, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px fontawesome, Noto Sans TC';
+            ctx.fillText('↻', r + 14, 0);
+
+            ctx.restore();
+        }
+
+        // 繪製三角形線段與頂點
+        function drawTriangle() {
+            const [a, b, c] = vertices;
+
+            // 填滿區域
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.lineTo(c.x, c.y);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(58, 123, 213, 0.18)';
+            ctx.fill();
+
+            // 外框線
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = '#2563eb';
+            ctx.stroke();
+
+            // 繪製直角記號 (如果有直角)
+            drawRightAngleMark();
+
+            // 繪製頂點 A, B, C
+            vertices.forEach(v => {
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 9, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#1d4ed8';
+                ctx.stroke();
+
+                // 標籤
+                ctx.fillStyle = '#1e293b';
+                ctx.font = 'bold 15px Noto Sans TC, sans-serif';
+                ctx.textAlign = 'center';
+                let offsetY = v.y < 200 ? -18 : 24;
+                ctx.fillText(v.label, v.x, v.y + offsetY);
+            });
+        }
+
+        // 繪製精準直角記號
+        function drawRightAngleMark() {
+            const [a, b, c] = vertices;
+            const angles = calcAngles();
+            
+            let rightVertex = null;
+            let v1 = null, v2 = null;
+
+            if (angles.A === 90) { rightVertex = a; v1 = b; v2 = c; }
+            else if (angles.B === 90) { rightVertex = b; v1 = a; v2 = c; }
+            else if (angles.C === 90) { rightVertex = c; v1 = a; v2 = b; }
+
+            if (!rightVertex) return;
+
+            const size = 16;
+            const len1 = Math.hypot(v1.x - rightVertex.x, v1.y - rightVertex.y);
+            const len2 = Math.hypot(v2.x - rightVertex.x, v2.y - rightVertex.y);
+
+            const u1 = { x: (v1.x - rightVertex.x) / len1, y: (v1.y - rightVertex.y) / len1 };
+            const u2 = { x: (v2.x - rightVertex.x) / len2, y: (v2.y - rightVertex.y) / len2 };
+
+            const p1 = { x: rightVertex.x + u1.x * size, y: rightVertex.y + u1.y * size };
+            const p2 = { x: rightVertex.x + u1.x * size + u2.x * size, y: rightVertex.y + u1.y * size + u2.y * size };
+            const p3 = { x: rightVertex.x + u2.x * size, y: rightVertex.y + u2.y * size };
+
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.strokeStyle = '#059669';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+
+        /* 4. 幾何數據精準計算與「雙重條件 (兩邊等長 且 兩角相等)」等腰判讀機制 */
+        function calcAngles() {
+            const [a, b, c] = vertices;
+            const dAB = Math.hypot(a.x - b.x, a.y - b.y);
+            const dBC = Math.hypot(b.x - c.x, b.y - c.y);
+            const dCA = Math.hypot(c.x - a.x, c.y - a.y);
+
+            // 餘弦定理計算角度
+            let degA = Math.acos((dAB**2 + dCA**2 - dBC**2) / (2 * dAB * dCA)) * (180 / Math.PI);
+            let degB = Math.acos((dAB**2 + dBC**2 - dCA**2) / (2 * dAB * dBC)) * (180 / Math.PI);
+            let degC = 180 - degA - degB;
+
+            return {
+                A: Math.round(degA),
+                B: Math.round(degB),
+                C: Math.round(degC),
+                rawA: degA,
+                rawB: degB,
+                rawC: degC,
+                dAB: dAB,
+                dBC: dBC,
+                dCA: dCA
+            };
+        }
+
+        function updateMathAnalysis() {
+            const data = calcAngles();
+            const { A, B, C, dAB, dBC, dCA } = data;
+
+            // 更新角度UI
+            document.getElementById('angle-A').innerText = `${A}°`;
+            document.getElementById('angle-B').innerText = `${B}°`;
+            document.getElementById('angle-C').innerText = `${C}°`;
+
+            // 更新邊長UI (縮放比例轉換為 cm 顯示)
+            const scale = 0.04;
+            const cmAB = (dAB * scale).toFixed(1);
+            const cmBC = (dBC * scale).toFixed(1);
+            const cmCA = (dCA * scale).toFixed(1);
+
+            document.getElementById('side-AB').innerText = `${cmAB} cm`;
+            document.getElementById('side-BC').innerText = `${cmBC} cm`;
+            document.getElementById('side-CA').innerText = `${cmCA} cm`;
+
+            // 角的類別判定 (直角必須精準 90 度)
+            const maxAngle = Math.max(A, B, C);
+            let angleType = "";
+            if (maxAngle === 90) {
+                angleType = "直角三角形";
+            } else if (maxAngle > 90) {
+                angleType = "鈍角三角形";
+            } else {
+                angleType = "銳角三角形";
+            }
+
+            // 雙重條件判定：兩邊長相等 且 兩角度相等
+            const hasEqualSides = (Math.abs(dAB - dBC) < 1.0) || (Math.abs(dBC - dCA) < 1.0) || (Math.abs(dCA - dAB) < 1.0);
+            const hasEqualAngles = (A === B) || (B === C) || (C === A);
+
+            // 正三角形雙重條件：三邊長相等 且 三角度皆為 60°
+            const hasThreeEqualSides = (Math.abs(dAB - dBC) < 1.0) && (Math.abs(dBC - dCA) < 1.0);
+            const hasThreeEqualAngles = (A === 60) && (B === 60) && (C === 60);
+
+            const isEquilateral = hasThreeEqualSides && hasThreeEqualAngles;
+            // 嚴格等腰：必須同時滿足「兩邊等長」與「兩角相等」
+            const isIsosceles = isEquilateral || (hasEqualSides && hasEqualAngles);
+
+            // 組合名稱
+            let finalName = angleType;
+            if (isEquilateral) {
+                finalName = "正三角形 (正三邊形)";
+            } else if (isIsosceles) {
+                if (maxAngle === 90) {
+                    finalName = "等腰直角三角形";
+                } else {
+                    finalName = `等腰${angleType}`;
+                }
+            }
+
+            // 更新 UI Badge
+            const badge = document.getElementById('classification-badge');
+            const desc = document.getElementById('classification-desc');
+            const isoscelesPanel = document.getElementById('isosceles-panel');
+
+            badge.innerText = finalName;
+
+            if (isEquilateral) {
+                desc.innerText = "三條邊長完全相等，且三個角度皆精準為 60°！";
+            } else if (isIsosceles) {
+                desc.innerText = `同時滿足「兩條邊長相等」與「兩個底角相等」條件！為${finalName}。`;
+            } else if (maxAngle === 90) {
+                desc.innerText = `最大角為精準 90° 直角，屬於直角三角形。`;
+            } else if (maxAngle > 90) {
+                desc.innerText = `最大角為 ${maxAngle}°（大於 90°），屬於鈍角三角形。`;
+            } else {
+                desc.innerText = `三個角皆小於 90°，屬於銳角三角形。`;
+            }
+
+            // 等腰面板解析
+            if (isIsosceles && !isEquilateral) {
+                isoscelesPanel.classList.remove('hidden');
+                let legs = "", base = "";
+                if (Math.abs(dAB - dCA) < 1.0 && A === C) {
+                    legs = '<span class="math-segment font-bold">AB</span> 與 <span class="math-segment font-bold">CA</span>';
+                    base = '<span class="math-segment font-bold">BC</span>';
+                } else if (Math.abs(dBC - dCA) < 1.0 && B === C) {
+                    legs = '<span class="math-segment font-bold">BC</span> 與 <span class="math-segment font-bold">CA</span>';
+                    base = '<span class="math-segment font-bold">AB</span>';
+                } else {
+                    legs = '<span class="math-segment font-bold">AB</span> 與 <span class="math-segment font-bold">BC</span>';
+                    base = '<span class="math-segment font-bold">CA</span>';
+                }
+                document.getElementById('isosceles-legs').innerHTML = legs;
+                document.getElementById('isosceles-base').innerHTML = base;
+            } else {
+                isoscelesPanel.classList.add('hidden');
+            }
+        }
+
+        /* 5. 快速圖形對齊範本 */
+        function loadTemplate(type) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w * 0.5;
+            const cy = h * 0.5;
+
+            if (type === 'acute') {
+                vertices = [
+                    { x: cx, y: cy - 100, label: 'A', isDragging: false },
+                    { x: cx - 110, y: cy + 80, label: 'B', isDragging: false },
+                    { x: cx + 110, y: cy + 80, label: 'C', isDragging: false }
+                ];
+            } else if (type === 'right') {
+                vertices = [
+                    { x: cx - 100, y: cy - 90, label: 'A', isDragging: false },
+                    { x: cx - 100, y: cy + 90, label: 'B', isDragging: false },
+                    { x: cx + 140, y: cy + 90, label: 'C', isDragging: false }
+                ];
+            } else if (type === 'obtuse') {
+                // 120 度頂點範本 (A點 120°)
+                vertices = [
+                    { x: cx - 30, y: cy - 40, label: 'A', isDragging: false },
+                    { x: cx - 150, y: cy + 60, label: 'B', isDragging: false },
+                    { x: cx + 160, y: cy + 60, label: 'C', isDragging: false }
+                ];
+            } else if (type === 'isosceles_right') {
+                vertices = [
+                    { x: cx - 90, y: cy - 90, label: 'A', isDragging: false },
+                    { x: cx - 90, y: cy + 90, label: 'B', isDragging: false },
+                    { x: cx + 90, y: cy + 90, label: 'C', isDragging: false }
+                ];
+            } else if (type === 'equilateral') {
+                const side = 200;
+                const alt = (Math.sqrt(3) / 2) * side;
+                vertices = [
+                    { x: cx, y: cy - alt / 2, label: 'A', isDragging: false },
+                    { x: cx - side / 2, y: cy + alt / 2, label: 'B', isDragging: false },
+                    { x: cx + side / 2, y: cy + alt / 2, label: 'C', isDragging: false }
+                ];
+            }
+            drawScene();
+        }
+
+        /* 6. 互動手勢與滑鼠事件處理 (拖曳頂點 & 旋轉量角器) */
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+
+        canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerUp);
+
+        function handlePointerDown(e) {
+            const pos = getCanvasCoords(e);
+
+            // 檢查是否點擊量角器旋轉手把
+            if (showProtractor) {
+                for (let v of vertices) {
+                    const rotX = v.x + Math.cos(protractorRotations[v.label]) * 84;
+                    const rotY = v.y + Math.sin(protractorRotations[v.label]) * 84;
+                    if (Math.hypot(pos.x - rotX, pos.y - rotY) < 18) {
+                        activeRotatingKey = v.label;
+                        e.preventDefault();
+                        return;
+                    }
+                }
+            }
+
+            // 檢查是否點擊頂點拖曳
+            for (let v of vertices) {
+                if (Math.hypot(pos.x - v.x, pos.y - v.y) < 22) {
+                    v.isDragging = true;
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+
+        function handlePointerMove(e) {
+            const pos = getCanvasCoords(e);
+
+            if (activeRotatingKey) {
+                const v = vertices.find(v => v.label === activeRotatingKey);
+                protractorRotations[activeRotatingKey] = Math.atan2(pos.y - v.y, pos.x - v.x);
+                drawScene();
+                e.preventDefault();
+                return;
+            }
+
+            let dragging = false;
+            vertices.forEach(v => {
+                if (v.isDragging) {
+                    let newX = Math.max(20, Math.min(canvas.width - 20, pos.x));
+                    let newY = Math.max(20, Math.min(canvas.height - 20, pos.y));
+
+                    // 磁吸網格運算
+                    if (enableSnapGrid) {
+                        newX = Math.round(newX / GRID_SNAP_STEP) * GRID_SNAP_STEP;
+                        newY = Math.round(newY / GRID_SNAP_STEP) * GRID_SNAP_STEP;
+                    }
+
+                    v.x = newX;
+                    v.y = newY;
+                    dragging = true;
+                }
+            });
+
+            if (dragging) {
+                drawScene();
+                e.preventDefault();
+            }
+        }
+
+        function handlePointerUp() {
+            vertices.forEach(v => v.isDragging = false);
+            activeRotatingKey = null;
+        }
+
+        /* 7. 分類挑戰賽：具備符合精準幾何條件之 SVG 向量圖示 */
+        const gameItems = [
+            { 
+                id: 1, 
+                name: '圖形 ① (40°, 60°, 80°)', 
+                type: 'acute', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="26,8 8,42 52,42" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/></svg>` 
+            },
+            { 
+                id: 2, 
+                name: '圖形 ② (30°, 60°, 90°)', 
+                type: 'right', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="12,15 12,40 55,40" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/><rect x="12" y="34" width="6" height="6" fill="none" stroke="#d97706" stroke-width="1.5"/></svg>` 
+            },
+            { 
+                id: 3, 
+                name: '圖形 ③ (20°, 40°, 120°)', 
+                type: 'obtuse', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="17,31 6,42 54,42" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/></svg>` 
+            },
+            { 
+                id: 4, 
+                name: '圖形 ④ (60°, 60°, 60°)', 
+                type: 'acute', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="30,8 10,42 50,42" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/></svg>` 
+            },
+            { 
+                id: 5, 
+                name: '圖形 ⑤ (45°, 45°, 90°)', 
+                type: 'right', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="12,10 12,42 44,42" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/><rect x="12" y="34" width="8" height="8" fill="none" stroke="#d97706" stroke-width="1.5"/></svg>` 
+            },
+            { 
+                id: 6, 
+                name: '圖形 ⑥ (15°, 25°, 140°)', 
+                type: 'obtuse', 
+                svg: `<svg viewBox="0 0 60 50" class="w-12 h-10"><polygon points="18,33 4,42 56,42" fill="rgba(234, 179, 8, 0.18)" stroke="#d97706" stroke-width="2.5" stroke-linejoin="round"/></svg>` 
+            }
+        ];
+
+        let selectedCardId = null;
+        let gameScore = 0;
+
+        function initGame() {
+            const pool = document.getElementById('cards-pool');
+            pool.innerHTML = '';
+            gameScore = 0;
+            document.getElementById('game-score').innerText = gameScore;
+
+            gameItems.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `card-${item.id}`;
+                card.draggable = true;
+                card.ondragstart = (e) => e.dataTransfer.setData('text/plain', item.id);
+                card.onclick = () => selectCard(item.id);
+                card.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-grab flex flex-col items-center justify-center space-y-2 hover:border-blue-400 transition";
+                card.innerHTML = `
+                    <div class="flex items-center justify-center h-12">${item.svg}</div>
+                    <span class="text-xs font-bold text-slate-700 text-center">${item.name}</span>
+                `;
+                pool.appendChild(card);
+            });
+        }
+
+        function selectCard(id) {
+            selectedCardId = id;
+            gameItems.forEach(item => {
+                const el = document.getElementById(`card-${item.id}`);
+                if (el) {
+                    if (item.id === id) {
+                        el.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50');
+                    } else {
+                        el.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+                    }
+                }
+            });
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e, targetType) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain') || selectedCardId;
+            if (id) checkClassification(parseInt(id), targetType);
+        }
+
+        function handleBucketClick(targetType) {
+            if (selectedCardId) {
+                checkClassification(selectedCardId, targetType);
+            }
+        }
+
+        function checkClassification(cardId, targetType) {
+            const item = gameItems.find(i => i.id === cardId);
+            if (!item) return;
+
+            const cardEl = document.getElementById(`card-${cardId}`);
+            if (item.type === targetType) {
+                // 正確分類
+                document.querySelector(`#drop-${targetType} .cards-container`).appendChild(cardEl);
+                cardEl.className = "bg-emerald-50 p-2 rounded-lg border border-emerald-300 text-xs font-bold text-emerald-800 w-full text-center flex flex-col items-center space-y-1";
+                cardEl.onclick = null;
+                cardEl.draggable = false;
+                gameScore++;
+                document.getElementById('game-score').innerText = gameScore;
+                selectedCardId = null;
+            } else {
+                // 錯誤提示
+                const container = document.getElementById(`drop-${targetType}`);
+                container.classList.add('animate-shake', 'border-rose-500');
+                setTimeout(() => container.classList.remove('animate-shake', 'border-rose-500'), 500);
+            }
+        }
+
+        /* 8. 觀念評量測驗 (5題歷程評量) */
+        const quizData = [
+            {
+                q: "1. 一個三角形如果三個角分別是 50°、60°、70°，請問屬於什麼三角形？",
+                options: ["直角三角形", "銳角三角形", "鈍角三角形", "等腰直角三角形"],
+                ans: 1,
+                explain: "三個角都小於 90°，因此是銳角三角形。"
+            },
+            {
+                q: "2. 直角三角形中的「最大角」一定是多少度？",
+                options: ["45°", "60°", "90°", "180°"],
+                ans: 2,
+                explain: "直角三角形恰有一個角是直角（精準 90°），且該角為三角形中的最大角。"
+            },
+            {
+                q: "3. 關於「正三角形」的描述，下列哪一個是正確的？",
+                options: ["可能會有一個 90° 直角", "三個內角都是 60°", "只有兩條邊一樣長", "最大角是鈍角"],
+                ans: 1,
+                explain: "正三角形三條邊完全相等，三個角也完全一樣大，皆為 180° ÷ 3 = 60°。"
+            },
+            {
+                q: "4. 等腰直角三角形的兩個「底角」分別是多少度？",
+                options: ["30°", "45°", "60°", "90°"],
+                ans: 1,
+                explain: "等腰直角三角形頂角為 90°，兩個底角相等，各為 (180° - 90°) ÷ 2 = 45°。"
+            },
+            {
+                q: "5. 若一個三角形最大角是 110°，請問它屬於哪一種三角形？",
+                options: ["銳角三角形", "直角三角形", "鈍角三角形", "正三角形"],
+                ans: 2,
+                explain: "最大角大於 90°（110° 為鈍角），因此屬於鈍角三角形。"
+            }
+        ];
+
+        let quizAnswers = new Array(quizData.length).fill(null);
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white/80 p-5 rounded-2xl border border-slate-200 space-y-3";
+                card.innerHTML = `
+                    <p class="font-bold text-slate-800 text-sm">${q.q}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <button onclick="selectAnswer(${idx}, ${oIdx})" id="q-${idx}-opt-${oIdx}" class="text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-indigo-50 transition">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="explain-${idx}" class="hidden p-3 rounded-xl bg-slate-100 text-xs text-slate-700 leading-relaxed"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectAnswer(qIdx, optIdx) {
+            quizAnswers[qIdx] = optIdx;
+            const q = quizData[qIdx];
+
+            // 按鈕狀態標示
+            q.options.forEach((_, oIdx) => {
+                const btn = document.getElementById(`q-${qIdx}-opt-${oIdx}`);
+                if (oIdx === optIdx) {
+                    if (optIdx === q.ans) {
+                        btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-xs";
+                    } else {
+                        btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-xs";
+                    }
+                } else {
+                    btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-400 opacity-60";
+                }
+            });
+
+            // 顯示解析
+            const exp = document.getElementById(`explain-${qIdx}`);
+            exp.classList.remove('hidden');
+            if (optIdx === q.ans) {
+                exp.className = "p-3 rounded-xl bg-emerald-50 text-xs text-emerald-800 font-medium border border-emerald-200";
+                exp.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i><strong>答對了！</strong> ${q.explain}`;
+            } else {
+                exp.className = "p-3 rounded-xl bg-rose-50 text-xs text-rose-800 font-medium border border-rose-200";
+                exp.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i><strong>再想想看：</strong> ${q.explain}`;
+            }
+
+            // 更新總分
+            let correctCount = 0;
+            quizAnswers.forEach((ans, i) => {
+                if (ans === quizData[i].ans) correctCount++;
+            });
+            document.getElementById('quiz-score-badge').innerText = `得分: ${correctCount * 20} / 100`;
+        }
+
+        function resetQuiz() {
+            quizAnswers.fill(null);
+            document.getElementById('quiz-score-badge').innerText = `目前得分: --`;
+            initQuiz();
+        }
+
+        /* 9. 頁面載入初始化 */
+        window.onload = function() {
+            resizeCanvas();
+            resetTriangle();
+            initGame();
+            initQuiz();
+        };
+    </script>
+</body>
+</html>

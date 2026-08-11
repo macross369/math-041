@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10-2 製作長條圖 - 互動探究與學習網頁</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #fbc2eb 100%);
+            min-height: 100vh;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 50px;
+            filter: blur(8px);
+            animation: floatCloud 25s infinite linear;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(100vw); }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(31, 38, 135, 0.15);
+        }
+        .shinkai-btn {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            transition: all 0.3s ease;
+        }
+        .shinkai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        input[type=range] {
+            accent-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12">
+
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-40">
+        <div class="cloud w-48 h-12 top-10 left-0"></div>
+        <div class="cloud w-72 h-16 top-32 left-10" style="animation-delay: -10s;"></div>
+        <div class="cloud w-60 h-14 top-64 left-20" style="animation-delay: -5s;"></div>
+    </div>
+
+    <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+    <div class="relative z-20 w-full max-w-7xl mx-auto px-4 pt-3 flex items-center justify-start mb-2 fade-in">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+    </div>
+
+    <header class="relative z-10 glass-card sticky top-0 mb-6 border-b border-white/50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-500 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    📊
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black bg-clip-text text transparent bg-gradient-to-r from-sky-600 to-indigo-700">
+                        國小四年級數學 10-2 互動學習網頁
+                    </h1>
+                    <p class="text-xs text-sky-700 font-medium">製作長條圖：一格代表的數量、項目順序與省略符號應用</p>
+                </div>
+            </div>
+
+            <!-- 分頁切換按鈕 -->
+            <nav class="flex flex-wrap gap-2 bg-sky-100/60 p-1.5 rounded-2xl border border-white/60">
+                <button onclick="switchTab('explorer')" id="tab-explorer" class="tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-white text-sky-700 shadow-sm transition-all">
+                    🔍 1. 概念探索
+                </button>
+                <button onclick="switchTab('hands-on')" id="tab-hands-on" class="tab-btn px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-sky-600 transition-all">
+                    ✏️ 2. 我來畫長條圖
+                </button>
+                <button onclick="switchTab('omission')" id="tab-omission" class="tab-btn px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-sky-600 transition-all">
+                    🌊 3. 省略符號解密
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-sky-600 transition-all">
+                    🏆 4. 隨堂測驗 (5題)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4">
+
+        <section id="sec-explorer" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- 左側控制面板 -->
+                <div class="lg:col-span-4 glass-card p-6 rounded-3xl space-y-5">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-3 border-sky-200">
+                        <span>⚙️</span> 統計圖參數操控台
+                    </h2>
+
+                    <!-- 主題切換 -->
+                    <div>
+                        <label class="block text-xs font-bold text-sky-900 mb-2">選擇演示資料集：</label>
+                        <select id="explorer-dataset" onchange="onDatasetChange()" class="w-full bg-white/80 border border-sky-300 rounded-xl p-2.5 text-sm font-medium focus:ring-2 focus:ring-sky-400 outline-none">
+                            <option value="cars">大好社區汽車顏色數量 (小數值)</option>
+                            <option value="drinks">四年乙班飲料喜好 (中小數值)</option>
+                            <option value="spots">台灣景點票數 (大數值與省略符號)</option>
+                        </select>
+                    </div>
+
+                    <!-- 縱軸刻度切換 -->
+                    <div>
+                        <label class="block text-xs font-bold text-sky-900 mb-2">縱軸每一大格代表數量：</label>
+                        <div class="grid grid-cols-4 gap-2" id="scale-btn-container">
+                            <!-- 動態根據數據資料生成刻度按鈕 -->
+                        </div>
+                    </div>
+
+                    <!-- 橫軸項目排序切換 -->
+                    <div>
+                        <label class="block text-xs font-bold text-sky-900 mb-2">橫軸項目順序（探究是否影響意義）：</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                            <button onclick="setOrder('default')" id="btn-order-default" class="bg-sky-500 text-white text-xs font-bold py-2 rounded-xl transition shadow-sm">預設順序</button>
+                            <button onclick="setOrder('desc')" id="btn-order-desc" class="bg-indigo-100 text-indigo-700 text-xs font-bold py-2 rounded-xl hover:bg-indigo-200 transition">由大到小</button>
+                            <button onclick="setOrder('asc')" id="btn-order-asc" class="bg-emerald-100 text-emerald-700 text-xs font-bold py-2 rounded-xl hover:bg-emerald-200 transition">由小到大</button>
+                            <button onclick="setOrder('shuffle')" id="btn-order-shuffle" class="bg-amber-100 text-amber-700 text-xs font-bold py-2 rounded-xl hover:bg-amber-200 transition">隨機排列</button>
+                        </div>
+                    </div>
+
+                    <!-- 省略符號開關與設定 -->
+                    <div class="p-3 bg-sky-50/80 rounded-2xl border border-sky-200 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-sky-900">使用省略符號「~~」</span>
+                            <input type="checkbox" id="toggle-omission" onchange="updateExplorerChart()" class="w-5 h-5 accent-sky-600 rounded cursor-pointer">
+                        </div>
+                        <div id="omission-setting-box" class="flex items-center justify-between pt-2 border-t border-sky-200 text-xs font-bold text-sky-900">
+                            <span>省略符號設定值 (省略門檻):</span>
+                            <input type="number" id="input-omission-base" onchange="updateExplorerChart()" class="w-20 px-2 py-1 bg-white border border-sky-300 rounded-lg text-center font-bold text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400">
+                        </div>
+                        <p class="text-[11px] text-slate-500">從 0 出發，第一格標記省略符號「~~」，並由此設定值向上累加刻度。</p>
+                    </div>
+                </div>
+
+                <!-- 右側圖表展示區 -->
+                <div class="lg:col-span-8 glass-card p-6 rounded-3xl flex flex-col justify-between">
+                    <div class="bg-white/70 p-4 rounded-2xl border border-white flex-1 flex flex-col items-center justify-center">
+                        <svg id="explorer-svg" viewBox="0 0 650 410" class="w-full h-auto max-h-[410px]"></svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-hands-on" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-4 border-sky-200 mb-6">
+                    <div>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">任務目標</span>
+                        <h2 class="text-xl font-black text-slate-800 mt-1">請看統計表，動態拉高長條繪製「崎峰社區汽車長條圖」！</h2>
+                    </div>
+                    <button onclick="checkUserBarChart()" class="shinkai-btn text-white px-6 py-2.5 rounded-2xl font-bold text-sm shadow-md">
+                        ✅ 驗證我的繪圖結果
+                    </button>
+                </div>
+
+                <!-- 題目統計表 -->
+                <div class="bg-gradient-to-r from-sky-50 to-indigo-50 p-4 rounded-2xl border border-sky-200 mb-6">
+                    <h4 class="text-xs font-bold text-sky-900 mb-2">【數據統計表】崎峰社區汽車顏色數量統計表</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs font-bold bg-white rounded-xl shadow-sm border border-sky-100">
+                            <tr class="bg-sky-200/60 text-sky-900">
+                                <td class="p-2 border border-sky-100">顏色</td>
+                                <td class="p-2 border border-sky-100 text-[#ff7675]">紅色</td>
+                                <td class="p-2 border border-sky-100 text-[#f7b731]">黃色</td>
+                                <td class="p-2 border border-sky-100 text-[#2ed573]">綠色</td>
+                                <td class="p-2 border border-sky-100 text-[#70a1ff]">藍色</td>
+                                <td class="p-2 border border-sky-100 text-[#a4b0be]">灰色</td>
+                                <td class="p-2 border border-sky-100 text-[#4b6584]">黑色</td>
+                            </tr>
+                            <tr class="text-slate-700">
+                                <td class="p-2 border border-sky-100 bg-sky-50">數量 (輛)</td>
+                                <td class="p-2 border border-sky-100">3</td>
+                                <td class="p-2 border border-sky-100">5</td>
+                                <td class="p-2 border border-sky-100">2</td>
+                                <td class="p-2 border border-sky-100">6</td>
+                                <td class="p-2 border border-sky-100">12</td>
+                                <td class="p-2 border border-sky-100">9</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <p class="text-[11px] text-sky-700 mt-2">提示：縱軸每一格代表 1 輛汽車。移動右方滑桿即可即時增減長條高度。</p>
+                </div>
+
+                <!-- 手動調控與即時畫布 -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-8 bg-white/70 p-4 rounded-2xl border border-white">
+                        <svg id="handson-svg" viewBox="0 0 650 410" class="w-full h-full max-h-[410px]"></svg>
+                    </div>
+
+                    <!-- 滑桿控制區 -->
+                    <div class="lg:col-span-4 space-y-3 bg-white/50 p-4 rounded-2xl border border-sky-100">
+                        <h4 class="text-sm font-bold text-sky-900 border-b pb-2">拖動滑桿調整數值：</h4>
+                        
+                        <div class="space-y-2">
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#ff7675]">
+                                    <span>紅色長條:</span> <span id="val-red">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-red" oninput="updateUserBar('red', this.value)" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#f7b731]">
+                                    <span>黃色長條:</span> <span id="val-yellow">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-yellow" oninput="updateUserBar('yellow', this.value)" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#2ed573]">
+                                    <span>綠色長條:</span> <span id="val-green">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-green" oninput="updateUserBar('green', this.value)" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#70a1ff]">
+                                    <span>藍色長條:</span> <span id="val-blue">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-blue" oninput="updateUserBar('blue', this.value)" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#a4b0be]">
+                                    <span>灰色長條:</span> <span id="val-gray">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-gray" oninput="updateUserBar('gray', this.value)" class="w-full">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold text-[#4b6584]">
+                                    <span>黑色長條:</span> <span id="val-black">0 輛</span>
+                                </div>
+                                <input type="range" min="0" max="16" value="0" id="slide-black" oninput="updateUserBar('black', this.value)" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- 結果即時提示盒 -->
+                        <div id="handson-feedback" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-omission" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="border-b pb-4 border-sky-200 mb-6">
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-bold">為什麼需要省略符號？</span>
+                    <h2 class="text-xl font-black text-slate-800 mt-1">「大數值長條圖」省略符號 ( ~~~ ) 效果即時對比</h2>
+                    <p class="text-xs text-slate-600 mt-1">當資料得票數都很高（例如都在 900~1300 票）時，若從 0 逐一畫到 1300，長條圖差異難以觀察；使用省略符號可大幅提升可讀性！</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 左圖：未使用省略符號 -->
+                    <div class="bg-white/80 p-5 rounded-2xl border border-red-200 shadow-sm flex flex-col justify-between min-h-[480px]">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-bold text-red-600">❌ 未使用省略符號 (從 0 畫到 1300)</span>
+                                <span class="text-[11px] bg-red-100 text-red-700 px-2.5 py-1 rounded-full font-bold">高低差距極不明顯</span>
+                            </div>
+                            <svg id="no-omission-svg" viewBox="0 0 650 410" class="w-full h-80 md:h-96 border border-slate-100 rounded-xl bg-slate-50/80 p-2"></svg>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-4 leading-relaxed font-medium bg-red-50/60 p-3 rounded-xl border border-red-100">
+                            📢 觀察結果：空間大量被 0~900 的空白浪費，各景點得票的細微差異（如 980 與 1040）幾乎看不出來。
+                        </p>
+                    </div>
+
+                    <!-- 右圖：使用省略符號 -->
+                    <div class="bg-white/80 p-5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col justify-between min-h-[480px]">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-bold text-emerald-600">✅ 從 0 起始並於第一格使用「~~」波浪線</span>
+                                <span class="text-[11px] bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-bold">對比清晰明確</span>
+                            </div>
+                            <svg id="with-omission-svg" viewBox="0 0 650 410" class="w-full h-80 md:h-96 border border-slate-100 rounded-xl bg-sky-50/60 p-2"></svg>
+                        </div>
+                        <p class="text-xs text-emerald-900 mt-4 leading-relaxed font-medium bg-emerald-50/80 p-3 rounded-xl border border-emerald-100">
+                            🎉 觀察結果：從 0 向上第一格省略 0~900 無資料區間，重點集中於 900~1300 的數據變化，圖表既精確又美觀！
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-quiz" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl">
+                <div class="flex justify-between items-center border-b pb-4 border-sky-200 mb-6">
+                    <div>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">自我檢驗</span>
+                        <h2 class="text-xl font-black text-slate-800 mt-1">長條圖觀念隨堂大挑戰 (共 5 題)</h2>
+                    </div>
+                    <div id="quiz-score-badge" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-2xl font-black text-sm shadow-sm">
+                        目前得分：0 / 500
+                    </div>
+                </div>
+
+                <!-- 測驗題目容器 -->
+                <div id="quiz-container" class="space-y-6"></div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="submitQuiz()" class="shinkai-btn text-white px-8 py-3 rounded-2xl font-black text-base shadow-lg">
+                        🚀 完成並提交測驗
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const datasets = {
+            cars: {
+                title: "大好社區汽車顏色數量統計圖",
+                unit: "輛",
+                defaultScale: 2,
+                scaleOptions: [1, 2, 3, 5],
+                items: [
+                    { name: "橘色", value: 2, color: "#ff9f7f" },
+                    { name: "黑色", value: 10, color: "#4b6584" },
+                    { name: "綠色", value: 6, color: "#2ed573" },
+                    { name: "藍色", value: 6, color: "#70a1ff" },
+                    { name: "灰色", value: 9, color: "#a4b0be" },
+                    { name: "黃色", value: 15, color: "#f7b731" }
+                ]
+            },
+            drinks: {
+                title: "四年乙班學生喜愛的飲料統計圖",
+                unit: "人",
+                defaultScale: 2,
+                scaleOptions: [1, 2, 3, 5],
+                items: [
+                    { name: "紅茶", value: 8, color: "#ff7675" },
+                    { name: "綠茶", value: 3, color: "#55efc4" },
+                    { name: "奶茶", value: 9, color: "#ffeaa7" },
+                    { name: "蜜茶", value: 14, color: "#a29bfe" },
+                    { name: "水果茶", value: 7, color: "#fd79a8" }
+                ]
+            },
+            spots: {
+                title: "外國旅客印象深刻的台灣景點統計圖",
+                unit: "票",
+                defaultScale: 50,
+                scaleOptions: [50, 100, 150, 200],
+                hasOmission: true,
+                items: [
+                    { name: "中正紀念堂", value: 920, color: "#81ecec" },
+                    { name: "士林夜市", value: 1240, color: "#ff7675" },
+                    { name: "故宮博物院", value: 1120, color: "#a29bfe" },
+                    { name: "日月潭", value: 980, color: "#55efc4" },
+                    { name: "臺北101", value: 1040, color: "#74b9ff" }
+                ]
+            }
+        };
+
+        let currentDatasetKey = "cars";
+        let currentScaleInterval = 2;
+        let currentOrderMode = "default";
+
+        let userBarValues = {
+            red: 0,
+            yellow: 0,
+            green: 0,
+            blue: 0,
+            gray: 0,
+            black: 0
+        };
+
+        function calcAutoOmissionBase(items) {
+            let minVal = Math.min(...items.map(i => i.value));
+            if(minVal <= 10) return 0;
+            let magnitude = Math.pow(10, Math.floor(Math.log10(minVal)));
+            return Math.floor(minVal / magnitude) * magnitude;
+        }
+
+        function switchTab(tabKey) {
+            const tabs = ['explorer', 'hands-on', 'omission', 'quiz'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const sec = document.getElementById(`sec-${t}`);
+                if(t === tabKey) {
+                    btn.className = "tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-white text-sky-700 shadow-sm transition-all";
+                    sec.classList.remove('hidden');
+                } else {
+                    btn.className = "tab-btn px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-sky-600 transition-all";
+                    sec.classList.add('hidden');
+                }
+            });
+
+            if(tabKey === 'explorer') updateExplorerChart();
+            if(tabKey === 'hands-on') renderHandsOnChart();
+            if(tabKey === 'omission') renderOmissionDemos();
+            if(tabKey === 'quiz') renderQuiz();
+        }
+
+        function updateScaleButtons(dataObj) {
+            const container = document.getElementById('scale-btn-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            dataObj.scaleOptions.forEach(s => {
+                const btn = document.createElement('button');
+                btn.onclick = () => updateScale(s);
+                const isActive = s === currentScaleInterval;
+                btn.className = isActive
+                    ? "bg-sky-600 text-white text-xs font-bold py-2 rounded-xl transition shadow-sm"
+                    : "bg-white/80 border border-sky-200 text-sky-900 text-xs font-bold py-2 rounded-xl hover:bg-sky-100 transition";
+                btn.innerText = `${s} ${dataObj.unit}`;
+                container.appendChild(btn);
+            });
+        }
+
+        function updateScale(scaleVal) {
+            currentScaleInterval = scaleVal;
+            updateExplorerChart();
+        }
+
+        function setOrder(mode) {
+            currentOrderMode = mode;
+            ['default', 'desc', 'asc', 'shuffle'].forEach(m => {
+                const btn = document.getElementById(`btn-order-${m}`);
+                if(btn) {
+                    if(m === mode) {
+                        btn.className = "bg-sky-500 text-white text-xs font-bold py-2 rounded-xl transition shadow-sm";
+                    } else {
+                        btn.className = "bg-sky-100 text-sky-700 text-xs font-bold py-2 rounded-xl hover:bg-sky-200 transition";
+                    }
+                }
+            });
+            updateExplorerChart();
+        }
+
+        function onDatasetChange() {
+            const selectedKey = document.getElementById('explorer-dataset').value;
+            currentDatasetKey = selectedKey;
+            const dataObj = datasets[currentDatasetKey];
+            currentScaleInterval = dataObj.defaultScale;
+
+            const toggleOmission = document.getElementById('toggle-omission');
+            if(dataObj.hasOmission) {
+                toggleOmission.checked = true;
+            } else {
+                toggleOmission.checked = false;
+            }
+
+            const autoBase = calcAutoOmissionBase(dataObj.items);
+            document.getElementById('input-omission-base').value = autoBase;
+
+            updateExplorerChart();
+        }
+
+        function updateExplorerChart() {
+            const dataObj = datasets[currentDatasetKey];
+            updateScaleButtons(dataObj);
+
+            const useOmission = document.getElementById('toggle-omission').checked;
+            let baseVal = parseInt(document.getElementById('input-omission-base').value);
+            if(isNaN(baseVal) || baseVal < 0) {
+                baseVal = calcAutoOmissionBase(dataObj.items);
+                document.getElementById('input-omission-base').value = baseVal;
+            }
+
+            const subtitleText = `縱軸每一大格 = ${currentScaleInterval} ${dataObj.unit}`;
+
+            let items = [...dataObj.items];
+            if(currentOrderMode === 'desc') {
+                items.sort((a,b) => b.value - a.value);
+            } else if(currentOrderMode === 'asc') {
+                items.sort((a,b) => a.value - b.value);
+            } else if(currentOrderMode === 'shuffle') {
+                items.sort(() => Math.random() - 0.5);
+            }
+
+            renderSVGChart("explorer-svg", items, dataObj.unit, currentScaleInterval, useOmission, baseVal, dataObj.title, subtitleText);
+        }
+
+        function renderSVGChart(svgId, items, unit, scaleInterval, useOmission, omissionBase = 900, chartTitle = "", subtitleText = "") {
+            const svg = document.getElementById(svgId);
+            if(!svg) return;
+            svg.innerHTML = '';
+
+            const width = 650;
+            const height = 410;
+            const paddingLeft = 70;
+            const paddingBottom = 90;
+            const paddingTop = 40;
+            const paddingRight = 30;
+
+            const chartWidth = width - paddingLeft - paddingRight;
+            const chartHeight = height - paddingTop - paddingBottom;
+
+            let maxDataVal = Math.max(...items.map(i => i.value));
+
+            let ticks = [];
+            let totalSteps = 5;
+
+            if (useOmission) {
+                let stepsAbove = Math.ceil((maxDataVal - omissionBase) / scaleInterval);
+                totalSteps = Math.max(4, stepsAbove + 1);
+                
+                ticks.push({ index: 0, val: 0 });
+                ticks.push({ index: 1, val: omissionBase });
+                for(let i = 2; i <= totalSteps; i++) {
+                    ticks.push({ index: i, val: omissionBase + (i - 1) * scaleInterval });
+                }
+            } else {
+                let displayMax = totalSteps * scaleInterval;
+                while(displayMax < maxDataVal) {
+                    totalSteps += 1;
+                    displayMax = totalSteps * scaleInterval;
+                }
+                for(let i = 0; i <= totalSteps; i++) {
+                    ticks.push({ index: i, val: i * scaleInterval });
+                }
+            }
+
+            const gridStepHeight = chartHeight / totalSteps;
+
+            // 繪製橫向網格線與 Y 軸標籤
+            ticks.forEach(t => {
+                let y = height - paddingBottom - (t.index * gridStepHeight);
+
+                let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", paddingLeft);
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", width - paddingRight);
+                line.setAttribute("y2", y);
+                line.setAttribute("stroke", "#e2e8f0");
+                line.setAttribute("stroke-width", "1");
+                svg.appendChild(line);
+
+                let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", paddingLeft - 10);
+                text.setAttribute("y", y + 4);
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("font-size", "12");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("fill", "#64748b");
+                text.textContent = t.val;
+                svg.appendChild(text);
+            });
+
+            // 繪製 X 軸與 Y 軸主邊框
+            let xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            xAxis.setAttribute("x1", paddingLeft);
+            xAxis.setAttribute("y1", height - paddingBottom);
+            xAxis.setAttribute("x2", width - paddingRight);
+            xAxis.setAttribute("y2", height - paddingBottom);
+            xAxis.setAttribute("stroke", "#334155");
+            xAxis.setAttribute("stroke-width", "2");
+            svg.appendChild(xAxis);
+
+            let yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            yAxis.setAttribute("x1", paddingLeft);
+            yAxis.setAttribute("y1", paddingTop);
+            yAxis.setAttribute("x2", paddingLeft);
+            yAxis.setAttribute("y2", height - paddingBottom);
+            yAxis.setAttribute("stroke", "#334155");
+            yAxis.setAttribute("stroke-width", "2");
+            svg.appendChild(yAxis);
+
+            // 單位標籤
+            let unitText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            unitText.setAttribute("x", paddingLeft - 10);
+            unitText.setAttribute("y", paddingTop - 15);
+            unitText.setAttribute("text-anchor", "end");
+            unitText.setAttribute("font-size", "11");
+            unitText.setAttribute("font-weight", "bold");
+            unitText.setAttribute("fill", "#0f172a");
+            unitText.textContent = `數量 (${unit})`;
+            svg.appendChild(unitText);
+
+            // 計算長條寬度與間距
+            const barWidth = Math.min(50, (chartWidth / items.length) - 20);
+            const gap = chartWidth / items.length;
+
+            items.forEach((item, index) => {
+                let x = paddingLeft + (index * gap) + (gap - barWidth) / 2;
+                
+                let barH = 0;
+                if (useOmission) {
+                    if (item.value >= omissionBase) {
+                        barH = gridStepHeight + ((item.value - omissionBase) / scaleInterval) * gridStepHeight;
+                    } else if (item.value > 0) {
+                        barH = (item.value / omissionBase) * gridStepHeight;
+                    }
+                } else {
+                    let displayMax = totalSteps * scaleInterval;
+                    barH = (item.value / displayMax) * chartHeight;
+                }
+
+                let y = height - paddingBottom - barH;
+
+                let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", x);
+                rect.setAttribute("y", y);
+                rect.setAttribute("width", barWidth);
+                rect.setAttribute("height", Math.max(0, barH));
+                rect.setAttribute("fill", item.color);
+                rect.setAttribute("rx", "6");
+                rect.setAttribute("class", "transition-all duration-300 ease-out hover:opacity-85");
+                svg.appendChild(rect);
+
+                // 數據數值標籤
+                let valText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                valText.setAttribute("x", x + barWidth / 2);
+                valText.setAttribute("y", Math.min(y - 8, height - paddingBottom - 10));
+                valText.setAttribute("text-anchor", "middle");
+                valText.setAttribute("font-size", "12");
+                valText.setAttribute("font-weight", "900");
+                valText.setAttribute("fill", item.color);
+                valText.textContent = item.value;
+                svg.appendChild(valText);
+
+                // 橫軸項目名稱標籤
+                let nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                nameText.setAttribute("x", x + barWidth / 2);
+                nameText.setAttribute("y", height - paddingBottom + 22);
+                nameText.setAttribute("text-anchor", "middle");
+                nameText.setAttribute("font-size", "12");
+                nameText.setAttribute("font-weight", "bold");
+                nameText.setAttribute("fill", "#334155");
+                nameText.textContent = item.name;
+                svg.appendChild(nameText);
+            });
+
+            // 當開啟省略符號時，在 0 向上第一格繪製全幅粗體波浪線
+            if(useOmission) {
+                let omissionY = height - paddingBottom - gridStepHeight;
+                let startX = paddingLeft - 5;
+                let endX = width - paddingRight + 5;
+                
+                let waveWidth = 14;
+                let amplitude = 4;
+                let pathD = `M ${startX} ${omissionY}`;
+                let x = startX;
+                let dir = -1;
+                while (x < endX) {
+                    let nextX = Math.min(x + waveWidth / 2, endX);
+                    let cpX = (x + nextX) / 2;
+                    let cpY = omissionY + (dir * amplitude);
+                    pathD += ` Q ${cpX} ${cpY}, ${nextX} ${omissionY}`;
+                    x = nextX;
+                    dir *= -1;
+                }
+
+                let wavePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                wavePath.setAttribute("d", pathD);
+                wavePath.setAttribute("fill", "none");
+                wavePath.setAttribute("stroke", "#dc2626");
+                wavePath.setAttribute("stroke-width", "4.5");
+                svg.appendChild(wavePath);
+            }
+
+            // 在橫軸各項目名稱正下方繪製統計圖標題
+            if(chartTitle) {
+                let titleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                titleText.setAttribute("x", paddingLeft + chartWidth / 2);
+                titleText.setAttribute("y", height - paddingBottom + 48);
+                titleText.setAttribute("text-anchor", "middle");
+                titleText.setAttribute("font-size", "14");
+                titleText.setAttribute("font-weight", "900");
+                titleText.setAttribute("fill", "#1e293b");
+                titleText.textContent = chartTitle;
+                svg.appendChild(titleText);
+            }
+
+            // 緊接在標題正下方繪製縱軸刻度說明副標題
+            if(subtitleText) {
+                let subText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                subText.setAttribute("x", paddingLeft + chartWidth / 2);
+                subText.setAttribute("y", height - paddingBottom + 68);
+                subText.setAttribute("text-anchor", "middle");
+                subText.setAttribute("font-size", "12");
+                subText.setAttribute("font-weight", "bold");
+                subText.setAttribute("fill", "#0284c7");
+                subText.textContent = subtitleText;
+                svg.appendChild(subText);
+            }
+        }
+
+        function updateUserBar(colorKey, value) {
+            userBarValues[colorKey] = parseInt(value) || 0;
+            const label = document.getElementById(`val-${colorKey}`);
+            if(label) label.innerText = `${value} 輛`;
+            renderHandsOnChart();
+        }
+
+        function renderHandsOnChart() {
+            const items = [
+                { name: "紅色", value: userBarValues.red, color: "#ff7675" },
+                { name: "黃色", value: userBarValues.yellow, color: "#f7b731" },
+                { name: "綠色", value: userBarValues.green, color: "#2ed573" },
+                { name: "藍色", value: userBarValues.blue, color: "#70a1ff" },
+                { name: "灰色", value: userBarValues.gray, color: "#a4b0be" },
+                { name: "黑色", value: userBarValues.black, color: "#4b6584" }
+            ];
+            renderSVGChart("handson-svg", items, "輛", 1, false, 0, "崎峰社區汽車顏色數量統計圖", "縱軸每一大格 = 1 輛");
+        }
+
+        function checkUserBarChart() {
+            const targets = { red: 3, yellow: 5, green: 2, blue: 6, gray: 12, black: 9 };
+            const feedback = document.getElementById('handson-feedback');
+            feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800');
+
+            let isCorrect = true;
+            for(let k in targets) {
+                if(userBarValues[k] !== targets[k]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if(isCorrect) {
+                feedback.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedback.innerHTML = "🎉 太棒了！你的長條圖畫得完全正確！";
+            } else {
+                feedback.classList.add('bg-red-100', 'text-red-800');
+                feedback.innerHTML = "❌ 還有長條高度不對喔，請再次核對表格數值！";
+            }
+        }
+
+        function renderOmissionDemos() {
+            const items = datasets.spots.items;
+            renderSVGChart("no-omission-svg", items, "票", 200, false, 0, "外國旅客印象深刻的台灣景點統計圖 (無省略符號)", "縱軸每一大格 = 200 票");
+            renderSVGChart("with-omission-svg", items, "票", 50, true, 900, "外國旅客印象深刻的台灣景點統計圖 (使用省略符號)", "縱軸每一大格 = 50 票");
+        }
+
+        const quizQuestions = [
+            {
+                id: 1,
+                title: "1. 縱軸每一格代表 2 輛車，若橘色汽車有 6 輛，長條應該畫到第幾格？",
+                options: ["2 格", "3 格", "6 格", "12 格"],
+                answer: 1,
+                explain: "解析：6 輛 ÷ 每一格 2 輛 = 3 格。"
+            },
+            {
+                id: 2,
+                title: "2. 在繪製長條圖時，橫軸上的「項目順序」（如汽車顏色）可以任意調整嗎？",
+                options: ["不可以，必須按字母或筆畫順序", "可以，項目順序不影響長條圖代表的數值意義", "不可以，必須由大到小排列"],
+                answer: 1,
+                explain: "解析：長條圖的橫軸項目沒有固定排列順序，只要項目對應的長條數值正確即可。"
+            },
+            {
+                id: 3,
+                title: "3. 美福國小的投票數據都在 220 票至 300 票之間，使用省略線「~~~」最適合省略哪個區間？",
+                options: ["省略 300 票以上的數據", "省略 200 票以下的數據", "省略 100 票到 200 票之間的數據"],
+                answer: 1,
+                explain: "解析：得票數都超過 200 票，因此從 0 起始並於第一格省略 200 票以下沒有資料的區間最合適。"
+            },
+            {
+                id: 4,
+                title: "4. 若縱軸刻度每一格代表 10 人，當長條高度到達第 8 格時，代表多少人？",
+                options: ["8 人", "18 人", "80 人", "800 人"],
+                answer: 2,
+                explain: "解析：每一格 10 人 × 8 格 = 80 人。"
+            },
+            {
+                id: 5,
+                title: "5. 外國旅客印象景點得票數都在 900~1200 票之間，於第一格啟用 900 省略符號，若得票數為 1100 票，且每格 100 票，該長條高出波浪線幾大格？",
+                options: ["1 大格", "2 大格", "9 大格", "11 大格"],
+                answer: 1,
+                explain: "解析：(1100 - 900) ÷ 100 = 2 大格。"
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q) => {
+                let card = document.createElement('div');
+                card.className = "p-5 bg-white/80 rounded-2xl border border-sky-100 space-y-3";
+                
+                let optHtml = q.options.map((opt, optIdx) => `
+                    <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 hover:bg-sky-50 cursor-pointer transition">
+                        <input type="radio" name="q-${q.id}" value="${optIdx}" class="w-4 h-4 accent-sky-600">
+                        <span class="text-xs font-bold text-slate-700">${opt}</span>
+                    </label>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="font-bold text-sm text-slate-800">${q.title}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${optHtml}</div>
+                    <div id="ans-feedback-${q.id}" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            quizQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+                const feedback = document.getElementById(`ans-feedback-${q.id}`);
+                if(!feedback) return;
+
+                feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800');
+
+                if(selected && parseInt(selected.value) === q.answer) {
+                    score += 100;
+                    feedback.classList.add('bg-emerald-100', 'text-emerald-800');
+                    feedback.innerHTML = `✅ 答對了！ ${q.explain}`;
+                } else {
+                    feedback.classList.add('bg-red-100', 'text-red-800');
+                    feedback.innerHTML = `❌ 答錯囉！ ${q.explain}`;
+                }
+            });
+
+            document.getElementById('quiz-score-badge').innerText = `目前得分：${score} / 500`;
+        }
+
+        window.onload = function() {
+            onDatasetChange();
+            renderHandsOnChart();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

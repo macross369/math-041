@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-2 測量與畫角 — 互動探究實驗室</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #e0c3fc 70%, #8ec5fc 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* 新海誠天空夢幻雲朵與光暈特效 */
+        .shinkai-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(180deg, #38bdf8 0%, #818cf8 40%, #c084fc 75%, #f472b6 100%);
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 50%;
+            filter: blur(25px);
+            animation: floatCloud 25s infinite linear;
+        }
+
+        @keyframes floatCloud {
+            0% { transform: translateX(-200px) translateY(0px); }
+            50% { transform: translateX(50vw) translateY(-20px); }
+            100% { transform: translateX(100vw) translateY(0px); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 數值滑桿樣式美化 */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(203, 213, 225, 0.6);
+            border-radius: 10px;
+            height: 8px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Canvas cursor style */
+        .interactive-canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-slate-800">
+
+    <div class="shinkai-bg">
+        <div class="cloud w-96 h-96 -top-20 -left-20"></div>
+        <div class="cloud w-80 h-80 top-1/3 left-2/3" style="animation-delay: -10s;"></div>
+        <div class="cloud w-72 h-72 top-2/3 left-10" style="animation-delay: -5s;"></div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <header class="glass-panel rounded-3xl p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border-b-4 border-sky-300">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-tr from-sky-400 to-indigo-500 text-white p-4 rounded-2xl shadow-lg">
+                    <i class="fa-solid me-1 fa-compass-drafting text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-indigo-600 to-pink-600">
+                        3-2 測量與畫角 — 互動探究實驗室
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-600 mt-1 font-medium">
+                        ✨ 觀察內外圈刻度、認識銳角/直角/鈍角、學習畫角與邊長延伸
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex bg-slate-200/60 p-1.5 rounded-2xl gap-1 text-sm font-bold w-full md:w-auto">
+                <button id="tab-lab-btn" onclick="switchTab('lab')" class="tab-btn active flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-shapes"></i> 互動實驗室
+                </button>
+                <button id="tab-quiz-btn" onclick="switchTab('quiz')" class="tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 text-slate-700 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-pen-ruler"></i> 隨堂測驗 (5題)
+                </button>
+            </div>
+        </header>
+
+        <main id="tab-lab" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Visualizing Canvas Section -->
+            <div class="lg:col-span-8 space-y-4">
+                <div class="glass-panel rounded-3xl p-4 md:p-6 relative">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-sky-400 animate-ping"></span>
+                            <h2 class="font-bold text-lg text-slate-700">動態量角與測量看板</h2>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="resetProtractorPos()" class="text-xs bg-white/80 hover:bg-white text-slate-700 px-3 py-1.5 rounded-lg font-bold border border-slate-200 transition shadow-sm">
+                                <i class="fa-solid fa-rotate-left mr-1"></i>重置量角器
+                            </button>
+                            <button onclick="snapToVertex()" class="text-xs bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-lg font-bold transition shadow-md">
+                                <i class="fa-solid fa-bullseye mr-1"></i>對齊頂點
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Area -->
+                    <div class="relative w-full bg-slate-900/5 rounded-2xl overflow-hidden border border-slate-200/60 shadow-inner min-h-[380px] md:min-h-[440px] flex items-center justify-center">
+                        <canvas id="angleCanvas" class="interactive-canvas w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                        
+                        <!-- Real-time Classification Badge -->
+                        <div class="absolute top-4 left-4 glass-card px-4 py-2 rounded-xl shadow-md border border-white flex items-center gap-2">
+                            <span class="text-xs text-slate-500 font-bold">角的類型：</span>
+                            <span id="angleTypeBadge" class="text-base font-black px-3 py-0.5 rounded-lg bg-sky-500 text-white shadow-sm">
+                                銳角
+                            </span>
+                        </div>
+
+                        <!-- Real-time Angle Readout -->
+                        <div class="absolute top-4 right-4 glass-card px-4 py-2 rounded-xl shadow-md border border-white text-right">
+                            <span class="text-xs text-slate-500 font-bold block">目前張開角度</span>
+                            <span id="angleValueText" class="text-2xl font-black text-indigo-600">30°</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-500 text-center mt-2 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-hand-pointer text-sky-500"></i> 提示：可用滑鼠或手指直接在畫面上拖曳量角器進行對齊測量喔！
+                    </p>
+                </div>
+
+                <!-- Guidance Note Panel -->
+                <div class="glass-panel rounded-2xl p-4 bg-gradient-to-r from-sky-500/10 to-indigo-500/10 border-l-4 border-sky-500">
+                    <h3 class="font-bold text-sky-800 text-sm flex items-center gap-2">
+                        <i class="fa-regular fa-lightbulb text-amber-500 text-base"></i> 觀念小提示 (讀數技巧)
+                    </h3>
+                    <p id="scaleInstructionText" class="text-xs md:text-sm text-slate-700 mt-1 leading-relaxed">
+                        當角的邊對齊量角器<strong class="text-sky-600">右側0度</strong>刻度時，請看<strong class="text-sky-600">內圈刻度</strong>；若對齊<strong class="text-indigo-600">左側0度</strong>，請看<strong class="text-indigo-600">外圈刻度</strong>。
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-4">
+                <div class="glass-panel rounded-3xl p-6 space-y-5">
+                    <h2 class="font-black text-slate-800 text-lg border-b pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-500"></i> 控制與變數參數
+                    </h2>
+
+                    <!-- Control 1: Angle Slider -->
+                    <div>
+                        <div class="flex justify-between text-sm font-bold mb-1">
+                            <label for="angleInput" class="text-slate-700">調整角度大小 (0° ~ 180°)</label>
+                            <span id="sliderAngleVal" class="text-sky-600 font-black">30°</span>
+                        </div>
+                        <input type="range" id="angleInput" min="0" max="180" value="30" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
+                            <span>0° (平)</span>
+                            <span>90° (直角)</span>
+                            <span>180°</span>
+                        </div>
+                    </div>
+
+                    <!-- Control 2: Base Ray Direction -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-700 block">角的對齊邊 (0度基準線)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="alignRightBtn" onclick="setBaseDirection('right')" class="py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-sky-500 text-white border-sky-500 shadow-sm">
+                                <i class="fa-solid fa-arrow-right"></i> 對齊右邊 (0°)
+                            </button>
+                            <button id="alignLeftBtn" onclick="setBaseDirection('left')" class="py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-white text-slate-700 border-slate-300 hover:bg-slate-50">
+                                <i class="fa-solid fa-arrow-left"></i> 對齊左邊 (0°)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Control 3: Ray Length (Simulate Short edge & extension) -->
+                    <div>
+                        <div class="flex justify-between text-sm font-bold mb-1">
+                            <label for="lengthInput" class="text-slate-700">邊長長短 (體驗延長線)</label>
+                            <span id="lengthValText" class="text-slate-500 text-xs font-bold">適中</span>
+                        </div>
+                        <input type="range" id="lengthInput" min="60" max="220" value="120" class="w-full">
+                        <p class="text-[11px] text-slate-500 mt-1">
+                            💡 若邊長太短對不到刻度，可以使用直尺把角的邊延長！
+                        </p>
+                    </div>
+
+                    <!-- Control 4: Display Options -->
+                    <div class="pt-3 border-t border-slate-200/80 space-y-3">
+                        <label class="text-sm font-bold text-slate-700 block">顯示設定</label>
+                        
+                        <label class="flex items-center justify-between cursor-pointer text-xs font-bold text-slate-700 bg-white/60 p-2.5 rounded-xl border border-slate-200">
+                            <span>高亮顯示對應刻度圈 (內/外)</span>
+                            <input type="checkbox" id="highlightScaleToggle" checked onchange="draw()" class="w-4 h-4 accent-sky-500 rounded">
+                        </label>
+
+                        <label class="flex items-center justify-between cursor-pointer text-xs font-bold text-slate-700 bg-white/60 p-2.5 rounded-xl border border-slate-200">
+                            <span>顯示延伸線 (虛線)</span>
+                            <input type="checkbox" id="extensionLineToggle" onchange="draw()" class="w-4 h-4 accent-sky-500 rounded">
+                        </label>
+                    </div>
+
+                    <!-- Quick Angle Presets -->
+                    <div class="pt-2">
+                        <label class="text-xs font-bold text-slate-500 block mb-2">快速選擇觀念角度：</label>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="setQuickAngle(30)" class="text-xs px-2.5 py-1 bg-white hover:bg-sky-50 text-slate-700 font-bold rounded-lg border border-slate-200 shadow-sm transition">30° (銳角)</button>
+                            <button onclick="setQuickAngle(60)" class="text-xs px-2.5 py-1 bg-white hover:bg-sky-50 text-slate-700 font-bold rounded-lg border border-slate-200 shadow-sm transition">60° (銳角)</button>
+                            <button onclick="setQuickAngle(90)" class="text-xs px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold rounded-lg border border-amber-300 shadow-sm transition">90° (直角)</button>
+                            <button onclick="setQuickAngle(120)" class="text-xs px-2.5 py-1 bg-white hover:bg-sky-50 text-slate-700 font-bold rounded-lg border border-slate-200 shadow-sm transition">120° (鈍角)</button>
+                            <button onclick="setQuickAngle(135)" class="text-xs px-2.5 py-1 bg-white hover:bg-sky-50 text-slate-700 font-bold rounded-lg border border-slate-200 shadow-sm transition">135° (鈍角)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <main id="tab-quiz" class="hidden space-y-6">
+            <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-4xl mx-auto">
+                <div class="flex items-center justify-between border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800">3-2 概念自我檢測測驗</h2>
+                        <p class="text-xs md:text-sm text-slate-500 mt-1">選出正確答案，完成後系統將為您進行即時批改與解析。</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-bold text-slate-500 block">目前得分</span>
+                        <span id="quizScoreDisplay" class="text-2xl font-black text-sky-600">-- / 100</span>
+                    </div>
+                </div>
+
+                <!-- Quiz Questions List Container -->
+                <div id="quizContainer" class="space-y-6">
+                    <!-- Dynamic Question items generated via JS -->
+                </div>
+
+                <!-- Submit & Feedback Button -->
+                <div class="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
+                    <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-arrow-rotate-left mr-1"></i> 重新測驗
+                    </button>
+                    <button onclick="submitQuiz()" class="px-8 py-3 rounded-xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-lg transition transform active:scale-95">
+                        提交答案並對答案 <i class="fa-solid fa-check mr-1"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-6 text-center text-xs text-slate-600 font-medium py-2">
+        </footer>
+    </div>
+
+    <script>
+        /* State Variables */
+        let currentAngle = 30;
+        let baseDirection = 'right'; // 'right' or 'left'
+        let rayLength = 120;
+        
+        // Canvas & Context
+        const canvas = document.getElementById('angleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Protractor Interactive State
+        let protractor = {
+            x: 0,
+            y: 0,
+            radius: 140,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0
+        };
+
+        // Vertex center point (fixed in canvas relative space)
+        let vertex = { x: 0, y: 0 };
+
+        /* Init Canvas on Load */
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            snapToVertex();
+            initQuiz();
+            setupEventListeners();
+            draw();
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            draw();
+        });
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Set vertex position to bottom-center of canvas area
+            vertex.x = canvas.width / 2;
+            vertex.y = canvas.height / 2 + 50;
+        }
+
+        function snapToVertex() {
+            protractor.x = vertex.x;
+            protractor.y = vertex.y;
+            draw();
+        }
+
+        function resetProtractorPos() {
+            protractor.x = canvas.width / 2 - 80;
+            protractor.y = canvas.height / 2 - 40;
+            draw();
+        }
+
+        function setupEventListeners() {
+            // Angle Range Slider
+            const angleInput = document.getElementById('angleInput');
+            angleInput.addEventListener('input', (e) => {
+                currentAngle = parseInt(e.target.value);
+                document.getElementById('sliderAngleVal').innerText = currentAngle + '°';
+                document.getElementById('angleValueText').innerText = currentAngle + '°';
+                updateAngleTypeBadge();
+                draw();
+            });
+
+            // Ray Length Slider
+            const lengthInput = document.getElementById('lengthInput');
+            lengthInput.addEventListener('input', (e) => {
+                rayLength = parseInt(e.target.value);
+                let label = "適中";
+                if(rayLength < 90) label = "偏短 (可試著延長)";
+                else if(rayLength > 160) label = "偏長";
+                document.getElementById('lengthValText').innerText = label;
+                draw();
+            });
+
+            // Canvas Mouse/Touch Dragging for Protractor
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', drag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
+
+            canvas.addEventListener('touchstart', (e) => {
+                if(e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    startDrag({ clientX: touch.clientX, clientY: touch.clientY });
+                }
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                if(e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    drag({ clientX: touch.clientX, clientY: touch.clientY });
+                }
+            });
+            canvas.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Check if inside protractor bounding box
+            const dist = Math.hypot(mouseX - protractor.x, mouseY - protractor.y);
+            if (dist < protractor.radius) {
+                protractor.isDragging = true;
+                protractor.dragStartX = mouseX - protractor.x;
+                protractor.dragStartY = mouseY - protractor.y;
+            }
+        }
+
+        function drag(e) {
+            if (!protractor.isDragging) return;
+            const rect = canvas.getBoundingClientRect();
+            protractor.x = (e.clientX - rect.left) - protractor.dragStartX;
+            protractor.y = (e.clientY - rect.top) - protractor.dragStartY;
+            draw();
+        }
+
+        function endDrag() {
+            protractor.isDragging = false;
+        }
+
+        function setBaseDirection(dir) {
+            baseDirection = dir;
+            const rightBtn = document.getElementById('alignRightBtn');
+            const leftBtn = document.getElementById('alignLeftBtn');
+
+            if(dir === 'right') {
+                rightBtn.className = "py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-sky-500 text-white border-sky-500 shadow-sm";
+                leftBtn.className = "py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-white text-slate-700 border-slate-300 hover:bg-slate-50";
+                document.getElementById('scaleInstructionText').innerHTML = '當角的邊對齊量角器<strong class="text-sky-600">右側0度</strong>刻度時，請看<strong class="text-sky-600">內圈刻度</strong>。';
+            } else {
+                leftBtn.className = "py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-indigo-600 text-white border-indigo-600 shadow-sm";
+                rightBtn.className = "py-2 px-3 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1 bg-white text-slate-700 border-slate-300 hover:bg-slate-50";
+                document.getElementById('scaleInstructionText').innerHTML = '當角的邊對齊量角器<strong class="text-indigo-600">左側0度</strong>刻度時，請看<strong class="text-indigo-600">外圈刻度</strong>。';
+            }
+            draw();
+        }
+
+        function setQuickAngle(deg) {
+            currentAngle = deg;
+            document.getElementById('angleInput').value = deg;
+            document.getElementById('sliderAngleVal').innerText = deg + '°';
+            document.getElementById('angleValueText').innerText = deg + '°';
+            updateAngleTypeBadge();
+            draw();
+        }
+
+        function updateAngleTypeBadge() {
+            const badge = document.getElementById('angleTypeBadge');
+            if(currentAngle < 90) {
+                badge.innerText = '銳角 (小於90°)';
+                badge.className = 'text-base font-black px-3 py-0.5 rounded-lg bg-sky-500 text-white shadow-sm';
+            } else if(currentAngle === 90) {
+                badge.innerText = '直角 (等於90°)';
+                badge.className = 'text-base font-black px-3 py-0.5 rounded-lg bg-amber-500 text-white shadow-sm';
+            } else if(currentAngle < 180) {
+                badge.innerText = '鈍角 (大於90°)';
+                badge.className = 'text-base font-black px-3 py-0.5 rounded-lg bg-pink-500 text-white shadow-sm';
+            } else {
+                badge.innerText = '平角 (等於180°)';
+                badge.className = 'text-base font-black px-3 py-0.5 rounded-lg bg-indigo-600 text-white shadow-sm';
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Grid / Canvas background accents
+            drawBackgroundGrid();
+
+            // 2. Draw Angle (Vertex & Rays)
+            drawAngleGeometry();
+
+            // 3. Draw Draggable Semi-transparent Protractor
+            drawProtractor();
+        }
+
+        function drawBackgroundGrid() {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+            ctx.lineWidth = 1;
+            const step = 30;
+            for(let x=0; x<canvas.width; x+=step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for(let y=0; y<canvas.height; y+=step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawAngleGeometry() {
+            ctx.save();
+            ctx.translate(vertex.x, vertex.y);
+
+            const isRight = (baseDirection === 'right');
+            const baseRad = isRight ? 0 : Math.PI;
+            const targetRad = isRight ? -currentAngle * (Math.PI / 180) : Math.PI + currentAngle * (Math.PI / 180);
+
+            const showExtension = document.getElementById('extensionLineToggle').checked;
+
+            // Base Ray
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(baseRad) * rayLength, Math.sin(baseRad) * rayLength);
+            ctx.strokeStyle = '#2563eb';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Target Ray
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(Math.cos(targetRad) * rayLength, Math.sin(targetRad) * rayLength);
+            ctx.strokeStyle = '#e11d48';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Optional Extension Line (Dashed)
+            if (showExtension || rayLength < 100) {
+                ctx.save();
+                ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 2;
+                // Extend Base
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(baseRad) * rayLength, Math.sin(baseRad) * rayLength);
+                ctx.lineTo(Math.cos(baseRad) * 200, Math.sin(baseRad) * 200);
+                ctx.stroke();
+
+                // Extend Target
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(targetRad) * rayLength, Math.sin(targetRad) * rayLength);
+                ctx.lineTo(Math.cos(targetRad) * 200, Math.sin(targetRad) * 200);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Angle Arc Indicator
+            ctx.beginPath();
+            ctx.arc(0, 0, 45, isRight ? targetRad : baseRad, isRight ? baseRad : targetRad, false);
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
+            ctx.lineTo(0,0);
+            ctx.fill();
+
+            // Right Angle Square symbol if exactly 90 deg
+            if (currentAngle === 90) {
+                ctx.save();
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2.5;
+                const size = 18;
+                ctx.beginPath();
+                if(isRight) {
+                    ctx.rect(0, -size, size, size);
+                } else {
+                    ctx.rect(-size, -size, size, size);
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Vertex Point
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+
+            // Text Label
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 14px "Noto Sans TC"';
+            ctx.fillText("頂點", -14, 25);
+
+            ctx.restore();
+        }
+
+        function drawProtractor() {
+            ctx.save();
+            ctx.translate(protractor.x, protractor.y);
+
+            const R = protractor.radius;
+            const highlightScale = document.getElementById('highlightScaleToggle').checked;
+
+            // Semi-transparent Body (High transparency for better angle visibility)
+            ctx.beginPath();
+            ctx.arc(0, 0, R, Math.PI, 0, false);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Bottom Line (0-180 Baseline)
+            ctx.beginPath();
+            ctx.moveTo(-R, 0);
+            ctx.lineTo(R, 0);
+            ctx.strokeStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Center Origin Crosshair
+            ctx.beginPath();
+            ctx.arc(0, 0, 8, 0, Math.PI * 2);
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(-12, 0); ctx.lineTo(12, 0);
+            ctx.moveTo(0, -12); ctx.lineTo(0, 12);
+            ctx.stroke();
+
+            // Tick Marks & Scale Numbers
+            const innerR = R - 25;
+            const outerR = R - 10;
+
+            for (let deg = 0; deg <= 180; deg += 1) {
+                const rad = Math.PI - (deg * Math.PI / 180);
+                let tickLen = 5;
+
+                if (deg % 10 === 0) tickLen = 12;
+                else if (deg % 5 === 0) tickLen = 8;
+
+                const x1 = Math.cos(rad) * R;
+                const y1 = -Math.sin(rad) * R;
+                const x2 = Math.cos(rad) * (R - tickLen);
+                const y2 = -Math.sin(rad) * (R - tickLen);
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = (deg % 10 === 0) ? '#0f172a' : '#64748b';
+                ctx.lineWidth = (deg % 10 === 0) ? 1.5 : 0.8;
+                ctx.stroke();
+
+                // Numbers every 10 deg
+                if (deg % 10 === 0) {
+                    ctx.save();
+                    ctx.font = '10px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Outer Scale (Left 0 to Right 180)
+                    const outerNum = 180 - deg;
+                    const xOut = Math.cos(rad) * (R - 18);
+                    const yOut = -Math.sin(rad) * (R - 18);
+                    
+                    if (highlightScale && baseDirection === 'left') {
+                        ctx.fillStyle = '#4f46e5'; // Highlight Outer Scale
+                        ctx.font = 'bold 11px sans-serif';
+                    } else {
+                        ctx.fillStyle = '#475569';
+                    }
+                    ctx.fillText(outerNum.toString(), xOut, yOut);
+
+                    // Inner Scale (Right 0 to Left 180)
+                    const innerNum = deg;
+                    const xIn = Math.cos(rad) * (R - 35);
+                    const yIn = -Math.sin(rad) * (R - 35);
+
+                    if (highlightScale && baseDirection === 'right') {
+                        ctx.fillStyle = '#0284c7'; // Highlight Inner Scale
+                        ctx.font = 'bold 11px sans-serif';
+                    } else {
+                        ctx.fillStyle = '#475569';
+                    }
+                    ctx.fillText(innerNum.toString(), xIn, yIn);
+
+                    ctx.restore();
+                }
+            }
+
+            // Labels for Inner/Outer Ring Indicator
+            ctx.font = '10px "Noto Sans TC"';
+            ctx.fillStyle = (baseDirection === 'right' && highlightScale) ? '#0284c7' : '#94a3b8';
+            ctx.fillText("← 內圈 (右0°)", 30, -50);
+
+            ctx.fillStyle = (baseDirection === 'left' && highlightScale) ? '#4f46e5' : '#94a3b8';
+            ctx.fillText("外圈 (左0°) →", -70, -50);
+
+            ctx.restore();
+        }
+
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 使用量角器測量角時，若角的底邊對齊量角器『右側』的 0 度刻度，應該讀取哪一個刻度圈？",
+                options: ["內圈刻度", "外圈刻度", "內外圈都可以", "隨便看一個刻度"],
+                answer: 0,
+                explanation: "角的開口向右、對齊右邊 0 度時，是由右往左數，故應讀取內圈刻度。"
+            },
+            {
+                id: 2,
+                question: "2. 三角板上有一個角度剛好是 90 度，這個角稱為什麼角？",
+                options: ["銳角", "直角", "鈍角", "平角"],
+                answer: 1,
+                explanation: "等於 90 度的角稱為直角。"
+            },
+            {
+                id: 3,
+                question: "3. 若角的邊長太短、對不到量角器的刻度線時，下列哪一種處理方法最正確？",
+                options: ["用猜的報出度數", "放棄不量", "用直尺將角的兩邊延長再測量", "直接將量角器剪小"],
+                answer: 2,
+                explanation: "角的大小只與兩邊張開的程度有關，與邊長無關。邊長太短時，可用直尺將邊延長再量。"
+            },
+            {
+                id: 4,
+                question: "4. 下列哪一個角度屬於『鈍角』？",
+                options: ["45度", "89度", "90度", "125度"],
+                answer: 3,
+                explanation: "大於 90 度且小於 180 度的角稱為鈍角，125 度屬於鈍角。"
+            },
+            {
+                id: 5,
+                question: "5. 小明用量角器畫一個 140 度的角，這個角看起來會比直角如何？",
+                options: ["比直角大", "比直角小", "和直角一樣大", "無法比較"],
+                answer: 0,
+                explanation: "140 度大於 90 度（直角），因此張開的角度會比直角大。"
+            }
+        ];
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const qEl = document.createElement('div');
+                qEl.className = 'glass-card rounded-2xl p-5 border border-white shadow-sm space-y-3';
+                qEl.innerHTML = `
+                    <p class="font-bold text-slate-800 text-base">${q.question}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                        ${q.options.map((opt, optIdx) => `
+                            <label class="flex items-center gap-3 p-3 rounded-xl bg-white/70 border border-slate-200 cursor-pointer hover:bg-sky-50/80 transition">
+                                <input type="radio" name="q_${q.id}" value="${optIdx}" class="accent-sky-500 w-4 h-4">
+                                <span class="text-xs md:text-sm text-slate-700 font-medium">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback_${q.id}" class="hidden p-3 rounded-xl text-xs font-bold leading-relaxed"></div>
+                `;
+                container.appendChild(qEl);
+            });
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            quizData.forEach((q) => {
+                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`feedback_${q.id}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+                if (selected) {
+                    const userAns = parseInt(selected.value);
+                    if (userAns === q.answer) {
+                        score += 20;
+                        feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 正確！ ${q.explanation}`;
+                    } else {
+                        feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 答案不正確喔。 ${q.explanation}`;
+                    }
+                } else {
+                    feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> 尚未作答！ ${q.explanation}`;
+                }
+            });
+
+            document.getElementById('quizScoreDisplay').innerText = score + ' / 100';
+        }
+
+        function resetQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            quizData.forEach(q => {
+                const feedbackEl = document.getElementById(`feedback_${q.id}`);
+                feedbackEl.classList.add('hidden');
+            });
+            document.getElementById('quizScoreDisplay').innerText = '-- / 100';
+        }
+
+        function switchTab(tabName) {
+            const labTab = document.getElementById('tab-lab');
+            const quizTab = document.getElementById('tab-quiz');
+            const labBtn = document.getElementById('tab-lab-btn');
+            const quizBtn = document.getElementById('tab-quiz-btn');
+
+            if(tabName === 'lab') {
+                labTab.classList.remove('hidden');
+                quizTab.classList.add('hidden');
+                labBtn.className = "tab-btn active flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2";
+                quizBtn.className = "tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 text-slate-700 flex items-center justify-center gap-2";
+                setTimeout(() => { resizeCanvas(); draw(); }, 50);
+            } else {
+                labTab.classList.add('hidden');
+                quizTab.classList.remove('hidden');
+                quizBtn.className = "tab-btn active flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center justify-center gap-2";
+                labBtn.className = "tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 text-slate-700 flex items-center justify-center gap-2";
+            }
+        }
+    </script>
+</body>
+</html>

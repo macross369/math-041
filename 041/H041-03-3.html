@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3-3 旋轉角與角度探究互動網頁</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans TC', 'sans-serif'],
+          },
+          colors: {
+            shinkai: {
+              sky: '#3a7bd5',
+              twilight: '#3a6073',
+              pink: '#f7accf',
+              sunset: '#ff9a9e',
+              initial: '#2563eb', // 始邊 藍色
+              terminal: '#16a34a', // 終邊 綠色
+              center: '#dc2626',   // 旋轉中心 紅色
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 新海誠動漫風天空漸層背景 */
+    body {
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #e0c3fc 70%, #8ec5fc 100%);
+      background-attachment: fixed;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+
+    /* 雲朵浮動背景裝飾 */
+    .cloud-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.25;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 20%),
+        radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.9) 0%, transparent 25%),
+        radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.7) 0%, transparent 30%);
+    }
+
+    /* 玻璃擬態卡片容器 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 互動標籤脈衝 glow 效果 */
+    .glow-pulse {
+      animation: pulseGlow 2s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 5px rgba(58, 123, 213, 0.4); }
+      100% { box-shadow: 0 0 18px rgba(58, 123, 213, 0.8); }
+    }
+
+    /* 自訂滑桿樣式 */
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 5px;
+      background: #cbd5e1;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+      transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen text-slate-800 pb-12">
+  <div class="cloud-bg"></div>
+
+  <header class="relative z-10 pt-8 pb-6 text-center">
+    <div class="max-w-4xl mx-auto px-4">
+      <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+      <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+          <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+          <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+      </div>
+
+      <div class="inline-block bg-white/70 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-indigo-600 mb-2 shadow-sm border border-white/60">
+        <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學 3-3 互動探究教材
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-wide drop-shadow-sm flex items-center justify-center gap-3">
+        <i class="fa-solid fa-compass-drafting text-sky-500"></i>
+        <span>旋轉角與角度探索樂園</span>
+      </h1>
+      <p class="mt-2 text-sm md:text-base text-slate-600 font-medium">
+        拉動滑桿、點擊按鈕，觀察「始邊」、「終邊」與鐘面角度的動態變化！
+      </p>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-5xl mx-auto px-4">
+    <!-- 頁籤切換選單 -->
+    <div class="flex justify-center mb-6">
+      <div class="glass-card p-1.5 rounded-full flex gap-1 shadow-md">
+        <button id="tab-clock" onclick="switchTab('clock')" class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 bg-sky-500 text-white shadow-md">
+          <i class="fa-regular fa-clock mr-1.5"></i> 鐘面旋轉探究
+        </button>
+        <button id="tab-life" onclick="switchTab('life')" class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 text-slate-600 hover:text-sky-600">
+          <i class="fa-solid fa-car-rear mr-1.5"></i> 生活旋轉模擬 (柵欄/黑膠)
+        </button>
+        <button id="tab-quiz" onclick="switchTab('quiz')" class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 text-slate-600 hover:text-sky-600">
+          <i class="fa-solid fa-file-pen mr-1.5"></i> 隨堂小測驗 (5題)
+        </button>
+      </div>
+    </div>
+
+    <!-- 模組 1：鐘面旋轉角動態探索器 -->
+    <section id="module-clock" class="space-y-6">
+      <div class="glass-card rounded-3xl p-6 md:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- 左側：SVG 互動鐘面顯示區 -->
+          <div class="lg:col-span-6 flex flex-col items-center justify-center">
+            <div class="relative bg-white/90 p-4 rounded-3xl shadow-inner border border-sky-100 flex items-center justify-center">
+              <svg id="clock-svg" width="340" height="340" viewBox="0 0 340 340" class="select-none">
+                <!-- 鐘面外框與漸層 -->
+                <defs>
+                  <radialGradient id="clock-grad" cx="50%" cy="50%" r="50%">
+                    <stop offset="85%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#e2e8f0"/>
+                  </radialGradient>
+                  <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.15"/>
+                  </filter>
+                </defs>
+
+                <!-- 鐘面底盤 -->
+                <circle cx="170" cy="170" r="150" fill="url(#clock-grad)" stroke="#94a3b8" stroke-width="6" filter="url(#shadow)" />
+                <circle cx="170" cy="170" r="142" fill="none" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,4" />
+
+                <!-- 鐘面數字與刻度 (動態由 JS 生成) -->
+                <g id="clock-ticks"></g>
+                <g id="clock-numbers"></g>
+
+                <!-- 旋轉角塗色區域 (扇形/弧線) -->
+                <path id="angle-sector" fill="rgba(245, 158, 11, 0.25)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,2" />
+                <path id="angle-arc" fill="none" stroke="#ef4444" stroke-width="3" />
+                <!-- 旋轉方向箭頭 -->
+                <polygon id="arrow-head" fill="#ef4444" />
+
+                <!-- 始邊 (Blue Line) -->
+                <line id="line-initial" x1="170" y1="170" x2="170" y2="40" stroke="#2563eb" stroke-width="6" stroke-linecap="round" />
+                <!-- 終邊 (Green Line) -->
+                <line id="line-terminal" x1="170" y1="170" x2="280" y2="170" stroke="#16a34a" stroke-width="6" stroke-linecap="round" />
+
+                <!-- 始邊、終邊 文字標籤 -->
+                <g id="label-initial" class="text-xs font-bold" fill="#1e40af">
+                  <rect x="0" y="0" width="40" height="20" rx="4" fill="#dbeafe"/>
+                  <text x="0" y="0" text-anchor="middle" dominant-baseline="central">始邊</text>
+                </g>
+                <g id="label-terminal" class="text-xs font-bold" fill="#14532d">
+                  <rect x="0" y="0" width="40" height="20" rx="4" fill="#dcfce7"/>
+                  <text x="0" y="0" text-anchor="middle" dominant-baseline="central">終邊</text>
+                </g>
+
+                <!-- 旋轉中心 (Red Point) -->
+                <circle cx="170" cy="170" r="8" fill="#dc2626" stroke="#ffffff" stroke-width="2" />
+                <text x="170" y="195" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="bold">旋轉中心</text>
+              </svg>
+            </div>
+
+            <div class="mt-4 flex gap-4 text-xs font-bold">
+              <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+                <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span> 藍線：始邊 (起點)
+              </span>
+              <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700">
+                <span class="w-3 h-3 rounded-full bg-green-600 inline-block"></span> 綠線：終邊 (終點)
+              </span>
+            </div>
+          </div>
+
+          <!-- 右側：控制面板與即時數據分析 -->
+          <div class="lg:col-span-6 space-y-5">
+            
+            <!-- 即時角度狀態卡片 -->
+            <div class="bg-gradient-to-r from-sky-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs uppercase font-bold tracking-wider text-sky-100">旋轉角度與類型</span>
+                <span id="angle-type-badge" class="px-3 py-0.5 rounded-full text-xs font-black bg-yellow-400 text-slate-900 shadow">
+                  直角 (90°)
+                </span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="display-degree" class="text-4xl md:text-5xl font-black">90</span>
+                <span class="text-2xl font-bold">度 (°)</span>
+              </div>
+              <p id="grid-calculation" class="text-sm text-sky-100 mt-2 font-medium">
+                <i class="fa-solid fa-calculator mr-1"></i> 轉動 3 個大格 × 30° = 90°
+              </p>
+            </div>
+
+            <!-- 控制選項 1：旋轉方向 -->
+            <div class="bg-white/70 p-4 rounded-xl border border-slate-200">
+              <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">1. 選擇旋轉方向</label>
+              <div class="grid grid-cols-2 gap-3">
+                <button id="btn-cw" onclick="setDirection('cw')" class="py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-sky-500 bg-sky-50 text-sky-700 transition-all">
+                  <i class="fa-solid fa-rotate-right text-lg"></i> 順時針旋轉
+                </button>
+                <button id="btn-ccw" onclick="setDirection('ccw')" class="py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-slate-200 bg-white text-slate-600 transition-all">
+                  <i class="fa-solid fa-rotate-left text-lg"></i> 逆時針旋轉
+                </button>
+              </div>
+            </div>
+
+            <!-- 控制選項 2：始邊與終邊位置滑桿 -->
+            <div class="bg-white/70 p-4 rounded-xl border border-slate-200 space-y-4">
+              <div>
+                <div class="flex justify-between text-sm font-bold mb-1">
+                  <span class="text-blue-700"><i class="fa-solid fa-play text-xs mr-1"></i> 始邊位置 (起始刻度)</span>
+                  <span id="val-start-label" class="text-blue-600 font-extrabold">數字 12</span>
+                </div>
+                <input type="range" id="slider-start" min="1" max="12" value="12" class="w-full" oninput="updateClockUI()">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-sm font-bold mb-1">
+                  <span class="text-green-700"><i class="fa-solid fa-flag-checkered text-xs mr-1"></i> 終邊位置 (到達刻度)</span>
+                  <span id="val-end-label" class="text-green-600 font-extrabold">數字 3</span>
+                </div>
+                <input type="range" id="slider-end" min="1" max="12" value="3" class="w-full" oninput="updateClockUI()">
+              </div>
+            </div>
+
+            <!-- 快捷角度選擇按鈕 -->
+            <div class="bg-white/70 p-4 rounded-xl border border-slate-200">
+              <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">2. 快速設定特殊角教學</label>
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="setPreset(12, 1)" class="py-2 px-2 bg-slate-100 hover:bg-sky-100 text-slate-700 font-bold rounded-lg text-xs transition">
+                  1大格 (30°)
+                </button>
+                <button onclick="setPreset(12, 3)" class="py-2 px-2 bg-slate-100 hover:bg-sky-100 text-slate-700 font-bold rounded-lg text-xs transition">
+                  直角 (90°)
+                </button>
+                <button onclick="setPreset(12, 6)" class="py-2 px-2 bg-slate-100 hover:bg-sky-100 text-slate-700 font-bold rounded-lg text-xs transition">
+                  平角 (180°)
+                </button>
+                <button onclick="setPreset(12, 12)" class="py-2 px-2 bg-slate-100 hover:bg-sky-100 text-slate-700 font-bold rounded-lg text-xs transition">
+                  周角 (360°)
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 模組 2：生活旋轉模擬器 (柵欄與旋轉物品) -->
+    <section id="module-life" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- 模擬一：停車場柵欄升降 -->
+        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-warehouse text-amber-500"></i> 停車場柵欄升降觀測
+              </h3>
+              <span id="gate-dir-badge" class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full font-bold text-xs">
+                升起 (逆時針)
+              </span>
+            </div>
+
+            <!-- SVG 柵欄動畫 -->
+            <div class="bg-gradient-to-b from-sky-200 to-indigo-100 rounded-2xl p-4 h-56 flex items-end justify-center relative overflow-hidden border border-sky-200">
+              <svg width="100%" height="100%" viewBox="0 0 300 180" class="overflow-visible">
+                <!-- 背景黑黃基座 -->
+                <rect x="40" y="120" width="30" height="50" fill="#334155" rx="4" />
+                <circle cx="55" cy="130" r="6" fill="#dc2626" /> <!-- 旋轉中心 -->
+                <text x="55" y="160" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">旋轉中心</text>
+
+                <!-- 水平基準虛線 (始邊) -->
+                <line x1="55" y1="130" x2="260" y2="130" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4" />
+
+                <!-- 動態柵欄桿 (終邊) -->
+                <g id="gate-arm-group" transform="rotate(0, 55, 130)">
+                  <rect x="55" y="124" width="180" height="12" fill="#ef4444" rx="3" />
+                  <!-- 紅白相間條紋 -->
+                  <rect x="85" y="124" width="25" height="12" fill="#ffffff" />
+                  <rect x="135" y="124" width="25" height="12" fill="#ffffff" />
+                  <rect x="185" y="124" width="25" height="12" fill="#ffffff" />
+                </g>
+
+                <!-- 旋轉弧線與角度 -->
+                <path id="gate-arc" fill="none" stroke="#f59e0b" stroke-width="3" stroke-dasharray="3,3" />
+              </svg>
+            </div>
+
+            <div class="mt-4 space-y-2">
+              <div class="flex justify-between text-sm font-bold">
+                <span>柵欄升起角度：</span>
+                <span id="gate-angle-text" class="text-amber-600 font-extrabold">0° (水平放下)</span>
+              </div>
+              <input type="range" id="slider-gate" min="0" max="90" value="0" class="w-full" oninput="updateGateUI()">
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-amber-50 rounded-xl text-xs text-amber-900 border border-amber-200 font-medium">
+            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> <strong>觀念說明：</strong> 柵欄水平放下時為始邊，升起時一端固定不動（旋轉中心），桿子轉動的角度即為旋轉角！
+          </div>
+        </div>
+
+        <!-- 模擬二：黑膠唱片與生活物品轉向 -->
+        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-compact-disc text-purple-500"></i> 生活轉動方向辨識
+              </h3>
+            </div>
+
+            <div class="bg-slate-900 rounded-2xl p-4 h-56 flex items-center justify-center relative overflow-hidden text-white">
+              <!-- 黑膠唱片動畫 -->
+              <div id="vinyl-disc" class="w-40 h-40 rounded-full border-4 border-slate-700 bg-slate-950 flex items-center justify-center relative transition-transform duration-300 shadow-2xl">
+                <!-- 唱片紋路 -->
+                <div class="w-32 h-32 rounded-full border border-slate-800"></div>
+                <div class="w-24 h-24 rounded-full border border-slate-800"></div>
+                <!-- 標籤 -->
+                <div class="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center font-black text-[10px] text-white">
+                  MUSIC
+                </div>
+                <!-- 指針標記線 -->
+                <div class="absolute top-2 w-1.5 h-6 bg-yellow-400 rounded-full"></div>
+              </div>
+
+              <!-- 動畫指針箭頭 -->
+              <div id="vinyl-arrow" class="absolute text-yellow-400 text-3xl font-bold transition-all">
+                <i class="fa-solid fa-rotate-right"></i>
+              </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <button onclick="spinVinyl('cw')" class="py-2.5 px-3 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-rotate-right text-sm"></i> 黑膠唱片運轉 (順時針)
+              </button>
+              <button onclick="spinVinyl('ccw')" class="py-2.5 px-3 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-rotate-left text-sm"></i> 旋開罐頭蓋 (逆時針)
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-purple-50 rounded-xl text-xs text-purple-900 border border-purple-200 font-medium">
+            <i class="fa-solid fa-circle-info text-purple-500 mr-1"></i> <strong>隨堂思考：</strong> 鐘面分針、黑膠唱片旋轉方向相同，稱為<b>順時針</b>；開罐頭蓋或開鎖時反向轉動稱為<b>逆時針</b>。
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 模組 3：歷程性評量 (5題即時回饋) -->
+    <section id="module-quiz" class="hidden space-y-6">
+      <div class="glass-card rounded-3xl p-6 md:p-8">
+        
+        <!-- 測驗標頭與計分牌 -->
+        <div class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-200 mb-6 gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-question text-sky-500"></i> 旋轉角核心觀念隨堂測驗
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">請回答下列 5 道經典課本延伸題目，考驗你的概念掌握度！</p>
+          </div>
+          <div class="flex items-center gap-4 bg-sky-50 px-5 py-2.5 rounded-2xl border border-sky-200">
+            <span class="text-xs font-bold text-slate-500">答對題數：</span>
+            <span id="quiz-score" class="text-2xl font-black text-sky-600">0 / 5</span>
+          </div>
+        </div>
+
+        <!-- 5 題測驗題目容器 -->
+        <div id="quiz-container" class="space-y-6">
+          <!-- 由 JS 動態生成 5 題內容 -->
+        </div>
+
+        <!-- 重測按鈕 -->
+        <div class="mt-8 text-center">
+          <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl text-sm shadow-lg transition duration-200">
+            <i class="fa-solid fa-rotate-left mr-2"></i> 重新作答小測驗
+          </button>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* ==========================================================================
+       狀態變數與數據設定
+       ========================================================================== */
+    let clockState = {
+      startNum: 12,
+      endNum: 3,
+      direction: 'cw' // 'cw' 順時針, 'ccw' 逆時針
+    };
+
+    // 評量題目資料庫
+    const quizData = [
+      {
+        id: 1,
+        question: "1. 鉛筆一端固定在鐘面上轉動，轉動時固定不動的點稱為？",
+        options: ["始邊", "終邊", "旋轉中心", "旋轉角"],
+        answer: 2,
+        explanation: "正確！轉動時固定不動的中心點稱為「旋轉中心」。"
+      },
+      {
+        id: 2,
+        question: "2. 鐘面上的分針從數字 12 沿著順時針方向轉到數字 3，形成的旋轉角是多少度？",
+        options: ["30度", "60度", "90度 (直角)", "180度 (平角)"],
+        answer: 2,
+        explanation: "正確！轉動 3 大格：3 × 30° = 90°，恰好是一個直角。"
+      },
+      {
+        id: 3,
+        question: "3. 鉛筆從 12 的位置開始，順時針轉了一圈回到 12 的位置，形成的角稱為什麼？",
+        options: ["直角 (90°)", "平角 (180°)", "周角 (360°)", "銳角"],
+        answer: 2,
+        explanation: "正確！轉了一整圈包含 12 大格，12 × 30° = 360°，稱為「周角」。"
+      },
+      {
+        id: 4,
+        question: "4. 鐘面上分針從數字 12 開始，逆時針方向轉了 2 大格（轉到 10），旋轉角是多少度？",
+        options: ["30度", "60度", "90度", "120度"],
+        answer: 1,
+        explanation: "正確！無論順時針或逆時針，每轉 1 大格就是 30°，轉 2 大格為 2 × 30° = 60°。"
+      },
+      {
+        id: 5,
+        question: "5. 哪三個角可以拼成一個「平角」(180°)？",
+        options: [
+          "60°、130°、190°",
+          "60°、70°、50°",
+          "90°、90°、90°",
+          "35°、50°、125°"
+        ],
+        answer: 1,
+        explanation: "正確！60° + 70° + 50° = 180°，三個角的和恰好等於一個平角！"
+      }
+    ];
+
+    let userAnswers = {};
+
+    /* ==========================================================================
+       初始化頁面與事件監聽
+       ========================================================================== */
+    window.onload = function() {
+      initClockSVG();
+      updateClockUI();
+      updateGateUI();
+      renderQuiz();
+    };
+
+    /* 頁籤切換邏輯 */
+    function switchTab(tabName) {
+      document.getElementById('module-clock').classList.add('hidden');
+      document.getElementById('module-life').classList.add('hidden');
+      document.getElementById('module-quiz').classList.add('hidden');
+
+      const tabs = ['clock', 'life', 'quiz'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if(t === tabName) {
+          btn.className = "px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 bg-sky-500 text-white shadow-md";
+        } else {
+          btn.className = "px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 text-slate-600 hover:text-sky-600";
+        }
+      });
+
+      document.getElementById(`module-${tabName}`).classList.remove('hidden');
+    }
+
+    /* ==========================================================================
+       鐘面繪製與角度計算邏輯
+       ========================================================================== */
+    function initClockSVG() {
+      const ticksG = document.getElementById('clock-ticks');
+      const numbersG = document.getElementById('clock-numbers');
+      ticksG.innerHTML = '';
+      numbersG.innerHTML = '';
+
+      const cx = 170, cy = 170, r = 130;
+
+      for (let i = 1; i <= 12; i++) {
+        const angleDeg = (i * 30) - 90;
+        const angleRad = angleDeg * Math.PI / 180;
+
+        // 繪製刻度
+        const x1 = cx + (r - 10) * Math.cos(angleRad);
+        const y1 = cy + (r - 10) * Math.sin(angleRad);
+        const x2 = cx + r * Math.cos(angleRad);
+        const y2 = cy + r * Math.sin(angleRad);
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", "#475569");
+        line.setAttribute("stroke-width", "3");
+        line.setAttribute("stroke-linecap", "round");
+        ticksG.appendChild(line);
+
+        // 繪製數字 1-12
+        const nx = cx + (r - 26) * Math.cos(angleRad);
+        const ny = cy + (r - 26) * Math.sin(angleRad);
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", nx);
+        text.setAttribute("y", ny);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "central");
+        text.setAttribute("font-size", "16");
+        text.setAttribute("font-weight", "900");
+        text.setAttribute("fill", "#1e293b");
+        text.textContent = i;
+        numbersG.appendChild(text);
+      }
+    }
+
+    function setDirection(dir) {
+      clockState.direction = dir;
+      const btnCw = document.getElementById('btn-cw');
+      const btnCcw = document.getElementById('btn-ccw');
+
+      if (dir === 'cw') {
+        btnCw.className = "py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-sky-500 bg-sky-50 text-sky-700 transition-all";
+        btnCcw.className = "py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-slate-200 bg-white text-slate-600 transition-all";
+      } else {
+        btnCcw.className = "py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-teal-500 bg-teal-50 text-teal-700 transition-all";
+        btnCw.className = "py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 border-2 border-slate-200 bg-white text-slate-600 transition-all";
+      }
+      updateClockUI();
+    }
+
+    function setPreset(start, end) {
+      document.getElementById('slider-start').value = start;
+      document.getElementById('slider-end').value = end;
+      updateClockUI();
+    }
+
+    function updateClockUI() {
+      const startVal = parseInt(document.getElementById('slider-start').value);
+      const endVal = parseInt(document.getElementById('slider-end').value);
+
+      clockState.startNum = startVal;
+      clockState.endNum = endVal;
+
+      document.getElementById('val-start-label').textContent = `數字 ${startVal}`;
+      document.getElementById('val-end-label').textContent = `數字 ${endVal}`;
+
+      // 計算鐘面大格數與角度
+      let units = 0;
+      if (clockState.direction === 'cw') {
+        units = (endVal - startVal + 12) % 12;
+      } else {
+        units = (startVal - endVal + 12) % 12;
+      }
+
+      // 特殊情況：若始邊與終邊相同刻度，視為周角 360° 或 0° (教學上預設為 360° 全轉)
+      let degrees = units * 30;
+      if (units === 0 && startVal === endVal) {
+        degrees = 360;
+        units = 12;
+      }
+
+      // 更新即時面板數據
+      document.getElementById('display-degree').textContent = degrees;
+      document.getElementById('grid-calculation').innerHTML = `<i class="fa-solid fa-calculator mr-1"></i> 轉動 ${units} 個大格 × 30° = ${degrees}°`;
+
+      // 角類型標籤
+      const badge = document.getElementById('angle-type-badge');
+      if (degrees === 90) {
+        badge.textContent = "直角 (90°)";
+        badge.className = "px-3 py-0.5 rounded-full text-xs font-black bg-emerald-400 text-slate-900 shadow";
+      } else if (degrees === 180) {
+        badge.textContent = "平角 (180°)";
+        badge.className = "px-3 py-0.5 rounded-full text-xs font-black bg-indigo-400 text-white shadow";
+      } else if (degrees === 360) {
+        badge.textContent = "周角 (360°)";
+        badge.className = "px-3 py-0.5 rounded-full text-xs font-black bg-pink-500 text-white shadow";
+      } else if (degrees < 90) {
+        badge.textContent = "銳角 (<90°)";
+        badge.className = "px-3 py-0.5 rounded-full text-xs font-black bg-sky-300 text-slate-900 shadow";
+      } else {
+        badge.textContent = "鈍角 (>90°)";
+        badge.className = "px-3 py-0.5 rounded-full text-xs font-black bg-amber-300 text-slate-900 shadow";
+      }
+
+      // 更新 SVG 指針與扇形區域
+      renderSVGClock(startVal, endVal, clockState.direction, degrees);
+    }
+
+    function renderSVGClock(startNum, endNum, dir, degrees) {
+      const cx = 170, cy = 170, r = 110;
+
+      // 角度計算 (12 點方向為 -90°)
+      const startDeg = (startNum * 30) - 90;
+      let endDeg = (endNum * 30) - 90;
+
+      const startRad = startDeg * Math.PI / 180;
+      const endRad = endDeg * Math.PI / 180;
+
+      // 始邊點座標
+      const sx = cx + r * Math.cos(startRad);
+      const sy = cy + r * Math.sin(startRad);
+      // 終邊點座標
+      const ex = cx + r * Math.cos(endRad);
+      const ey = cy + r * Math.sin(endRad);
+
+      // 設定始邊 (藍線) 與 終邊 (綠線)
+      document.getElementById('line-initial').setAttribute('x2', sx);
+      document.getElementById('line-initial').setAttribute('y2', sy);
+
+      document.getElementById('line-terminal').setAttribute('x2', ex);
+      document.getElementById('line-terminal').setAttribute('y2', ey);
+
+      // 設定文字標籤位置
+      const labelInit = document.getElementById('label-initial');
+      const labelTerm = document.getElementById('label-terminal');
+
+      const lx1 = cx + (r + 22) * Math.cos(startRad);
+      const ly1 = cy + (r + 22) * Math.sin(startRad);
+      labelInit.setAttribute('transform', `translate(${lx1 - 20}, ${ly1 - 10})`);
+
+      const lx2 = cx + (r + 22) * Math.cos(endRad);
+      const ly2 = cy + (r + 22) * Math.sin(endRad);
+      labelTerm.setAttribute('transform', `translate(${lx2 - 20}, ${ly2 - 10})`);
+
+      // 繪製角度扇形與弧線
+      const sectorPath = document.getElementById('angle-sector');
+      const arcPath = document.getElementById('angle-arc');
+      const arrowHead = document.getElementById('arrow-head');
+
+      if (degrees === 360) {
+        // 周角畫全圓弧
+        sectorPath.setAttribute('d', `M ${cx} ${cy} m -${r}, 0 a ${r},${r} 0 1,0 ${r*2},0 a ${r},${r} 0 1,0 -${r*2},0`);
+        arcPath.setAttribute('d', `M ${cx} ${cy} m -${r-15}, 0 a ${r-15},${r-15} 0 1,0 ${(r-15)*2},0 a ${r-15},${r-15} 0 1,0 -${(r-15)*2},0`);
+        arrowHead.setAttribute('points', '');
+        return;
+      }
+
+      const sweepFlag = (dir === 'cw') ? 1 : 0;
+      const largeArcFlag = (degrees > 180) ? 1 : 0;
+
+      // 扇形區域
+      const dSector = `M ${cx} ${cy} L ${sx} ${sy} A ${r} ${r} 0 ${largeArcFlag} ${sweepFlag} ${ex} ${ey} Z`;
+      sectorPath.setAttribute('d', dSector);
+
+      // 弧線標記 (半徑較小)
+      const arcR = 55;
+      const asx = cx + arcR * Math.cos(startRad);
+      const asy = cy + arcR * Math.sin(startRad);
+      const aex = cx + arcR * Math.cos(endRad);
+      const aey = cy + arcR * Math.sin(endRad);
+
+      const dArc = `M ${asx} ${asy} A ${arcR} ${arcR} 0 ${largeArcFlag} ${sweepFlag} ${aex} ${aey}`;
+      arcPath.setAttribute('d', dArc);
+
+      // 繪製弧線末端箭頭方向
+      let arrowAngle = endDeg + (dir === 'cw' ? 90 : -90);
+      let arrowRad = arrowAngle * Math.PI / 180;
+      let ax1 = aex + 8 * Math.cos(arrowRad);
+      let ay1 = aey + 8 * Math.sin(arrowRad);
+      let ax2 = aex - 6 * Math.cos(endRad);
+      let ay2 = aey - 6 * Math.sin(endRad);
+
+      arrowHead.setAttribute('points', `${aex},${aey} ${ax1},${ay1} ${ax2},${ay2}`);
+    }
+
+    /* ==========================================================================
+       生活範例互動邏輯 (柵欄與黑膠)
+       ========================================================================== */
+    function updateGateUI() {
+      const angle = parseInt(document.getElementById('slider-gate').value);
+      const armGroup = document.getElementById('gate-arm-group');
+      const gateText = document.getElementById('gate-angle-text');
+
+      // 柵欄往上升起屬於逆時針旋轉
+      armGroup.setAttribute('transform', `rotate(-${angle}, 55, 130)`);
+
+      if (angle === 0) {
+        gateText.textContent = `0° (水平放下)`;
+      } else if (angle === 90) {
+        gateText.textContent = `90° (完全升起/直角)`;
+      } else {
+        gateText.textContent = `${angle}° (升起中)`;
+      }
+
+      // 繪製升起弧線
+      const gateArc = document.getElementById('gate-arc');
+      const arcR = 80;
+      const rad = (-angle) * Math.PI / 180;
+      const ex = 55 + arcR * Math.cos(rad);
+      const ey = 130 + arcR * Math.sin(rad);
+
+      gateArc.setAttribute('d', `M ${55 + arcR} 130 A ${arcR} ${arcR} 0 0 0 ${ex} ${ey}`);
+    }
+
+    function spinVinyl(dir) {
+      const disc = document.getElementById('vinyl-disc');
+      const arrow = document.getElementById('vinyl-arrow');
+
+      if (dir === 'cw') {
+        disc.style.transform = 'rotate(360deg)';
+        arrow.innerHTML = `<i class="fa-solid fa-rotate-right"></i> 順時針`;
+        arrow.className = "absolute text-pink-400 text-2xl font-bold transition-all transform scale-110";
+      } else {
+        disc.style.transform = 'rotate(-360deg)';
+        arrow.innerHTML = `<i class="fa-solid fa-rotate-left"></i> 逆時針`;
+        arrow.className = "absolute text-teal-300 text-2xl font-bold transition-all transform scale-110";
+      }
+
+      setTimeout(() => {
+        disc.style.transform = 'rotate(0deg)';
+        disc.style.transition = 'none';
+        setTimeout(() => { disc.style.transition = 'transform 0.6s ease-out'; }, 50);
+      }, 600);
+    }
+
+    /* ==========================================================================
+       隨堂測驗評量模組與回饋機制
+       ========================================================================== */
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      quizData.forEach((q, index) => {
+        const qBox = document.createElement('div');
+        qBox.className = "p-5 bg-white/80 rounded-2xl border border-slate-200 shadow-sm transition-all";
+        qBox.id = `quiz-card-${q.id}`;
+
+        let optionsHTML = '';
+        q.options.forEach((opt, optIdx) => {
+          optionsHTML += `
+            <button onclick="selectAnswer(${q.id}, ${optIdx})" id="btn-${q.id}-${optIdx}" 
+              class="w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-sky-50 transition-all font-medium text-sm flex items-center justify-between">
+              <span>${opt}</span>
+              <i id="icon-${q.id}-${optIdx}" class="fa-regular fa-circle text-slate-300 text-base"></i>
+            </button>
+          `;
+        });
+
+        qBox.innerHTML = `
+          <h4 class="font-bold text-base text-slate-800 mb-3">${q.question}</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            ${optionsHTML}
+          </div>
+          <div id="explain-${q.id}" class="hidden mt-3 p-3 rounded-xl text-xs font-medium"></div>
+        `;
+
+        container.appendChild(qBox);
+      });
+    }
+
+    function selectAnswer(qId, optIdx) {
+      const q = quizData.find(item => item.id === qId);
+      userAnswers[qId] = optIdx;
+
+      // 重置按鈕狀態
+      q.options.forEach((_, idx) => {
+        const btn = document.getElementById(`btn-${qId}-${idx}`);
+        const icon = document.getElementById(`icon-${qId}-${idx}`);
+        btn.className = "w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:bg-sky-50 transition-all font-medium text-sm flex items-center justify-between";
+        icon.className = "fa-regular fa-circle text-slate-300 text-base";
+      });
+
+      const selectedBtn = document.getElementById(`btn-${qId}-${optIdx}`);
+      const selectedIcon = document.getElementById(`icon-${qId}-${optIdx}`);
+      const explainBox = document.getElementById(`explain-${qId}`);
+
+      if (optIdx === q.answer) {
+        // 答對
+        selectedBtn.className = "w-full text-left p-3 rounded-xl border-2 border-green-500 bg-green-50 font-bold text-green-800 text-sm flex items-center justify-between";
+        selectedIcon.className = "fa-solid fa-circle-check text-green-600 text-base";
+        
+        explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-green-100 text-green-900 border border-green-200 block";
+        explainBox.innerHTML = `<i class="fa-solid fa-face-smile mr-1"></i> ${q.explanation}`;
+      } else {
+        // 答錯
+        selectedBtn.className = "w-full text-left p-3 rounded-xl border-2 border-red-400 bg-red-50 font-bold text-red-800 text-sm flex items-center justify-between";
+        selectedIcon.className = "fa-solid fa-circle-xmark text-red-500 text-base";
+
+        explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-red-100 text-red-900 border border-red-200 block";
+        explainBox.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1"></i> 再試試看！提示：鐘面上每一個大格代表 30°。`;
+      }
+
+      updateQuizScore();
+    }
+
+    function updateQuizScore() {
+      let correctCount = 0;
+      quizData.forEach(q => {
+        if (userAnswers[q.id] === q.answer) {
+          correctCount++;
+        }
+      });
+      document.getElementById('quiz-score').textContent = `${correctCount} / ${quizData.length}`;
+    }
+
+    function resetQuiz() {
+      userAnswers = {};
+      document.getElementById('quiz-score').textContent = `0 / 5`;
+      renderQuiz();
+    }
+  </script>
+</body>
+</html>

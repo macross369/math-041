@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乘以三位數與整百倍 - 互動探究學習網</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0b132b 0%, #1c2541 25%, #3a506b 55%, #f72585 85%, #ffb703 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* 新海誠風半透明玻璃質感面板 */
+        .shinkai-glass {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .shinkai-glass-dark {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 夢幻漸層文字與按鈕 */
+        .text-shinkai-gradient {
+            background: linear-gradient(90deg, #4895ef, #7209b7, #f72585);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-shinkai {
+            background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+        .btn-shinkai:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(114, 9, 183, 0.5);
+        }
+
+        /* 直式計算格子視覺優化 */
+        .digit-cell {
+            width: 2.2rem;
+            height: 2.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-radius: 0.375rem;
+            transition: all 0.25s ease;
+        }
+
+        .place-header {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 2px;
+        }
+
+        /* 雲朵與閃爍星光動畫背景 */
+        @keyframes cloudFloat {
+            0% { transform: translateX(-5%); }
+            50% { transform: translateX(5%); }
+            100% { transform: translateX(-5%); }
+        }
+        .animate-cloud {
+            animation: cloudFloat 20s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 pb-20 relative overflow-x-hidden">
+
+    <!-- 背景夢幻星光與雲霧光暈裝飾 -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-10 left-10 w-96 h-96 bg-cyan-400 opacity-20 rounded-full blur-3xl animate-cloud"></div>
+        <div class="absolute bottom-10 right-10 w-[30rem] h-[30rem] bg-pink-500 opacity-20 rounded-full blur-3xl animate-cloud" style="animation-delay: -5s;"></div>
+    </div>
+
+    <div class="max-w-5xl mx-auto relative z-10 space-y-6">
+        
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- 頂部標題區 -->
+        <header class="shinkai-glass rounded-3xl p-6 md:p-8 text-center relative overflow-hidden">
+            <div class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-bold mb-3 tracking-wide shadow-sm">
+                <i class="fa-solid font-sparkles mr-1"></i> 國小數學互動探究實驗室
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-2">
+                乘以三位數 <span class="text-shinkai-gradient">& 整百倍拆解</span>
+            </h1>
+            <p class="text-slate-600 text-base md:text-lg max-w-2xl mx-auto font-medium">
+                拖動滑桿觀察「整百倍概念」與「直式位值分解」，一分鐘釐清個位、十位與百位的對齊規律！
+            </p>
+        </header>
+
+        <!-- 標籤頁導覽列 -->
+        <div class="flex flex-wrap justify-center gap-3 my-2">
+            <button onclick="switchTab('explorer')" id="tab-btn-explorer" class="px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 shadow-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white scale-105">
+                <i class="fa-solid fa-sliders"></i> 動態直式探究
+            </button>
+            <button onclick="switchTab('challenge')" id="tab-btn-challenge" class="px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 bg-white/80 text-slate-700 hover:bg-white hover:shadow-md">
+                <i class="fa-solid fa-puzzle-piece text-pink-500"></i> 觀念動態挑戰
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 bg-white/80 text-slate-700 hover:bg-white hover:shadow-md">
+                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 歷程性小試身手
+            </button>
+        </div>
+
+        <!-- 第一分頁：主功能區（動態直式探究器） -->
+        <main id="tab-explorer" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- 左側：參數滑桿與範例切換 -->
+            <section class="lg:col-span-5 shinkai-glass rounded-3xl p-6 flex flex-col justify-between space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> 動態參數控制台
+                    </h2>
+
+                    <!-- 教材經典情境速選 -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">課本重點快速觀察</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setExample(8, 300)" class="px-3 py-2 text-xs font-bold rounded-xl bg-sky-100 text-sky-700 hover:bg-sky-200 transition text-left">
+                                <i class="fa-solid fa-balloon mr-1"></i> 8 × 300 (整百倍)
+                            </button>
+                            <button onclick="setExample(24, 365)" class="px-3 py-2 text-xs font-bold rounded-xl bg-purple-100 text-purple-700 hover:bg-purple-200 transition text-left">
+                                <i class="fa-solid fa-bottle-water mr-1"></i> 24 × 365 (三層拆解)
+                            </button>
+                            <button onclick="setExample(156, 248)" class="px-3 py-2 text-xs font-bold rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200 transition text-left">
+                                <i class="fa-solid fa-boxes-packing mr-1"></i> 156 × 248 (三位乘三位)
+                            </button>
+                            <button onclick="setExample(128, 206)" class="px-3 py-2 text-xs font-bold rounded-xl bg-amber-100 text-amber-800 hover:bg-amber-200 transition text-left">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> 128 × 206 (十位為0)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 被乘數滑桿 -->
+                    <div class="space-y-2 mb-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-700">被乘數 (A)</span>
+                            <span id="numA-val" class="text-lg font-black text-indigo-600 bg-indigo-50 px-3 py-0.5 rounded-lg border border-indigo-200">24</span>
+                        </div>
+                        <input id="numA-slider" type="range" min="1" max="500" value="24" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    </div>
+
+                    <!-- 乘數滑桿 -->
+                    <div class="space-y-2 mb-5">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-700">乘數 (B)</span>
+                            <span id="numB-val" class="text-lg font-black text-purple-600 bg-purple-50 px-3 py-0.5 rounded-lg border border-purple-200">365</span>
+                        </div>
+                        <input id="numB-slider" type="range" min="100" max="999" value="365" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                    </div>
+
+                    <!-- 十位數為0的快捷切換 -->
+                    <div class="flex items-center justify-between bg-slate-100/80 p-3 rounded-2xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-600">包含「中間為 0」模式</span>
+                        <button id="zero-toggle" onclick="toggleZeroMode()" class="px-3 py-1 text-xs font-bold bg-slate-300 text-slate-700 rounded-xl hover:bg-indigo-500 hover:text-white transition">
+                            切換為 206
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 概念解說卡 -->
+                <div class="bg-indigo-900/90 text-white rounded-2xl p-4 text-xs space-y-2 leading-relaxed shadow-inner">
+                    <div class="font-bold text-amber-300 flex items-center gap-1.5 text-sm">
+                        <i class="fa-regular fa-lightbulb"></i> 核心觀察點：
+                    </div>
+                    <p id="concept-tip">
+                        乘數的「百位數字」代表「幾個百」。乘完後的結果需從**百位**開始記錄，個位與十位補 0！
+                    </p>
+                </div>
+            </section>
+
+            <!-- 右側：直式拆解與動態圖解展示 -->
+            <section class="lg:col-span-7 shinkai-glass rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> 動態直式與觀念拆解
+                        </h2>
+                        <span id="equation-title" class="text-sm font-bold text-slate-500 bg-white px-3 py-1 rounded-full border">
+                            24 × 365
+                        </span>
+                    </div>
+
+                    <!-- 直式呈現區域 -->
+                    <div class="bg-white/90 rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center justify-around gap-6">
+                        
+                        <!-- 位值直式表格 -->
+                        <div class="font-mono text-slate-800 select-none">
+                            <!-- 位值表頭 -->
+                            <div class="flex justify-end mb-1 text-center">
+                                <div class="digit-cell place-header">十萬</div>
+                                <div class="digit-cell place-header">萬</div>
+                                <div class="digit-cell place-header">千</div>
+                                <div class="digit-cell place-header">百</div>
+                                <div class="digit-cell place-header">十</div>
+                                <div class="digit-cell place-header">個</div>
+                            </div>
+
+                            <!-- 被乘數 -->
+                            <div id="row-a" class="flex justify-end"></div>
+
+                            <!-- 乘號與乘數 -->
+                            <div id="row-b" class="flex justify-end border-b-2 border-slate-800 pb-1"></div>
+
+                            <!-- 第一層：乘個位 -->
+                            <div id="row-step1" class="flex justify-end pt-1 hover:bg-emerald-50 rounded transition cursor-pointer"></div>
+
+                            <!-- 第二層：乘十位 -->
+                            <div id="row-step2" class="flex justify-end hover:bg-amber-50 rounded transition cursor-pointer"></div>
+
+                            <!-- 第三層：乘百位 -->
+                            <div id="row-step3" class="flex justify-end border-b-2 border-slate-800 pb-1 hover:bg-sky-50 rounded transition cursor-pointer"></div>
+
+                            <!-- 總和 -->
+                            <div id="row-sum" class="flex justify-end pt-1 font-black text-indigo-700"></div>
+                        </div>
+
+                        <!-- 步驟說明與拆解公式卡片 -->
+                        <div class="w-full md:w-64 space-y-3">
+                            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-1">
+                                <span class="font-bold text-emerald-700 block">❶ 個位拆解</span>
+                                <p id="step1-desc" class="text-slate-600 font-mono">24 × 5 = 120 (120個一)</p>
+                            </div>
+                            <div id="step2-card" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1">
+                                <span class="font-bold text-amber-700 block">❷ 十位拆解</span>
+                                <p id="step2-desc" class="text-slate-600 font-mono">24 × 60 = 1440 (144個十)</p>
+                            </div>
+                            <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl text-xs space-y-1">
+                                <span class="font-bold text-sky-700 block">❸ 百位拆解</span>
+                                <p id="step3-desc" class="text-slate-600 font-mono">24 × 300 = 7200 (72個百)</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 橫式合成公式總結 -->
+                <div class="mt-4 p-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl flex flex-col md:flex-row justify-between items-center gap-2">
+                    <span class="text-xs font-medium text-indigo-100">橫式完整意義：</span>
+                    <span id="full-equation-text" class="font-bold font-mono text-sm md:text-base tracking-wide text-center">
+                        24 × 365 = 120 + 1440 + 7200 = 8760
+                    </span>
+                </div>
+            </section>
+        </main>
+
+        <!-- 第二分頁：位值填空互動小挑戰 -->
+        <section id="tab-challenge" class="tab-content hidden shinkai-glass rounded-3xl p-6 md:p-8 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200/80 pb-3">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-puzzle-piece text-pink-500"></i> 直式拆解觀念動態挑戰
+                </h2>
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">動腦想一想</span>
+            </div>
+
+            <p class="text-sm text-slate-600">
+                觀察算式 <span class="font-bold text-slate-800">156 × 248</span> 的直式拆解，請在下方空格中填入正確的數值或位值觀念：
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/80 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <div class="text-xs font-bold text-slate-500">第 1 層：156 × 8</div>
+                    <div class="text-lg font-black text-slate-800">1248</div>
+                    <div class="text-xs text-slate-500">代表有 1248 個 <input id="fill-1" type="text" placeholder="?" class="w-12 text-center font-bold border-b-2 border-indigo-500 focus:outline-none bg-indigo-50/50"></div>
+                </div>
+
+                <div class="bg-white/80 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <div class="text-xs font-bold text-slate-500">第 2 層：156 × 40</div>
+                    <div class="text-lg font-black text-slate-800">6240</div>
+                    <div class="text-xs text-slate-500">代表 624 個 <input id="fill-2" type="text" placeholder="?" class="w-12 text-center font-bold border-b-2 border-indigo-500 focus:outline-none bg-indigo-50/50"> (個/十/百)</div>
+                </div>
+
+                <div class="bg-white/80 p-4 rounded-2xl border border-slate-200 space-y-2">
+                    <div class="text-xs font-bold text-slate-500">第 3 層：156 × 200</div>
+                    <div class="text-lg font-black text-slate-800"><input id="fill-3" type="text" placeholder="答案" class="w-20 text-center font-bold border-b-2 border-indigo-500 focus:outline-none bg-indigo-50/50"></div>
+                    <div class="text-xs text-slate-500">代表 312 個百，末兩位上記錄 0</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="checkFillIn()" class="btn-shinkai px-5 py-2.5 rounded-xl font-bold text-sm">
+                    檢查挑戰答案
+                </button>
+                <span id="fill-result" class="text-sm font-bold"></span>
+            </div>
+        </section>
+
+        <!-- 第三分頁：歷程性自我評量測驗 (5題) -->
+        <section id="tab-quiz" class="tab-content hidden shinkai-glass rounded-3xl p-6 md:p-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200/80 pb-4 gap-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 歷程性小試身手（5 題）
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">即時檢測你的學習成效，答題後可獲得精準解析！</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500">當前得分：</span>
+                    <span id="quiz-score" class="text-2xl font-black text-indigo-600">0</span>
+                    <span class="text-xs font-bold text-slate-400">/ 100</span>
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-6">
+                <!-- 測驗題目由 JavaScript 動態渲染 -->
+            </div>
+
+            <div class="text-center pt-4">
+                <button onclick="resetQuiz()" class="px-6 py-2.5 bg-slate-200 text-slate-700 font-bold text-sm rounded-xl hover:bg-slate-300 transition">
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新作答所有題目
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JavaScript 邏輯控制 -->
+    <script>
+        let currentA = 24;
+        let currentB = 365;
+        let isZeroMode = false;
+        let userQuizAnswers = {};
+
+        // 切換頁籤邏輯
+        function switchTab(tabId) {
+            const tabs = ['explorer', 'challenge', 'quiz'];
+            tabs.forEach(id => {
+                const content = document.getElementById(`tab-${id}`);
+                const btn = document.getElementById(`tab-btn-${id}`);
+                
+                if (id === tabId) {
+                    content.classList.remove('hidden');
+                    btn.className = 'px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 shadow-md bg-gradient-to-r from-indigo-600 to-purple-600 text-white scale-105';
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = 'px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 bg-white/80 text-slate-700 hover:bg-white hover:shadow-md';
+                }
+            });
+        }
+
+        // 5 題歷程性測驗資料庫
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 計算 8 × 300 時，可以看成「8 × 3 個百」，結果是幾個百？答案是多少？",
+                options: ["24 個百，是 2400", "24 個十，是 240", "8 個百，是 800", "16 個百，是 1600"],
+                answer: 0,
+                explanation: "8 × 300 可以看成 8 × 3 個百 = 24 個百 = 2400。"
+            },
+            {
+                id: 2,
+                question: "2. 在直式計算 24 × 365 中，第二層計算的 1440 代表什麼意義？",
+                options: ["24 × 6 個一", "24 × 60 (24 的 60 倍)", "24 × 600", "24 × 300"],
+                answer: 1,
+                explanation: "乘數的十位數字是 6，代表 60，所以第二層是 24 × 60 = 1440 (144 個十)。"
+            },
+            {
+                id: 3,
+                question: "3. 一箱番茄有 156 顆，進貨 248 箱共有幾顆番茄？",
+                options: ["38688 顆", "38000 顆", "37688 顆", "39688 顆"],
+                answer: 0,
+                explanation: "156 × 248 = 156×8 + 156×40 + 156×200 = 1248 + 6240 + 31200 = 38688。"
+            },
+            {
+                id: 4,
+                question: "4. 計算 128 × 206 時，因為乘數十位數是 0 (0個十)，在直式計算中可以怎麼處理？",
+                options: [
+                    "必須完整寫出一整行 000，否則算式會錯",
+                    "十位數的 0 可以省略不寫，但百位的乘積仍要對齊百位記錄",
+                    "直接把十位數當作 1 計算",
+                    "不用寫百位數字"
+                ],
+                answer: 1,
+                explanation: "128 × 0 十 = 0，可以省略該行筆記，但乘以百位數字 2 時，答案仍須從百位對齊寫起。"
+            },
+            {
+                id: 5,
+                question: "5. 【生活應用題】一袋冷凍水餃 199 元，水餃工廠今天售出 336 袋，共可收入多少元？",
+                options: ["66864 元", "66800 元", "65864 元", "67864 元"],
+                answer: 0,
+                explanation: "199 × 336 = 199×6 + 199×30 + 199×300 = 1194 + 5970 + 59700 = 66864 元。"
+            }
+        ];
+
+        // 頁面初始化
+        window.onload = function() {
+            setupSliders();
+            updateCalculator();
+            renderQuiz();
+        };
+
+        // 設定滑桿監聽事件
+        function setupSliders() {
+            const sliderA = document.getElementById('numA-slider');
+            const sliderB = document.getElementById('numB-slider');
+
+            sliderA.addEventListener('input', (e) => {
+                currentA = parseInt(e.target.value);
+                document.getElementById('numA-val').innerText = currentA;
+                updateCalculator();
+            });
+
+            sliderB.addEventListener('input', (e) => {
+                currentB = parseInt(e.target.value);
+                document.getElementById('numB-val').innerText = currentB;
+                updateCalculator();
+            });
+        }
+
+        // 切換課本經典範例
+        function setExample(a, b) {
+            currentA = a;
+            currentB = b;
+            document.getElementById('numA-slider').value = a;
+            document.getElementById('numB-slider').value = b;
+            document.getElementById('numA-val').innerText = a;
+            document.getElementById('numB-val').innerText = b;
+            updateCalculator();
+        }
+
+        // 切換「十位數為0」特別範例
+        function toggleZeroMode() {
+            isZeroMode = !isZeroMode;
+            if (isZeroMode) {
+                setExample(128, 206);
+                document.getElementById('zero-toggle').classList.replace('bg-slate-300', 'bg-indigo-600');
+                document.getElementById('zero-toggle').classList.replace('text-slate-700', 'text-white');
+            } else {
+                setExample(24, 365);
+                document.getElementById('zero-toggle').classList.replace('bg-indigo-600', 'bg-slate-300');
+                document.getElementById('zero-toggle').classList.replace('text-white', 'text-slate-700');
+            }
+        }
+
+        // 動態計算並更新直式與解說
+        function updateCalculator() {
+            const digitOnes = currentB % 10;
+            const digitTens = Math.floor((currentB % 100) / 10);
+            const digitHundreds = Math.floor(currentB / 100);
+
+            const p1 = currentA * digitOnes;
+            const p2 = currentA * digitTens * 10;
+            const p3 = currentA * digitHundreds * 100;
+            const total = currentA * currentB;
+
+            // 標題更新
+            document.getElementById('equation-title').innerText = `${currentA} × ${currentB}`;
+
+            // 渲染直式各列
+            document.getElementById('row-a').innerHTML = formatDigitRow(currentA, '');
+            document.getElementById('row-b').innerHTML = formatDigitRow(currentB, '×');
+
+            // 第一層（個位）
+            document.getElementById('row-step1').innerHTML = formatDigitRow(p1, '', 'text-emerald-600');
+            document.getElementById('step1-desc').innerText = `${currentA} × ${digitOnes} = ${p1} (${p1} 個一)`;
+
+            // 第二層（十位）
+            const step2Card = document.getElementById('step2-card');
+            if (digitTens === 0) {
+                document.getElementById('row-step2').innerHTML = formatDigitRow('000', '', 'text-slate-300 line-through');
+                document.getElementById('step2-desc').innerText = `${currentA} × 0 = 0 (十位為 0 可簡略)`;
+                step2Card.classList.add('opacity-50');
+            } else {
+                document.getElementById('row-step2').innerHTML = formatDigitRow(p2, '', 'text-amber-600');
+                document.getElementById('step2-desc').innerText = `${currentA} × ${digitTens * 10} = ${p2} (${p2 / 10} 個十)`;
+                step2Card.classList.remove('opacity-50');
+            }
+
+            // 第三層（百位）
+            document.getElementById('row-step3').innerHTML = formatDigitRow(p3, '', 'text-sky-600');
+            document.getElementById('step3-desc').innerText = `${currentA} × ${digitHundreds * 100} = ${p3} (${p3 / 100} 個百)`;
+
+            // 總計
+            document.getElementById('row-sum').innerHTML = formatDigitRow(total, '');
+
+            // 橫式總結
+            if (digitTens === 0) {
+                document.getElementById('full-equation-text').innerText = `${currentA} × ${currentB} = ${p1} + ${p3} = ${total}`;
+                document.getElementById('concept-tip').innerText = `注意到乘數中間的 0 了嗎？乘數十位為 0 時，128×0=0，直式中可以簡略不寫，但百位乘積依然要對齊百位開始寫！`;
+            } else {
+                document.getElementById('full-equation-text').innerText = `${currentA} × ${currentB} = ${p1} + ${p2} + ${p3} = ${total}`;
+                document.getElementById('concept-tip').innerText = `乘數的「百位數字 ${digitHundreds}」代表 ${digitHundreds} 個百。乘完結果為 ${p3}，也就是 ${p3/100} 個百，從百位開始記入直式！`;
+            }
+        }
+
+        // 將數字格式化為 6 格對齊的 HTML 數字格
+        function formatDigitRow(value, operator = '', customColor = '') {
+            const strVal = String(value);
+            const maxLen = 6;
+            const padLen = maxLen - strVal.length;
+
+            let html = '';
+            
+            // 運算符號位置
+            if (operator) {
+                html += `<div class="digit-cell text-slate-500 font-bold">${operator}</div>`;
+            } else {
+                html += `<div class="digit-cell"></div>`;
+            }
+
+            // 補空白格以維持對齊
+            for (let i = 0; i < padLen - 1; i++) {
+                html += `<div class="digit-cell"></div>`;
+            }
+
+            // 填入數字字元
+            for (let char of strVal) {
+                html += `<div class="digit-cell ${customColor}">${char}</div>`;
+            }
+
+            return html;
+        }
+
+        // 填空題檢查
+        function checkFillIn() {
+            const ans1 = document.getElementById('fill-1').value.trim();
+            const ans2 = document.getElementById('fill-2').value.trim();
+            const ans3 = document.getElementById('fill-3').value.trim();
+
+            const resElem = document.getElementById('fill-result');
+
+            if ((ans1 === '一' || ans1 === '1') && (ans2 === '十' || ans2 === '10') && ans3 === '31200') {
+                resElem.innerHTML = `<span class="text-emerald-600"><i class="fa-solid fa-circle-check"></i> 太棒了！觀念完全正確！</span>`;
+            } else {
+                resElem.innerHTML = `<span class="text-rose-500"><i class="fa-solid fa-circle-xmark"></i> 還差一點點，再想一想喔！（提示：一/十/31200）</span>`;
+            }
+        }
+
+        // 渲染 5 題歷程性測驗
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q, qIndex) => {
+                const qBox = document.createElement('div');
+                qBox.className = 'bg-white/80 rounded-2xl p-5 border border-slate-200/80 space-y-3';
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHTML += `
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-indigo-50/50 cursor-pointer transition">
+                            <input type="radio" name="quiz-${q.id}" value="${optIndex}" onchange="selectAnswer(${q.id}, ${optIndex})" class="w-4 h-4 text-indigo-600 accent-indigo-600">
+                            <span class="text-sm text-slate-700 font-medium">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                qBox.innerHTML = `
+                    <h3 class="font-bold text-slate-800 text-base">${q.question}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+                        ${optionsHTML}
+                    </div>
+                    <div id="explain-${q.id}" class="hidden p-3 rounded-xl text-xs leading-relaxed mt-2"></div>
+                `;
+
+                container.appendChild(qBox);
+            });
+        }
+
+        // 選擇答案與即時對錯評量
+        function selectAnswer(qId, selectedIdx) {
+            userQuizAnswers[qId] = selectedIdx;
+            const q = quizData.find(item => item.id === qId);
+            const explainElem = document.getElementById(`explain-${qId}`);
+
+            explainElem.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
+
+            if (selectedIdx === q.answer) {
+                explainElem.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-check text-emerald-600"></i> 回答正確！</span> ${q.explanation}`;
+            } else {
+                explainElem.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-xmark text-rose-500"></i> 答案不對喔！</span> ${q.explanation}`;
+            }
+
+            calculateScore();
+        }
+
+        // 計算總分
+        function calculateScore() {
+            let score = 0;
+            quizData.forEach(q => {
+                if (userQuizAnswers[q.id] === q.answer) {
+                    score += 20;
+                }
+            });
+            document.getElementById('quiz-score').innerText = score;
+        }
+
+        // 重置測驗
+        function resetQuiz() {
+            userQuizAnswers = {};
+            document.getElementById('quiz-score').innerText = '0';
+            renderQuiz();
+        }
+    </script>
+</body>
+</html>

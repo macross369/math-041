@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三位數除法探究館 - 估商與調商大挑戰</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-[#0f172a];
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(251, 146, 60, 0.35) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(129, 140, 248, 0.25) 0px, transparent 50%),
+                linear-gradient(135deg, #0284c7 0%, #1e1b4b 50%, #311b92 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #0f172a;
+        }
+
+        /* Shinkai style glowing cloud effects */
+        .shinkai-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 20px 40px -15px rgba(14, 165, 233, 0.25), 0 0 15px rgba(255, 255, 255, 0.5) inset;
+        }
+
+        .shinkai-btn-primary {
+            background: linear-gradient(135deg, #0284c7 0%, #4338ca 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.39);
+        }
+        .shinkai-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(2, 132, 199, 0.55);
+        }
+
+        /* Division Grid Cell Standard width */
+        .grid-cell {
+            width: 2.2rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka', 'Courier New', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        /* Place Value Headers */
+        .pv-cell {
+            width: 2.2rem;
+            height: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 800;
+        }
+
+        .pulse-subtle {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.92; transform: scale(1.01); }
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #0284c7;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.8);
+            margin-top: -10px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8">
+
+    <header class="max-w-6xl mx-auto mb-6 text-center text-white relative">
+        <!-- 閒雲數學小棧 Logo與標題 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <div class="inline-block px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-sky-100 text-xs sm:text-sm font-medium mb-3 shadow-lg">
+            ✨ 國小數學 6-3 互動教學模組
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight drop-shadow-md mb-2">
+            三位數除法探究館 <span class="text-amber-300 text-2xl sm:text-4xl block sm:inline mt-1 sm:mt-0">｜ 估商與調商</span>
+        </h1>
+        <p class="text-sky-100/90 text-sm sm:text-base max-w-2xl mx-auto font-light">
+            透過圖示化直式模擬器觀察數值變化，掌握「將除數看成整百數估商」與「試商過大或過小的修正調商」技巧！
+        </p>
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center gap-2 sm:gap-4 mt-6">
+            <button id="tab-btn-sim" onclick="switchTab('sim')" class="px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white text-sky-900 shadow-lg border-2 border-sky-300">
+                <i class="fa-solid fa-calculator mr-1.5"></i> 1. 圖示直式與估商探索器
+            </button>
+            <button id="tab-btn-quiz" onclick="switchTab('quiz')" class="px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30">
+                <i class="fa-solid fa-list-check mr-1.5"></i> 2. 歷程評量 (5題)
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto">
+        <!-- TAB 1: DIVISION SIMULATOR & ADJUSTMENT LAB -->
+        <div id="tab-sim" class="space-y-6">
+            <!-- Preset Selector -->
+            <div class="shinkai-card rounded-3xl p-5 sm:p-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-sky-100 pb-3">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center">
+                        <i class="fa-solid fa-book-open text-sky-600 mr-2"></i> 課本經典教材題型快速載入：
+                    </h2>
+                    <span class="text-xs text-sky-700 bg-sky-100 px-3 py-1 rounded-full font-medium">點擊下方按鈕切換範例</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+                    <button onclick="loadExample(917, 300)" class="p-2.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-left transition text-xs sm:text-sm">
+                        <div class="font-bold text-sky-900">917 ÷ 300</div>
+                        <div class="text-slate-500 text-[11px]">3位數÷整百數</div>
+                    </button>
+                    <button onclick="loadExample(4956, 200)" class="p-2.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-left transition text-xs sm:text-sm">
+                        <div class="font-bold text-sky-900">4956 ÷ 200</div>
+                        <div class="text-slate-500 text-[11px]">4位數÷整百數</div>
+                    </button>
+                    <button onclick="loadExample(1293, 295)" class="p-2.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-left transition text-xs sm:text-sm">
+                        <div class="font-bold text-sky-900">1293 ÷ 295</div>
+                        <div class="text-slate-500 text-[11px]">估商: 295看作300</div>
+                    </button>
+                    <button onclick="loadExample(4552, 519)" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-left transition text-xs sm:text-sm">
+                        <div class="font-bold text-amber-900">4552 ÷ 519</div>
+                        <div class="text-amber-600 text-[11px]">經典調商題(試9修8)</div>
+                    </button>
+                    <button onclick="loadExample(2600, 285)" class="p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-left transition text-xs sm:text-sm">
+                        <div class="font-bold text-emerald-900">2600 ÷ 285</div>
+                        <div class="text-emerald-600 text-[11px]">容量裝瓶應用</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Interactive Workbench -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Control Panel (4 cols) -->
+                <div class="lg:col-span-5 space-y-5">
+                    <div class="shinkai-card rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                            <i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> 參數控制與估商嘗試
+                        </h3>
+                        
+                        <!-- Dividend Input -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">被除數 (Dividend)</label>
+                            <input type="number" id="input-dividend" value="4552" min="10" max="9999" onchange="updateDivision()"
+                                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-400 focus:outline-none font-bold text-slate-800">
+                        </div>
+
+                        <!-- Divisor Input -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">除數 (Divisor)</label>
+                            <input type="number" id="input-divisor" value="519" min="1" max="999" onchange="updateDivision()"
+                                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-400 focus:outline-none font-bold text-slate-800">
+                        </div>
+
+                        <!-- Division Rounding Tip Box -->
+                        <div id="rounding-tip" class="p-3.5 bg-indigo-50 border border-indigo-100 rounded-2xl mb-5 text-xs text-indigo-900 leading-relaxed">
+                            <!-- JS injected estimation tip -->
+                        </div>
+
+                        <!-- Interactive Slider for Quotient -->
+                        <div class="p-4 bg-sky-50/70 border border-sky-100 rounded-2xl">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-bold text-sky-900">嘗試輸入/調商 (Quotient):</label>
+                                <span id="current-quotient-display" class="text-2xl font-black text-sky-600 font-mono">8</span>
+                            </div>
+                            <input type="range" id="quotient-slider" min="0" max="25" value="8" step="1" oninput="onSliderChange(this.value)" class="w-full mb-3">
+                            
+                            <div class="flex justify-between items-center gap-2">
+                                <button onclick="adjustQuotient(-1)" class="flex-1 py-2 bg-white border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-50 shadow-sm active:scale-95 transition">
+                                    <i class="fa-solid fa-minus text-red-500"></i> 商 -1 (調小)
+                                </button>
+                                <button onclick="adjustQuotient(1)" class="flex-1 py-2 bg-white border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-50 shadow-sm active:scale-95 transition">
+                                    <i class="fa-solid fa-plus text-emerald-500"></i> 商 +1 (調大)
+                                </button>
+                            </div>
+                        </div>
+
+                        <button onclick="autoCalculateBest()" class="w-full mt-4 py-2.5 shinkai-btn-primary text-white font-bold rounded-xl text-sm shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 自動尋找最佳正確商數
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Visual Display Panel (7 cols) -->
+                <div class="lg:col-span-7 space-y-5">
+                    <!-- Division Canvas Card -->
+                    <div class="shinkai-card rounded-3xl p-6 relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-800">
+                                <i class="fa-solid fa-square-poll-vertical text-sky-600 mr-2"></i> 課本標準圖示化直式計算
+                            </h3>
+                            <span id="status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                觀察中
+                            </span>
+                        </div>
+
+                        <!-- Graphical Vertical Long Division Render Area -->
+                        <div class="bg-slate-50/90 rounded-2xl p-6 border border-slate-200 flex flex-col items-center justify-center min-h-[260px] overflow-x-auto">
+                            <div id="division-vertical-container" class="py-2">
+                                <!-- Dynamically Rendered SVG Long Division HTML -->
+                            </div>
+                        </div>
+
+                        <!-- Visual Feedback Alert Banner -->
+                        <div id="feedback-alert" class="mt-4 p-4 rounded-2xl transition-all duration-300 flex items-start gap-3">
+                            <i id="feedback-icon" class="fa-solid fa-circle-info text-xl mt-0.5"></i>
+                            <div>
+                                <h4 id="feedback-title" class="font-bold text-sm">狀態說明</h4>
+                                <p id="feedback-desc" class="text-xs mt-0.5 leading-relaxed">請拉動滑桿調整試商。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step Explanation Breakdown Card -->
+                    <div class="shinkai-card rounded-3xl p-6">
+                        <h3 class="text-base font-bold text-slate-800 mb-2 flex items-center">
+                            <i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i> 解題思考與位值拆解步驟：
+                        </h3>
+                        <div id="step-explanation" class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: FORMATIVE ASSESSMENT (5 QUESTIONS) -->
+        <div id="tab-quiz" class="hidden space-y-6">
+            <div class="shinkai-card rounded-3xl p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-sky-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">
+                            <i class="fa-solid fa-clipboard-question text-sky-600 mr-2"></i> 單元歷程評量 (共 5 題)
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">請讀題後選擇正確答案，系統將提供即時的教學診斷與解說！</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div id="score-display" class="px-4 py-2 bg-sky-100 text-sky-900 rounded-2xl font-black text-sm">
+                            得分：0 / 100
+                        </div>
+                        <button onclick="resetQuiz()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> 重測
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Questions Container -->
+                <div id="quiz-questions-container" class="space-y-6">
+                    <!-- Dynamically Generated Questions -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DATA & STATE MANAGEMENT ---
+        let currentDividend = 4552;
+        let currentDivisor = 519;
+        let userQuotient = 8;
+
+        // Quiz Questions Data based on Textbook Images
+        const quizQuestions = [
+            {
+                id: 1,
+                title: "【整百數除法】把 917 元平分給 300 人，每人分到幾元？剩下幾元？",
+                options: [
+                    "商 3，餘 17",
+                    "商 30，餘 17",
+                    "商 3，餘 170",
+                    "商 2，餘 317"
+                ],
+                answer: 0,
+                explanation: "917 是 9個百、1個十與7個一。9個百除以300不夠分，917個一平分給300人，每人分到 3元，剩下 17元。"
+            },
+            {
+                id: 2,
+                title: "【商的位數判斷】計算 4956 ÷ 200 時，請問商是幾位數？最高位在什麼位？",
+                options: [
+                    "一位數，最高位在個位",
+                    "二位數，最高位在十位",
+                    "三位數，最高位在百位",
+                    "二位數，最高位在個位"
+                ],
+                answer: 1,
+                explanation: "先拿千位4個不夠分，再拿49個百除以200，可在十位商 2，因此商是『二位數』，最高位在『十位』。"
+            },
+            {
+                id: 3,
+                title: "【估商技巧】計算 1293 ÷ 295 時，除數 295 非常接近哪一個整百數？通常會看成多少來估商？",
+                options: [
+                    "看成 200",
+                    "看成 250",
+                    "看成 300",
+                    "看成 400"
+                ],
+                answer: 2,
+                explanation: "295 很接近 300，所以我們可以把 295 看作 300 來估商（300 × 4 = 1200 接近 1293）。"
+            },
+            {
+                id: 4,
+                title: "【調商判斷】計算 4552 ÷ 519 時，若我們先將除數看作 500，試商算 9，發現 519 × 9 = 4671（大於被除數 4552），此時應該如何修正？",
+                options: [
+                    "試商太大，應該把商調小改為 8",
+                    "試商太小，應該把商調大改為 10",
+                    "保持商為 9，直接相減",
+                    "題目出錯無法計算"
+                ],
+                answer: 0,
+                explanation: "因為 519 × 9 = 4671 > 4552，相乘結果比被除數還大無法相減，代表估商過大，必須『調小』為 8。"
+            },
+            {
+                id: 5,
+                title: "【生活應用】把 2600 毫升的綠茶，每 285 毫升裝成一瓶，最多可以裝滿幾瓶？還剩下多少毫升？",
+                options: [
+                    "最多 8 瓶，剩 320 毫升",
+                    "最多 9 瓶，剩 35 毫升",
+                    "最多 9 瓶，剩 350 毫升",
+                    "最多 10 瓶，剩 0 毫升"
+                ],
+                answer: 1,
+                explanation: "將 285 看作 300 估商：300 × 9 = 2700 ≈ 2600。試商 9：285 × 9 = 2565。2600 - 2565 = 35。因此可裝 9 瓶，剩下 35 毫升。"
+            }
+        ];
+
+        let quizUserAnswers = {};
+
+        // --- SIMULATOR FUNCTIONS ---
+        function updateDivision() {
+            currentDividend = parseInt(document.getElementById('input-dividend').value) || 100;
+            currentDivisor = parseInt(document.getElementById('input-divisor').value) || 1;
+            
+            if (currentDivisor <= 0) currentDivisor = 1;
+            if (currentDividend < 0) currentDividend = 0;
+
+            const correctQ = Math.floor(currentDividend / currentDivisor);
+            const slider = document.getElementById('quotient-slider');
+            
+            slider.max = Math.max(15, correctQ + 5);
+            
+            userQuotient = parseInt(slider.value);
+            if(userQuotient > slider.max) {
+                userQuotient = correctQ;
+                slider.value = correctQ;
+            }
+
+            renderDivisionUI();
+        }
+
+        function onSliderChange(val) {
+            userQuotient = parseInt(val);
+            document.getElementById('current-quotient-display').innerText = userQuotient;
+            renderDivisionUI();
+        }
+
+        function adjustQuotient(delta) {
+            const slider = document.getElementById('quotient-slider');
+            let newVal = userQuotient + delta;
+            if (newVal >= 0 && newVal <= parseInt(slider.max)) {
+                slider.value = newVal;
+                onSliderChange(newVal);
+            }
+        }
+
+        function autoCalculateBest() {
+            const correctQ = Math.floor(currentDividend / currentDivisor);
+            const slider = document.getElementById('quotient-slider');
+            slider.value = correctQ;
+            onSliderChange(correctQ);
+        }
+
+        function loadExample(dividend, divisor) {
+            document.getElementById('input-dividend').value = dividend;
+            document.getElementById('input-divisor').value = divisor;
+            
+            if(dividend === 4552 && divisor === 519) {
+                document.getElementById('quotient-slider').value = 9;
+                userQuotient = 9;
+            } else {
+                userQuotient = Math.floor(dividend / divisor);
+                document.getElementById('quotient-slider').value = userQuotient;
+            }
+            
+            document.getElementById('current-quotient-display').innerText = userQuotient;
+            updateDivision();
+        }
+
+        // --- STREAMING_CHUNK:Rendering graphical long division layout with place value headers and accurate SVG division bracket... ---
+        function renderDivisionUI() {
+            const product = currentDivisor * userQuotient;
+            const remainder = currentDividend - product;
+
+            // 1. Estimation / Rounding Tip Text
+            const roundedDivisor = Math.round(currentDivisor / 100) * 100 || Math.round(currentDivisor / 10) * 10;
+            const roundingTipEl = document.getElementById('rounding-tip');
+            roundingTipEl.innerHTML = `
+                <strong><i class="fa-solid fa-calculator text-indigo-600"></i> 估商思考小指引：</strong><br>
+                除數 <span class="font-bold text-indigo-700">${currentDivisor}</span> 接近整百數 <span class="font-bold text-indigo-700">${roundedDivisor}</span>。<br>
+                可以用 <span class="font-bold">${currentDividend} ÷ ${roundedDivisor}</span> 來初步預估商數大約是多少。
+            `;
+
+            // 2. Render Graphical Division
+            const container = document.getElementById('division-vertical-container');
+
+            const dividendStr = currentDividend.toString();
+            const numDigits = dividendStr.length; // e.g., 3 or 4
+            const placeValueNames = ['千', '百', '十', '個'];
+            const placeValueColors = [
+                'text-blue-600 bg-blue-50 border-blue-200',   // 千
+                'text-pink-600 bg-pink-50 border-pink-200',   // 百
+                'text-amber-600 bg-amber-50 border-amber-200', // 十
+                'text-emerald-600 bg-emerald-50 border-emerald-200' // 個
+            ];
+
+            // Slice place value names for current number of digits
+            const activePlaceNames = placeValueNames.slice(4 - numDigits);
+            const activePlaceColors = placeValueColors.slice(4 - numDigits);
+
+            // Format Quotient Digits aligned to right
+            const quotientStr = userQuotient.toString();
+            const qDigits = quotientStr.padStart(numDigits, ' '); // right aligned in dividend columns
+
+            // Format Product Digits aligned to right
+            const prodStr = product.toString();
+            const pDigits = prodStr.padStart(numDigits, ' ');
+
+            // Format Remainder Digits
+            const remStr = remainder.toString();
+            const rDigits = remStr.padStart(numDigits, ' ');
+
+            // Build Header Row (Place Values)
+            let headerCellsHTML = activePlaceNames.map((name, i) => `
+                <div class="pv-cell font-bold rounded border ${activePlaceColors[i]} shadow-xs">${name}</div>
+            `).join('');
+
+            // Build Quotient Row
+            let quotientCellsHTML = Array.from(qDigits).map(char => `
+                <div class="grid-cell text-sky-600 font-extrabold">${char !== ' ' ? char : ''}</div>
+            `).join('');
+
+            // Build Dividend Cells
+            let dividendCellsHTML = Array.from(dividendStr).map(char => `
+                <div class="grid-cell text-slate-900 font-black">${char}</div>
+            `).join('');
+
+            // Build Product Cells
+            let productCellsHTML = Array.from(pDigits).map(char => `
+                <div class="grid-cell text-slate-600">${char !== ' ' ? char : ''}</div>
+            `).join('');
+
+            // Build Remainder Cells
+            let remainderColorClass = remainder < 0 ? 'text-red-600' : (remainder >= currentDivisor ? 'text-amber-600' : 'text-emerald-600');
+            let remainderCellsHTML = Array.from(rDigits).map(char => `
+                <div class="grid-cell font-black ${remainderColorClass}">${char !== ' ' ? char : ''}</div>
+            `).join('');
+
+            // Calculate exact block width for dividend and division lines
+            // Cell width = 2.2rem (35.2px) + gap (4px)
+            const totalDividendPx = numDigits * 35.2 + (numDigits - 1) * 4;
+            const svgWidthPx = Math.round(totalDividendPx + 24);
+            const bracketStartX = 12; // Precise X coordinate where ')' starts and top bar begins
+
+            // Taiwanese Division Bracket SVG Path:
+            // Curve starts at x=12 y=37, arches right to x=22 y=20, reaches top tip x=12 y=3,
+            // then horizontal line extends straight right to svgWidthPx (never left of bracketStartX).
+            const svgPathData = `M ${bracketStartX} 37 C 22 27, 22 13, ${bracketStartX} 3 H ${svgWidthPx}`;
+
+            container.innerHTML = `
+                <div class="inline-flex flex-col items-end selection:bg-none">
+                    <!-- Place Value Labels Row -->
+                    <div class="flex items-center mb-1">
+                        <div class="w-16 mr-3"></div> <!-- Divisor spacer -->
+                        <div class="flex gap-1 justify-end" style="width: ${svgWidthPx}px;">
+                            ${headerCellsHTML}
+                        </div>
+                    </div>
+
+                    <!-- Quotient Row -->
+                    <div class="flex items-center mb-0.5">
+                        <div class="w-16 mr-3"></div> <!-- Divisor spacer -->
+                        <div class="flex gap-1 justify-end" style="width: ${svgWidthPx}px;">
+                            ${quotientCellsHTML}
+                        </div>
+                    </div>
+
+                    <!-- Divisor + Graphical Bracket + Dividend Row -->
+                    <div class="flex items-center relative">
+                        <!-- Divisor Number -->
+                        <div class="w-16 text-right pr-2 font-mono font-bold text-2xl text-slate-700">
+                            ${currentDivisor}
+                        </div>
+
+                        <!-- Dividend Digits with SVG Bracket overlay -->
+                        <div class="relative flex gap-1 justify-end py-0.5" style="width: ${svgWidthPx}px;">
+                            <!-- SVG Graphical Division Symbol ')' -->
+                            <svg class="absolute left-0 top-0 overflow-visible pointer-events-none" style="width: ${svgWidthPx}px; height: 40px;">
+                                <path d="${svgPathData}" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            
+                            ${dividendCellsHTML}
+                        </div>
+                    </div>
+
+                    <!-- Product Row (Divisor * Quotient) -->
+                    <div class="flex items-center mt-1">
+                        <div class="w-16 text-right pr-2"></div>
+                        <div class="flex flex-col items-end" style="width: ${svgWidthPx}px;">
+                            <div class="flex gap-1 justify-end">
+                                ${productCellsHTML}
+                            </div>
+                            <!-- Subtraction horizontal line (Identical length & alignment to top bracket line) -->
+                            <svg style="width: ${svgWidthPx}px; height: 6px;" class="my-1 overflow-visible">
+                                <line x1="${bracketStartX}" y1="3" x2="${svgWidthPx}" y2="3" stroke="#1e293b" stroke-width="3" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Remainder Row -->
+                    <div class="flex items-center">
+                        <div class="w-16 text-right pr-2"></div>
+                        <div class="flex gap-1 justify-end" style="width: ${svgWidthPx}px;">
+                            ${remainderCellsHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 3. Status Alert & Feedback logic
+            const statusBadge = document.getElementById('status-badge');
+            const feedbackAlert = document.getElementById('feedback-alert');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDesc = document.getElementById('feedback-desc');
+
+            if (product > currentDividend) {
+                // 商太大了 (Product > Dividend)
+                statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200";
+                statusBadge.innerText = "⚠️ 商估得太大了！";
+
+                feedbackAlert.className = "mt-4 p-4 rounded-2xl transition-all duration-300 flex items-start gap-3 bg-red-50 text-red-900 border border-red-200";
+                feedbackIcon.className = "fa-solid fa-triangle-exclamation text-red-600 text-xl mt-0.5";
+                feedbackTitle.innerText = "【調商警告：估商過大】無法相減！";
+                feedbackDesc.innerHTML = `
+                    積數 (<span class="font-bold">${currentDivisor} × ${userQuotient} = ${product}</span>) 已經超過了被除數 (${currentDividend})！<br>
+                    <span class="font-bold underline">建議處置：</span>請按下 <strong>「商 -1 (調小)」</strong> 進行修正調商。
+                `;
+            } else if (remainder >= currentDivisor) {
+                // 商太小了 (Remainder >= Divisor)
+                statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200";
+                statusBadge.innerText = "💡 商估得太小了！";
+
+                feedbackAlert.className = "mt-4 p-4 rounded-2xl transition-all duration-300 flex items-start gap-3 bg-amber-50 text-amber-900 border border-amber-200";
+                feedbackIcon.className = "fa-solid fa-circle-exclamation text-amber-600 text-xl mt-0.5";
+                feedbackTitle.innerText = "【調商提示：餘數過大】還可以再分！";
+                feedbackDesc.innerHTML = `
+                    目前的餘數是 <span class="font-bold text-amber-700">${remainder}</span>，依然大於等於除數 (${currentDivisor})！代表還可以繼續平分。<br>
+                    <span class="font-bold underline">建議處置：</span>請按下 <strong>「商 +1 (調大)」</strong> 進行修正調商。
+                `;
+            } else {
+                // 完美商數 (Correct)
+                statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                statusBadge.innerText = "✨ 完美的正確估商！";
+
+                feedbackAlert.className = "mt-4 p-4 rounded-2xl transition-all duration-300 flex items-start gap-3 bg-emerald-50 text-emerald-900 border border-emerald-200";
+                feedbackIcon.className = "fa-solid fa-circle-check text-emerald-600 text-xl mt-0.5";
+                feedbackTitle.innerText = "【計算正確】成功找到正確的商與餘數！";
+                feedbackDesc.innerHTML = `
+                    答對了！商為 <span class="font-bold text-emerald-700 text-sm">${userQuotient}</span>，餘數為 <span class="font-bold text-emerald-700 text-sm">${remainder}</span>。<br>
+                    滿足條件：<span class="bg-emerald-100 px-1.5 py-0.5 rounded text-emerald-900 font-medium">餘數 (${remainder}) < 除數 (${currentDivisor})</span> 且沒有超過被除數！
+                `;
+            }
+
+            // 4. Detailed Breakdown Steps Text
+            const stepEl = document.getElementById('step-explanation');
+            stepEl.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-xs">1</span>
+                    <span><strong>觀察位值：</strong>被除數最高位與次高位是否足夠除以除數 ${currentDivisor}？</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-xs">2</span>
+                    <span><strong>估算試商：</strong>將 ${currentDivisor} 看作 ${roundedDivisor}，嘗試商 = ${userQuotient}。</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-xs">3</span>
+                    <span><strong>乘積檢驗：</strong>${currentDivisor} × ${userQuotient} = ${product}。</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-5 h-5 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-xs">4</span>
+                    <span><strong>結算餘數：</strong>${currentDividend} - ${product} = ${remainder} ${remainder >= 0 && remainder < currentDivisor ? '（符合規定 ✅）' : '（需調商 ❌）'}。</span>
+                </div>
+            `;
+        }
+
+        // --- QUIZ FUNCTIONS ---
+        function renderQuiz() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, qIndex) => {
+                const qCard = document.createElement('div');
+                qCard.className = "p-5 rounded-2xl bg-slate-50/80 border border-slate-200 space-y-3";
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    const isSelected = quizUserAnswers[q.id] === optIndex;
+                    optionsHTML += `
+                        <button onclick="selectAnswer(${q.id}, ${optIndex})" 
+                            class="w-full text-left p-3 rounded-xl border transition-all text-xs sm:text-sm font-medium flex items-center justify-between
+                            ${isSelected ? 'bg-sky-500 text-white border-sky-600 shadow-md' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                            <span>${String.fromCharCode(65 + optIndex)}. ${opt}</span>
+                            ${isSelected ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-regular fa-circle text-slate-300"></i>'}
+                        </button>
+                    `;
+                });
+
+                let explanationHTML = '';
+                if (quizUserAnswers[q.id] !== undefined) {
+                    const isCorrect = quizUserAnswers[q.id] === q.answer;
+                    explanationHTML = `
+                        <div class="mt-3 p-3.5 rounded-xl text-xs ${isCorrect ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-red-50 text-red-900 border border-red-200'}">
+                            <div class="font-bold flex items-center gap-1.5 mb-1">
+                                ${isCorrect ? '<i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i> 回答正確！' : '<i class="fa-solid fa-circle-xmark text-red-600 text-sm"></i> 回答錯誤！'}
+                            </div>
+                            <div>${q.explanation}</div>
+                        </div>
+                    `;
+                }
+
+                qCard.innerHTML = `
+                    <div class="flex items-start gap-2.5">
+                        <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 font-black text-xs">第 ${qIndex + 1} 題</span>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base leading-snug">${q.title}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                        ${optionsHTML}
+                    </div>
+                    ${explanationHTML}
+                `;
+
+                container.appendChild(qCard);
+            });
+
+            calculateScore();
+        }
+
+        function selectAnswer(questionId, optionIndex) {
+            quizUserAnswers[questionId] = optionIndex;
+            renderQuiz();
+        }
+
+        function calculateScore() {
+            let correctCount = 0;
+            quizQuestions.forEach(q => {
+                if (quizUserAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+            const score = (correctCount / quizQuestions.length) * 100;
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.innerText = `得分：${Math.round(score)} / 100`;
+            if (score === 100) {
+                scoreDisplay.className = "px-4 py-2 bg-emerald-500 text-white rounded-2xl font-black text-sm shadow-lg pulse-subtle";
+            } else {
+                scoreDisplay.className = "px-4 py-2 bg-sky-100 text-sky-900 rounded-2xl font-black text-sm";
+            }
+        }
+
+        function resetQuiz() {
+            quizUserAnswers = {};
+            renderQuiz();
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            const simTab = document.getElementById('tab-sim');
+            const quizTab = document.getElementById('tab-quiz');
+            const simBtn = document.getElementById('tab-btn-sim');
+            const quizBtn = document.getElementById('tab-btn-quiz');
+
+            if (tabName === 'sim') {
+                simTab.classList.remove('hidden');
+                quizTab.classList.add('hidden');
+                simBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white text-sky-900 shadow-lg border-2 border-sky-300";
+                quizBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30";
+            } else {
+                simTab.classList.add('hidden');
+                quizTab.classList.remove('hidden');
+                quizBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white text-sky-900 shadow-lg border-2 border-sky-300";
+                simBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-all bg-white/20 text-white hover:bg-white/30 border border-white/30";
+            }
+        }
+
+        // INITIALIZATION
+        window.onload = function() {
+            updateDivision();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

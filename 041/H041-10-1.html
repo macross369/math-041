@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新海誠風 - 國小四年級數學：長條圖動態探究與報讀網頁</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 25%, #686de0 50%, #ffbe76 80%, #ff7979 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2d3436;
+        }
+
+        /* Glassmorphism Panel */
+        .shinkai-glass {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 32px 0 rgba(31, 38, 135, 0.18);
+        }
+
+        .shinkai-glass-dark {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+        }
+
+        /* Shinkai Sunset Glowing Text */
+        .shinkai-title {
+            background: linear-gradient(45deg, #2563eb, #7c3aed, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animated Glowing Effect */
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* Custom Bar Chart Transition */
+        .bar-transition {
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        x 0.6s ease, y 0.6s ease, fill 0.3s ease;
+        }
+
+        /* Sky cloud vector background decoration */
+        .cloud-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.25;
+            background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8) 0%, transparent 40%),
+                              radial-gradient(circle at 80% 30%, rgba(255,220,240,0.8) 0%, transparent 50%),
+                              radial-gradient(circle at 50% 80%, rgba(255,255,255,0.6) 0%, transparent 60%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-12 overflow-x-hidden">
+    <div class="cloud-bg"></div>
+
+    <!-- Main Outer Container -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        
+        <!-- 閒雲數學小棧 Logo Header -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header Banner -->
+        <header class="shinkai-glass rounded-3xl p-6 mb-8 text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-sky-400/20 rounded-full blur-2xl"></div>
+            
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-semibold mb-3">
+                <i class="fa-solid fa-cloud-sun text-amber-500"></i>
+                國小四年級數學 10-1 互動學習網頁
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black shinkai-title tracking-wide mb-2">
+                長條圖報讀與統計實驗室
+            </h1>
+            <p class="text-slate-600 max-w-2xl mx-auto text-sm sm:text-base font-medium">
+                動態調控長條圖的橫軸、縱軸、大格與小格刻度！輕鬆掌握單式、複式與堆疊長條圖的報讀技巧。
+            </p>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button onclick="switchTab('explore')" id="tab-explore" class="px-6 py-3 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-md bg-indigo-600 text-white flex items-center gap-2 glow-effect">
+                <i class="fa-solid fa-chart-column"></i>
+                1. 長條圖動態探索中心
+            </button>
+            <button onclick="switchTab('scale')" id="tab-scale" class="px-6 py-3 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-md bg-white/80 text-slate-700 hover:bg-white flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                2. 刻度與小格放大鏡
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="px-6 py-3 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-md bg-white/80 text-slate-700 hover:bg-white flex items-center gap-2">
+                <i class="fa-solid fa-pen-ruler"></i>
+                3. 歷程性自我檢測 (5題)
+            </button>
+        </div>
+
+        <!-- TAB 1: Chart Exploration Center -->
+        <div id="section-explore" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Left Control Panel -->
+                <div class="lg:col-span-4 space-y-5">
+                    
+                    <!-- Dataset Selection Card -->
+                    <div class="shinkai-glass rounded-2xl p-5 border border-white">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-indigo-500"></i> 選擇教學情境主題
+                        </h3>
+                        <div class="space-y-2">
+                            <button onclick="loadDataset('plants')" id="ds-btn-plants" class="w-full text-left p-3 rounded-xl border border-indigo-200 bg-indigo-50/80 hover:bg-indigo-100 transition flex items-center justify-between font-semibold text-slate-700 text-sm">
+                                <span><i class="fa-solid fa-seedling text-emerald-500 mr-2"></i>美福國小校園植物統計</span>
+                                <span class="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">單式</span>
+                            </button>
+                            <button onclick="loadDataset('snacks')" id="ds-btn-snacks" class="w-full text-left p-3 rounded-xl border border-slate-200 bg-white/60 hover:bg-slate-100 transition flex items-center justify-between font-semibold text-slate-700 text-sm">
+                                <span><i class="fa-solid fa-utensils text-amber-500 mr-2"></i>臺灣夜市小吃熱量(大刻度)</span>
+                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">每格10</span>
+                            </button>
+                            <button onclick="loadDataset('clubs')" id="ds-btn-clubs" class="w-full text-left p-3 rounded-xl border border-slate-200 bg-white/60 hover:bg-slate-100 transition flex items-center justify-between font-semibold text-slate-700 text-sm">
+                                <span><i class="fa-solid fa-users text-sky-500 mr-2"></i>四年級社團男女生人數</span>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">複式/堆疊</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Display Mode Controls Card -->
+                    <div class="shinkai-glass rounded-2xl p-5 border border-white">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-500"></i> 圖表型態與方向切換
+                        </h3>
+                        
+                        <!-- Orientation Toggle -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">長條圖方向</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setOrientation('vertical')" id="ori-vertical" class="py-2 px-3 rounded-xl font-bold text-xs bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow">
+                                    <i class="fa-solid fa-chart-column"></i> 直立長條圖
+                                </button>
+                                <button onclick="setOrientation('horizontal')" id="ori-horizontal" class="py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-chart-bar"></i> 橫式長條圖
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Multi-bar Chart Type (Only for grouped data) -->
+                        <div id="chart-type-container" class="mb-4 hidden">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">雙資料呈現方式</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setChartType('grouped')" id="type-grouped" class="py-2 px-3 rounded-xl font-bold text-xs bg-purple-600 text-white flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-bars-staggered"></i> 複式長條圖
+                                </button>
+                                <button onclick="setChartType('stacked')" id="type-stacked" class="py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-layer-group"></i> 堆疊長條圖
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Scale Tuning Slider -->
+                        <div class="pt-2 border-t border-slate-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-bold text-slate-600">每一大格代表刻度：</label>
+                                <span id="scale-value-display" class="text-sm font-black text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded">1 單位</span>
+                            </div>
+                            <input type="range" id="scale-slider" min="0" max="3" value="0" step="1" oninput="updateScaleFromSlider(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                            <div id="scale-ticks-container" class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono font-bold">
+                                <span>1</span>
+                                <span>2</span>
+                                <span>5</span>
+                                <span>10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Elements Indicator Switch -->
+                    <div class="shinkai-glass rounded-2xl p-5 border border-white">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-indigo-500"></i> 長條圖組成要素顯隱
+                        </h3>
+                        <div class="space-y-2 text-xs font-semibold text-slate-700">
+                            <label class="flex items-center justify-between p-2 rounded-lg hover:bg-white/60 cursor-pointer">
+                                <span><i class="fa-solid fa-heading text-indigo-500 mr-2"></i>顯示圖表「標題」</span>
+                                <input type="checkbox" id="toggle-title" checked onchange="renderChart()" class="w-4 h-4 accent-indigo-600 rounded">
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-lg hover:bg-white/60 cursor-pointer">
+                                <span><i class="fa-solid fa-arrows-left-right-to-line text-indigo-500 mr-2"></i>顯示「橫軸 / 縱軸」名稱</span>
+                                <input type="checkbox" id="toggle-axes" checked onchange="renderChart()" class="w-4 h-4 accent-indigo-600 rounded">
+                            </label>
+                            <label class="flex items-center justify-between p-2 rounded-lg hover:bg-white/60 cursor-pointer">
+                                <span><i class="fa-solid fa-hashtag text-indigo-500 mr-2"></i>顯示「長條頂端數據數值」</span>
+                                <input type="checkbox" id="toggle-labels" checked onchange="renderChart()" class="w-4 h-4 accent-indigo-600 rounded">
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Canvas & Interactive Data Panel -->
+                <div class="lg:col-span-8 flex flex-col space-y-5">
+                    
+                    <!-- SVG Chart Display Viewport -->
+                    <div class="shinkai-glass rounded-3xl p-6 border border-white flex-1 flex flex-col justify-between relative overflow-hidden">
+                        <!-- Sky glow decoration -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-200/30 via-indigo-200/20 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+                        <!-- Top Header Display inside Canvas -->
+                        <div class="flex justify-between items-center mb-2 border-b border-slate-200/60 pb-2">
+                            <div>
+                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest block">動態圖表呈現</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="unit-badge" class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">
+                                    單位：棵
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- SVG Chart Area & Title below -->
+                        <div class="relative w-full overflow-x-auto my-2 min-h-[360px] flex flex-col items-center justify-center">
+                            <svg id="chart-svg" class="w-full h-[380px] overflow-visible"></svg>
+                            
+                            <!-- Chart Main Title placed below the chart -->
+                            <div class="mt-3 text-center">
+                                <h2 id="chart-main-title" class="text-lg sm:text-xl font-black text-slate-800 bg-white/80 px-5 py-2 rounded-2xl border border-indigo-100 shadow-sm inline-block">
+                                    美福國小校園植物數量統計圖
+                                </h2>
+                            </div>
+                        </div>
+
+                        <!-- Live Bar Height Tweaker Sliders -->
+                        <div class="mt-4 pt-4 border-t border-slate-200/80 bg-white/50 rounded-2xl p-4 backdrop-blur-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-xs font-bold text-slate-700 uppercase flex items-center gap-1.5">
+                                    <i class="fa-solid fa-sliders text-indigo-600"></i> 動態拖動數值（觀察長條高低與刻度變化）：
+                                </h4>
+                                <button onclick="resetCurrentDatasetData()" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold underline">重置預設數據</button>
+                            </div>
+                            <div id="data-sliders-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                                <!-- Dynamic Sliders injected here via JS -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 2: Scale Magnifier & Grid Breakdown -->
+        <div id="section-scale" class="hidden space-y-6">
+            <div class="shinkai-glass rounded-3xl p-6 sm:p-8 border border-white">
+                <div class="max-w-3xl mx-auto text-center mb-8">
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold uppercase tracking-wider mb-2 inline-block">核心觀念拆解</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-800">大格與小格刻度報讀放大鏡</h2>
+                    <p class="text-slate-600 text-sm mt-2">
+                        在報讀長條圖時，最關鍵的是先找出「一大格代表多少？」以及「一小格代表多少？」。
+                    </p>
+                </div>
+
+                <!-- Interactive Calculator / Magnifier Sandbox -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white/70 rounded-2xl p-6 border border-indigo-100 shadow-inner">
+                    
+                    <!-- Left: Control Sliders -->
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                1. 一大格代表的數值：<span id="mag-big-val" class="text-indigo-600 font-extrabold text-lg">100</span>
+                            </label>
+                            <input type="range" id="mag-big-input" min="10" max="500" step="10" value="100" oninput="updateScaleMagnifier()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                2. 一大格被平均分成幾小格：<span id="mag-sub-div" class="text-indigo-600 font-extrabold text-lg">10</span> 小格
+                            </label>
+                            <input type="range" id="mag-sub-input" min="2" max="10" step="1" value="10" oninput="updateScaleMagnifier()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                3. 長條佔據的刻度：<span id="mag-bar-position" class="text-indigo-600 font-extrabold text-lg">5 大格又 2 小格</span>
+                            </label>
+                            <input type="range" id="mag-pos-input" min="1" max="8" step="0.1" value="5.2" oninput="updateScaleMagnifier()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Calculation Formula Box -->
+                        <div class="bg-indigo-50/90 rounded-xl p-4 border border-indigo-200">
+                            <h4 class="text-xs font-bold text-indigo-700 uppercase mb-2">計算原理步驟：</h4>
+                            <ul class="text-xs sm:text-sm text-slate-700 space-y-1 font-mono">
+                                <li>• 每 1 小格 = <span id="formula-step1" class="font-bold text-indigo-600">100 ÷ 10 = 10</span></li>
+                                <li>• 基底數值 (5大格) = <span id="formula-step2" class="font-bold text-indigo-600">500</span></li>
+                                <li>• 多出的小格數值 = <span id="formula-step3" class="font-bold text-indigo-600">2 × 10 = 20</span></li>
+                                <li class="pt-2 border-t border-indigo-200 font-extrabold text-base text-indigo-900">
+                                    ★ 最終報讀結果 = <span id="formula-total" class="text-rose-600">520</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right: Visual Grid Magnifier SVG -->
+                    <div class="flex flex-col items-center justify-center p-4 bg-slate-900/90 rounded-2xl text-white shadow-2xl relative overflow-hidden min-h-[320px]">
+                        <div class="absolute top-3 left-3 text-xs text-sky-400 font-mono font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-microscope"></i> 高倍刻度模擬視窗
+                        </div>
+                        <svg id="magnifier-svg" class="w-full h-[260px]"></svg>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Interactive Quiz (5 Questions) -->
+        <div id="section-quiz" class="hidden space-y-6">
+            <div class="shinkai-glass rounded-3xl p-6 sm:p-8 border border-white">
+                
+                <!-- Quiz Header & Scoreboard -->
+                <div class="flex flex-col sm:flex-row justify-between items-center pb-6 border-b border-slate-200 mb-6 gap-4">
+                    <div>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold uppercase tracking-wider mb-1 inline-block">歷程性自我評量</span>
+                        <h2 class="text-2xl font-black text-slate-800">長條圖報讀挑戰關卡 (共 5 題)</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow font-extrabold text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-trophy text-amber-300"></i>
+                            目前得分：<span id="quiz-score" class="text-2xl text-amber-300 font-black">0</span> / 100
+                        </div>
+                        <button onclick="resetQuiz()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-xs font-bold text-slate-700">
+                            重新測驗
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Container -->
+                <div id="quiz-list-container" class="space-y-8">
+                    <!-- Quiz cards injected dynamically via JS -->
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        
+        // Dataset Definitions based on provided textbook screenshots
+        const datasets = {
+            plants: {
+                title: '美福國小校園植物種類數量統計圖',
+                unit: '棵',
+                scaleUnit: 1,
+                scaleOptions: [1, 2, 5, 10],
+                maxScale: 14,
+                categories: ['榕樹', '大王椰子', '鳳凰木', '桂花樹', '麵包樹'],
+                type: 'single',
+                values: [8, 7, 8, 11, 3],
+                defaultValues: [8, 7, 8, 11, 3],
+                colors: ['#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6', '#3b82f6']
+            },
+            snacks: {
+                title: '臺灣夜市小吃熱量統計圖',
+                unit: '大卡',
+                scaleUnit: 100,
+                scaleOptions: [10, 20, 50, 100, 200],
+                maxScale: 600,
+                categories: ['炭烤雞排', '蚵仔煎', '營養三明治', '煎蘿蔔糕', '豬血糕', '章魚燒'],
+                type: 'single',
+                values: [440, 520, 470, 80, 240, 300],
+                defaultValues: [440, 520, 470, 80, 240, 300],
+                colors: ['#ec4899', '#ec4899', '#ec4899', '#ec4899', '#ec4899', '#ec4899']
+            },
+            clubs: {
+                title: '美福國小四年級社團人數統計圖',
+                unit: '人',
+                scaleUnit: 5,
+                scaleOptions: [1, 2, 5, 10, 20],
+                maxScale: 25,
+                categories: ['水彩畫社', '直笛社', '桌球社', '漫畫社'],
+                type: 'multi',
+                values: {
+                    boy: [13, 18, 17, 12],
+                    girl: [17, 17, 20, 0]
+                },
+                defaultValues: {
+                    boy: [13, 18, 17, 12],
+                    girl: [17, 17, 20, 0]
+                },
+                colors: { boy: '#10b981', girl: '#f97316' }
+            }
+        };
+
+        // Current App State
+        let currentDatasetKey = 'plants';
+        let currentOrientation = 'vertical'; // 'vertical' or 'horizontal'
+        let currentChartType = 'grouped'; // 'grouped' or 'stacked'
+        let currentScaleValue = 1;
+
+        // Quiz Questions Data (5 Questions with immediate explanations)
+        const quizData = [
+            {
+                id: 1,
+                question: "觀察「美福國小校園植物長條圖」，哪一種植物的數量最多？哪一種最少？",
+                options: [
+                    "桂花樹最多，麵包樹最少",
+                    "榕樹最多，大王椰子最少",
+                    "鳳凰木最多，麵包樹最少",
+                    "桂花樹最多，大王椰子最少"
+                ],
+                correct: 0,
+                explanation: "長條最高的代表數量最多（桂花樹 11 棵）；長條最低的代表數量最少（麵包樹 3 棵）。"
+            },
+            {
+                id: 2,
+                question: "在「臺灣夜市小吃熱量圖」中，縱軸每一大格表示 100 大卡，被平分成 10 小格。每一小格表示多少大卡？如果蚵仔煎高出 500 大卡線 2 小格，熱量是多少？",
+                options: [
+                    "每小格 1 大卡，熱量 502 大卡",
+                    "每小格 10 大卡，熱量 520 大卡",
+                    "每小格 20 大卡，熱量 540 大卡",
+                    "每小格 10 大卡，熱量 502 大卡"
+                ],
+                correct: 1,
+                explanation: "100 ÷ 10 = 10，所以每小格是 10 大卡。500 大卡再高出 2 小格 = 500 + (2 × 10) = 520 大卡。"
+            },
+            {
+                id: 3,
+                question: "觀察「四年級社團人數長條圖」，參加桌球社的男生有 17 人，女生有 20 人。請問男生多還是女生多？相差幾人？",
+                options: [
+                    "男生多，相差 3 人",
+                    "女生多，相差 3 人",
+                    "女生多，相差 5 人",
+                    "兩人數一樣多"
+                ],
+                correct: 1,
+                explanation: "20 人（女生）> 17 人（男生），女生較多。相差 20 - 17 = 3 人。"
+            },
+            {
+                id: 4,
+                question: "在「漫畫社」中，代表女生的橘色長條沒有出現，這代表什麼意思？",
+                options: [
+                    "忘記繪製長條圖",
+                    "表示沒有女生參加漫畫社（女生 0 人）",
+                    "表示男生人數超過限制",
+                    "表示資料不齊全"
+                ],
+                correct: 1,
+                explanation: "長條圖高度為 0（未顯示長條）代表該類別數量為 0，意即沒有女生參加漫畫社。"
+            },
+            {
+                id: 5,
+                question: "觀察社團「堆疊長條圖」，將男女生人數堆疊後，哪一個社團的『總人數』最多？總共有幾人？",
+                options: [
+                    "直笛社最多，共 35 人",
+                    "桌球社最多，共 37 人",
+                    "水彩畫社最多，共 30 人",
+                    "漫畫社最多，共 12 人"
+                ],
+                correct: 1,
+                explanation: "桌球社男生 17 人 + 女生 20 人 = 37 人，堆疊起來的長條最長，總人數最多。"
+            }
+        ];
+
+        let quizUserAnswers = {};
+        let quizSubmitted = {};
+
+        window.onload = function() {
+            loadDataset('plants');
+            updateScaleMagnifier();
+            renderQuiz();
+        };
+
+        // Navigation Tab Switcher
+        function switchTab(tabKey) {
+            ['explore', 'scale', 'quiz'].forEach(key => {
+                const sec = document.getElementById(`section-${key}`);
+                const btn = document.getElementById(`tab-${key}`);
+                if (key === tabKey) {
+                    sec.classList.remove('hidden');
+                    btn.className = "px-6 py-3 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-md bg-indigo-600 text-white flex items-center gap-2 glow-effect";
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = "px-6 py-3 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 shadow-md bg-white/80 text-slate-700 hover:bg-white flex items-center gap-2";
+                }
+            });
+
+            if (tabKey === 'explore') {
+                renderChart();
+            }
+        }
+
+        // Dataset Switcher
+        function loadDataset(key) {
+            currentDatasetKey = key;
+            const ds = datasets[key];
+
+            // Highlight dataset button
+            ['plants', 'snacks', 'clubs'].forEach(k => {
+                const btn = document.getElementById(`ds-btn-${k}`);
+                if (k === key) {
+                    btn.className = "w-full text-left p-3 rounded-xl border border-indigo-300 bg-indigo-50/90 hover:bg-indigo-100 transition flex items-center justify-between font-bold text-indigo-900 text-sm shadow-sm";
+                } else {
+                    btn.className = "w-full text-left p-3 rounded-xl border border-slate-200 bg-white/60 hover:bg-slate-100 transition flex items-center justify-between font-semibold text-slate-700 text-sm";
+                }
+            });
+
+            // Update Titles & Units
+            document.getElementById('chart-main-title').innerText = ds.title;
+            document.getElementById('unit-badge').innerText = `單位：${ds.unit}`;
+
+            // Show/Hide multi-bar option
+            const chartTypeBox = document.getElementById('chart-type-container');
+            if (ds.type === 'multi') {
+                chartTypeBox.classList.remove('hidden');
+            } else {
+                chartTypeBox.classList.add('hidden');
+            }
+
+            // Sync Slider & Ticks according to current dataset scaleOptions
+            const opts = ds.scaleOptions || [1, 2, 5, 10];
+            const slider = document.getElementById('scale-slider');
+            slider.min = 0;
+            slider.max = opts.length - 1;
+
+            let defaultIdx = opts.indexOf(ds.scaleUnit);
+            if (defaultIdx === -1) defaultIdx = 0;
+            slider.value = defaultIdx;
+
+            currentScaleValue = opts[defaultIdx];
+            document.getElementById('scale-value-display').innerText = `${currentScaleValue} ${ds.unit}`;
+
+            const ticksContainer = document.getElementById('scale-ticks-container');
+            if (ticksContainer) {
+                ticksContainer.innerHTML = opts.map(val => `<span>${val}</span>`).join('');
+            }
+
+            // Render Bar Height Sliders & SVG Chart
+            buildDataSliders();
+            renderChart();
+        }
+
+        // Orientation Setter
+        function setOrientation(ori) {
+            currentOrientation = ori;
+            const btnV = document.getElementById('ori-vertical');
+            const btnH = document.getElementById('ori-horizontal');
+            if (ori === 'vertical') {
+                btnV.className = "py-2 px-3 rounded-xl font-bold text-xs bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow";
+                btnH.className = "py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            } else {
+                btnH.className = "py-2 px-3 rounded-xl font-bold text-xs bg-indigo-600 text-white flex items-center justify-center gap-1.5 shadow";
+                btnV.className = "py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            }
+            renderChart();
+        }
+
+        // Multi Chart Type Setter
+        function setChartType(type) {
+            currentChartType = type;
+            const btnG = document.getElementById('type-grouped');
+            const btnS = document.getElementById('type-stacked');
+            if (type === 'grouped') {
+                btnG.className = "py-2 px-3 rounded-xl font-bold text-xs bg-purple-600 text-white flex items-center justify-center gap-1.5 shadow";
+                btnS.className = "py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            } else {
+                btnS.className = "py-2 px-3 rounded-xl font-bold text-xs bg-purple-600 text-white flex items-center justify-center gap-1.5 shadow";
+                btnG.className = "py-2 px-3 rounded-xl font-bold text-xs bg-white text-slate-700 border hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            }
+            renderChart();
+        }
+
+        // Scale Slider Handler
+        function updateScaleFromSlider(idx) {
+            const ds = datasets[currentDatasetKey];
+            const opts = ds.scaleOptions || [1, 2, 5, 10];
+            const selectedVal = opts[parseInt(idx)] || opts[0];
+            currentScaleValue = selectedVal;
+            document.getElementById('scale-value-display').innerText = `${currentScaleValue} ${ds.unit}`;
+            renderChart();
+        }
+
+        // Build Dynamic Sliders for Tweaking Bar Values
+        function buildDataSliders() {
+            const container = document.getElementById('data-sliders-container');
+            container.innerHTML = '';
+            const ds = datasets[currentDatasetKey];
+
+            if (ds.type === 'single') {
+                ds.categories.forEach((cat, idx) => {
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-2 rounded-xl border border-slate-200 text-center shadow-sm";
+                    div.innerHTML = `
+                        <div class="text-[11px] font-bold text-slate-700 truncate">${cat}</div>
+                        <div class="text-xs font-extrabold text-indigo-600 my-1" id="val-lbl-${idx}">${ds.values[idx]}</div>
+                        <input type="range" min="0" max="${ds.maxScale * 1.5}" value="${ds.values[idx]}" 
+                               oninput="updateBarVal(${idx}, this.value)" 
+                               class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                // Multi-dataset (clubs)
+                ds.categories.forEach((cat, idx) => {
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-2 rounded-xl border border-slate-200 text-center shadow-sm space-y-1";
+                    div.innerHTML = `
+                        <div class="text-[11px] font-bold text-slate-800 truncate border-b pb-1">${cat}</div>
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="text-emerald-600 font-bold">男: <span id="val-lbl-boy-${idx}">${ds.values.boy[idx]}</span></span>
+                            <span class="text-amber-600 font-bold">女: <span id="val-lbl-girl-${idx}">${ds.values.girl[idx]}</span></span>
+                        </div>
+                        <input type="range" min="0" max="25" value="${ds.values.boy[idx]}" title="男生"
+                               oninput="updateMultiVal('boy', ${idx}, this.value)" 
+                               class="w-full h-1 bg-emerald-200 rounded appearance-none accent-emerald-600">
+                        <input type="range" min="0" max="25" value="${ds.values.girl[idx]}" title="女生"
+                               oninput="updateMultiVal('girl', ${idx}, this.value)" 
+                               class="w-full h-1 bg-amber-200 rounded appearance-none accent-amber-500">
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        function updateBarVal(idx, val) {
+            datasets[currentDatasetKey].values[idx] = parseFloat(val);
+            document.getElementById(`val-lbl-${idx}`).innerText = val;
+            renderChart();
+        }
+
+        function updateMultiVal(gender, idx, val) {
+            datasets[currentDatasetKey].values[gender][idx] = parseFloat(val);
+            document.getElementById(`val-lbl-${gender}-${idx}`).innerText = val;
+            renderChart();
+        }
+
+        function resetCurrentDatasetData() {
+            const ds = datasets[currentDatasetKey];
+            if (ds.type === 'single') {
+                ds.values = [...ds.defaultValues];
+            } else {
+                ds.values.boy = [...ds.defaultValues.boy];
+                ds.values.girl = [...ds.defaultValues.girl];
+            }
+            buildDataSliders();
+            renderChart();
+        }
+
+        // SVG Main Chart Rendering Engine
+        function renderChart() {
+            const svg = document.getElementById('chart-svg');
+            svg.innerHTML = ''; // Clear SVG
+
+            const ds = datasets[currentDatasetKey];
+            const showTitle = document.getElementById('toggle-title').checked;
+            const showAxes = document.getElementById('toggle-axes').checked;
+            const showLabels = document.getElementById('toggle-labels').checked;
+
+            // 切換圖表標題顯示狀態 (位於圖表下方)
+            const titleEl = document.getElementById('chart-main-title');
+            if (titleEl) {
+                titleEl.style.display = showTitle ? 'inline-block' : 'none';
+            }
+
+            const width = svg.clientWidth || 650;
+            const height = 380;
+            const margin = { top: 40, right: 30, bottom: 60, left: 70 };
+
+            const chartW = width - margin.left - margin.right;
+            chartH = height - margin.top - margin.bottom;
+
+            // Calculate Max Value on Axis
+            let maxDataVal = 10;
+            if (ds.type === 'single') {
+                maxDataVal = Math.max(...ds.values, ds.maxScale);
+            } else {
+                if (currentChartType === 'stacked') {
+                    const totals = ds.categories.map((_, i) => ds.values.boy[i] + ds.values.girl[i]);
+                    maxDataVal = Math.max(...totals, ds.maxScale);
+                } else {
+                    maxDataVal = Math.max(...ds.values.boy, ...ds.values.girl, ds.maxScale);
+                }
+            }
+
+            // Round up max scale to clean intervals
+            const stepVal = currentScaleValue;
+            const numSteps = Math.max(5, Math.ceil(maxDataVal / stepVal));
+            const yAxisMax = numSteps * stepVal;
+
+            // Draw Background Grid & Axis
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.setAttribute("transform", `translate(${margin.left}, ${margin.top})`);
+            svg.appendChild(g);
+
+            if (currentOrientation === 'vertical') {
+                // Vertical Bar Layout
+                // Y Gridlines & Scale Ticks
+                for (let i = 0; i <= numSteps; i++) {
+                    const yVal = i * stepVal;
+                    const yPos = chartH - (yVal / yAxisMax) * chartH;
+
+                    // Horizontal Gridline
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", 0);
+                    line.setAttribute("x2", chartW);
+                    line.setAttribute("y1", yPos);
+                    line.setAttribute("y2", yPos);
+                    line.setAttribute("stroke", i === 0 ? "#1e293b" : "#94a3b8");
+                    line.setAttribute("stroke-width", i === 0 ? "2" : "1.2");
+                    if (i > 0) line.setAttribute("stroke-dasharray", "4 4");
+                    g.appendChild(line);
+
+                    // Y Label (Scale numbers)
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", -10);
+                    text.setAttribute("y", yPos + 4);
+                    text.setAttribute("text-anchor", "end");
+                    text.setAttribute("font-size", "11");
+                    text.setAttribute("font-weight", "600");
+                    text.setAttribute("fill", "#64748b");
+                    text.textContent = yVal;
+                    g.appendChild(text);
+                }
+
+                // X Categories & Bars
+                const catCount = ds.categories.length;
+                const bandW = chartW / catCount;
+
+                ds.categories.forEach((cat, i) => {
+                    const centerX = i * bandW + bandW / 2;
+
+                    // Category Text on X axis
+                    const catText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    catText.setAttribute("x", centerX);
+                    catText.setAttribute("y", chartH + 25);
+                    catText.setAttribute("text-anchor", "middle");
+                    catText.setAttribute("font-size", "12");
+                    catText.setAttribute("font-weight", "bold");
+                    catText.setAttribute("fill", "#334155");
+                    catText.textContent = cat;
+                    g.appendChild(catText);
+
+                    if (ds.type === 'single') {
+                        const val = ds.values[i];
+                        const barH = (val / yAxisMax) * chartH;
+                        const barW = Math.min(bandW * 0.5, 45);
+                        const xPos = centerX - barW / 2;
+                        const yPos = chartH - barH;
+
+                        drawSVGBar(g, xPos, yPos, barW, barH, "#6366f1", val, showLabels);
+                    } else if (currentChartType === 'grouped') {
+                        // Grouped Bar (Boy & Girl)
+                        const barW = Math.min(bandW * 0.35, 25);
+                        const bVal = ds.values.boy[i];
+                        const gVal = ds.values.girl[i];
+
+                        const bH = (bVal / yAxisMax) * chartH;
+                        const gH = (gVal / yAxisMax) * chartH;
+
+                        drawSVGBar(g, centerX - barW - 2, chartH - bH, barW, bH, "#10b981", bVal, showLabels);
+                        drawSVGBar(g, centerX + 2, chartH - gH, barW, gH, "#f97316", gVal, showLabels);
+                    } else {
+                        // Stacked Bar
+                        const barW = Math.min(bandW * 0.5, 45);
+                        const bVal = ds.values.boy[i];
+                        const gVal = ds.values.girl[i];
+
+                        const bH = (bVal / yAxisMax) * chartH;
+                        const gH = (gVal / yAxisMax) * chartH;
+
+                        // Bottom bar (Boy)
+                        drawSVGBar(g, centerX - barW / 2, chartH - bH, barW, bH, "#10b981", bVal, false);
+                        // Top bar (Girl stacked on top)
+                        drawSVGBar(g, centerX - barW / 2, chartH - bH - gH, barW, gH, "#f97316", gVal, false);
+
+                        if (showLabels) {
+                            // 男生分段數值顯示於該長條正中央
+                            if (bVal > 0 && bH >= 10) {
+                                const txtB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                                txtB.setAttribute("x", centerX);
+                                txtB.setAttribute("y", chartH - bH / 2 + 4);
+                                txtB.setAttribute("text-anchor", "middle");
+                                txtB.setAttribute("font-size", "11");
+                                txtB.setAttribute("font-weight", "900");
+                                txtB.setAttribute("fill", "#ffffff");
+                                txtB.textContent = bVal;
+                                g.appendChild(txtB);
+                            }
+                            // 女生分段數值顯示於該長條正中央
+                            if (gVal > 0 && gH >= 10) {
+                                const txtG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                                txtG.setAttribute("x", centerX);
+                                txtG.setAttribute("y", chartH - bH - gH / 2 + 4);
+                                txtG.setAttribute("text-anchor", "middle");
+                                txtG.setAttribute("font-size", "11");
+                                txtG.setAttribute("font-weight", "900");
+                                txtG.setAttribute("fill", "#ffffff");
+                                txtG.textContent = gVal;
+                                g.appendChild(txtG);
+                            }
+
+                            const total = bVal + gVal;
+                            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                            txt.setAttribute("x", centerX);
+                            txt.setAttribute("y", chartH - bH - gH - 8);
+                            txt.setAttribute("text-anchor", "middle");
+                            txt.setAttribute("font-size", "11");
+                            txt.setAttribute("font-weight", "900");
+                            txt.setAttribute("fill", "#1e1b4b");
+                            txt.textContent = `共${total}`;
+                            g.appendChild(txt);
+                        }
+                    }
+                });
+
+                // Axis Title Labels
+                if (showAxes) {
+                    // Y Axis Title
+                    const yTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    yTitle.setAttribute("x", -chartH / 2);
+                    yTitle.setAttribute("y", -45);
+                    yTitle.setAttribute("transform", "rotate(-90)");
+                    yTitle.setAttribute("text-anchor", "middle");
+                    yTitle.setAttribute("font-size", "12");
+                    yTitle.setAttribute("font-weight", "bold");
+                    yTitle.setAttribute("fill", "#475569");
+                    yTitle.textContent = `縱軸：數量 (${ds.unit})`;
+                    g.appendChild(yTitle);
+
+                    // X Axis Title
+                    const xTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    xTitle.setAttribute("x", chartW / 2);
+                    xTitle.setAttribute("y", chartH + 50);
+                    xTitle.setAttribute("text-anchor", "middle");
+                    xTitle.setAttribute("font-size", "12");
+                    xTitle.setAttribute("font-weight", "bold");
+                    xTitle.setAttribute("fill", "#475569");
+                    xTitle.textContent = ds.type === 'plants' ? "橫軸：植物種類" : (ds.type === 'snacks' ? "橫軸：小吃名稱" : "橫軸：社團名稱");
+                    g.appendChild(xTitle);
+                }
+
+            } else {
+                // Horizontal Bar Layout
+                // X Gridlines & Scale Ticks
+                for (let i = 0; i <= numSteps; i++) {
+                    const xVal = i * stepVal;
+                    const xPos = (xVal / yAxisMax) * chartW;
+
+                    // Vertical Gridline
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", xPos);
+                    line.setAttribute("x2", xPos);
+                    line.setAttribute("y1", 0);
+                    line.setAttribute("y2", chartH);
+                    line.setAttribute("stroke", i === 0 ? "#1e293b" : "#94a3b8");
+                    line.setAttribute("stroke-width", i === 0 ? "2" : "1.2");
+                    if (i > 0) line.setAttribute("stroke-dasharray", "4 4");
+                    g.appendChild(line);
+
+                    // X Label (Scale numbers)
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", xPos);
+                    text.setAttribute("y", chartH + 20);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("font-size", "11");
+                    text.setAttribute("font-weight", "600");
+                    text.setAttribute("fill", "#64748b");
+                    text.textContent = xVal;
+                    g.appendChild(text);
+                }
+
+                // Y Categories & Horizontal Bars
+                const catCount = ds.categories.length;
+                const bandH = chartH / catCount;
+
+                ds.categories.forEach((cat, i) => {
+                    const centerY = i * bandH + bandH / 2;
+
+                    // Category Text on Y axis
+                    const catText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    catText.setAttribute("x", -10);
+                    catText.setAttribute("y", centerY + 4);
+                    catText.setAttribute("text-anchor", "end");
+                    catText.setAttribute("font-size", "12");
+                    catText.setAttribute("font-weight", "bold");
+                    catText.setAttribute("fill", "#334155");
+                    catText.textContent = cat;
+                    g.appendChild(catText);
+
+                    if (ds.type === 'single') {
+                        const val = ds.values[i];
+                        const barW = (val / yAxisMax) * chartW;
+                        const barH = Math.min(bandH * 0.5, 30);
+                        const yPos = centerY - barH / 2;
+
+                        drawSVGBarH(g, 0, yPos, barW, barH, "#6366f1", val, showLabels);
+                    } else if (currentChartType === 'grouped') {
+                        const barH = Math.min(bandH * 0.35, 18);
+                        const bVal = ds.values.boy[i];
+                        const gVal = ds.values.girl[i];
+
+                        const bW = (bVal / yAxisMax) * chartW;
+                        const gW = (gVal / yAxisMax) * chartW;
+
+                        drawSVGBarH(g, 0, centerY - barH - 2, bW, barH, "#10b981", bVal, showLabels);
+                        drawSVGBarH(g, 0, centerY + 2, gW, barH, "#f97316", gVal, showLabels);
+                    } else {
+                        // Stacked Horizontal
+                        const barH = Math.min(bandH * 0.5, 30);
+                        const bVal = ds.values.boy[i];
+                        const gVal = ds.values.girl[i];
+
+                        const bW = (bVal / yAxisMax) * chartW;
+                        const gW = (gVal / yAxisMax) * chartW;
+
+                        drawSVGBarH(g, 0, centerY - barH / 2, bW, barH, "#10b981", bVal, false);
+                        drawSVGBarH(g, bW, centerY - barH / 2, gW, barH, "#f97316", gVal, false);
+
+                        if (showLabels) {
+                            // 男生分段數值顯示於該長條正中央
+                            if (bVal > 0 && bW >= 12) {
+                                const txtB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                                txtB.setAttribute("x", bW / 2);
+                                txtB.setAttribute("y", centerY + 4);
+                                txtB.setAttribute("text-anchor", "middle");
+                                txtB.setAttribute("font-size", "11");
+                                txtB.setAttribute("font-weight", "900");
+                                txtB.setAttribute("fill", "#ffffff");
+                                txtB.textContent = bVal;
+                                g.appendChild(txtB);
+                            }
+                            // 女生分段數值顯示於該長條正中央
+                            if (gVal > 0 && gW >= 12) {
+                                const txtG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                                txtG.setAttribute("x", bW + gW / 2);
+                                txtG.setAttribute("y", centerY + 4);
+                                txtG.setAttribute("text-anchor", "middle");
+                                txtG.setAttribute("font-size", "11");
+                                txtG.setAttribute("font-weight", "900");
+                                txtG.setAttribute("fill", "#ffffff");
+                                txtG.textContent = gVal;
+                                g.appendChild(txtG);
+                            }
+
+                            const total = bVal + gVal;
+                            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                            txt.setAttribute("x", bW + gW + 8);
+                            txt.setAttribute("y", centerY + 4);
+                            txt.setAttribute("text-anchor", "start");
+                            txt.setAttribute("font-size", "11");
+                            txt.setAttribute("font-weight", "900");
+                            txt.setAttribute("fill", "#1e1b4b");
+                            txt.textContent = `共${total}`;
+                            g.appendChild(txt);
+                        }
+                    }
+                });
+
+                if (showAxes) {
+                    // Horizontal Axis Labels
+                    const xTitle = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    xTitle.setAttribute("x", chartW / 2);
+                    xTitle.setAttribute("y", chartH + 45);
+                    xTitle.setAttribute("text-anchor", "middle");
+                    xTitle.setAttribute("font-size", "12");
+                    xTitle.setAttribute("font-weight", "bold");
+                    xTitle.setAttribute("fill", "#475569");
+                    xTitle.textContent = `橫軸：人數/數量 (${ds.unit})`;
+                    g.appendChild(xTitle);
+                }
+            }
+
+            // Render Legend if Multi-dataset
+            if (ds.type === 'multi') {
+                const legendG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                legendG.setAttribute("transform", `translate(${width - 140}, 10)`);
+
+                // Boy box
+                const rectB = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rectB.setAttribute("x", 0); rectB.setAttribute("y", 0);
+                rectB.setAttribute("width", 14); rectB.setAttribute("height", 14);
+                rectB.setAttribute("rx", 3); rectB.setAttribute("fill", "#10b981");
+                legendG.appendChild(rectB);
+
+                const txtB = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txtB.setAttribute("x", 20); txtB.setAttribute("y", 12);
+                txtB.setAttribute("font-size", "12"); txtB.setAttribute("font-weight", "bold");
+                txtB.setAttribute("fill", "#334155"); txtB.textContent = "男生";
+                legendG.appendChild(txtB);
+
+                // Girl box
+                const rectG = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rectG.setAttribute("x", 65); rectG.setAttribute("y", 0);
+                rectG.setAttribute("width", 14); rectG.setAttribute("height", 14);
+                rectG.setAttribute("rx", 3); rectG.setAttribute("fill", "#f97316");
+                legendG.appendChild(rectG);
+
+                const txtG = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txtG.setAttribute("x", 85); txtG.setAttribute("y", 12);
+                txtG.setAttribute("font-size", "12"); txtG.setAttribute("font-weight", "bold");
+                txtG.setAttribute("fill", "#334155"); txtG.textContent = "女生";
+                legendG.appendChild(txtG);
+
+                svg.appendChild(legendG);
+            }
+        }
+
+        // Helper: Draw Vertical SVG Bar
+        function drawSVGBar(parent, x, y, w, h, fill, val, showLabel) {
+            const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rect.setAttribute("x", x);
+            rect.setAttribute("y", y);
+            rect.setAttribute("width", w);
+            rect.setAttribute("height", Math.max(0, h));
+            rect.setAttribute("fill", fill);
+            rect.setAttribute("rx", 4);
+            rect.setAttribute("class", "bar-transition cursor-pointer hover:opacity-80");
+            parent.appendChild(rect);
+
+            if (showLabel && h > 0) {
+                const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txt.setAttribute("x", x + w / 2);
+                txt.setAttribute("y", y - 6);
+                txt.setAttribute("text-anchor", "middle");
+                txt.setAttribute("font-size", "11");
+                txt.setAttribute("font-weight", "bold");
+                txt.setAttribute("fill", "#334155");
+                txt.textContent = val;
+                parent.appendChild(txt);
+            }
+        }
+
+        // Helper: Draw Horizontal SVG Bar
+        function drawSVGBarH(parent, x, y, w, h, fill, val, showLabel) {
+            const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rect.setAttribute("x", x);
+            rect.setAttribute("y", y);
+            rect.setAttribute("width", Math.max(0, w));
+            rect.setAttribute("height", h);
+            rect.setAttribute("fill", fill);
+            rect.setAttribute("rx", 4);
+            rect.setAttribute("class", "bar-transition cursor-pointer hover:opacity-80");
+            parent.appendChild(rect);
+
+            if (showLabel && w > 0) {
+                const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txt.setAttribute("x", x + w + 8);
+                txt.setAttribute("y", y + h / 2 + 4);
+                txt.setAttribute("text-anchor", "start");
+                txt.setAttribute("font-size", "11");
+                txt.setAttribute("font-weight", "bold");
+                txt.setAttribute("fill", "#334155");
+                txt.textContent = val;
+                parent.appendChild(txt);
+            }
+        }
+
+        // TAB 2: Scale Magnifier Logic
+        function updateScaleMagnifier() {
+            const bigVal = parseFloat(document.getElementById('mag-big-input').value);
+            const subDiv = parseInt(document.getElementById('mag-sub-input').value);
+            const posVal = parseFloat(document.getElementById('mag-pos-input').value);
+
+            document.getElementById('mag-big-val').innerText = bigVal;
+            document.getElementById('mag-sub-val') ? document.getElementById('mag-sub-val').innerText = subDiv : null;
+            document.getElementById('mag-sub-div').innerText = subDiv;
+
+            const fullBigs = Math.floor(posVal);
+            const extraSubs = Math.round((posVal - fullBigs) * subDiv);
+            document.getElementById('mag-bar-position').innerText = `${fullBigs} 大格又 ${extraSubs} 小格`;
+
+            const perSubVal = bigVal / subDiv;
+            const baseVal = fullBigs * bigVal;
+            const extraVal = extraSubs * perSubVal;
+            const totalVal = baseVal + extraVal;
+
+            document.getElementById('formula-step1').innerText = `${bigVal} ÷ ${subDiv} = ${perSubVal}`;
+            document.getElementById('formula-step2').innerText = `${baseVal}`;
+            document.getElementById('formula-step3').innerText = `${extraSubs} × ${perSubVal} = ${extraVal}`;
+            document.getElementById('formula-total').innerText = `${totalVal}`;
+
+            // Draw Magnifier SVG
+            const svg = document.getElementById('magnifier-svg');
+            svg.innerHTML = '';
+            const w = svg.clientWidth || 350;
+            const h = 260;
+
+            // Draw magnifying ruler axis
+            const startY = 30;
+            const endY = h - 30;
+            const axisX = 80;
+
+            // Axis line
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", axisX); line.setAttribute("x2", axisX);
+            line.setAttribute("y1", startY); line.setAttribute("y2", endY);
+            line.setAttribute("stroke", "#38bdf8"); line.setAttribute("stroke-width", "3");
+            svg.appendChild(line);
+
+            // Draw 2 Big Scale marks (e.g. 500 and 600)
+            const lowBigNum = fullBigs * bigVal;
+            const highBigNum = (fullBigs + 1) * bigVal;
+
+            const lowY = endY - 20;
+            const highY = startY + 20;
+
+            // Ticks
+            for (let i = 0; i <= subDiv; i++) {
+                const tickY = lowY - (i / subDiv) * (lowY - highY);
+                const isBig = i === 0 || i === subDiv;
+
+                const tLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                tLine.setAttribute("x1", axisX);
+                tLine.setAttribute("x2", isBig ? axisX + 30 : axisX + 15);
+                tLine.setAttribute("y1", tickY);
+                tLine.setAttribute("y2", tickY);
+                tLine.setAttribute("stroke", isBig ? "#f43f5e" : "#94a3b8");
+                tLine.setAttribute("stroke-width", isBig ? "3" : "1.5");
+                svg.appendChild(tLine);
+
+                // Tick labels for big numbers
+                if (isBig) {
+                    const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    txt.setAttribute("x", axisX - 10);
+                    txt.setAttribute("y", tickY + 5);
+                    txt.setAttribute("text-anchor", "end");
+                    txt.setAttribute("font-size", "13");
+                    txt.setAttribute("font-weight", "900");
+                    txt.setAttribute("fill", "#f8fafc");
+                    txt.textContent = i === 0 ? lowBigNum : highBigNum;
+                    svg.appendChild(txt);
+                }
+            }
+
+            // Draw Bar Height inside Magnifier
+            const barPosRatio = (posVal - fullBigs);
+            const currentBarY = lowY - barPosRatio * (lowY - highY);
+
+            const barRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            barRect.setAttribute("x", axisX + 35);
+            barRect.setAttribute("y", currentBarY);
+            barRect.setAttribute("width", "120");
+            barRect.setAttribute("height", Math.max(0, endY - currentBarY));
+            barRect.setAttribute("fill", "url(#shinkaiGrad)");
+            barRect.setAttribute("rx", "6");
+            svg.appendChild(barRect);
+
+            // Pointer Arrow Line
+            const ptr = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            ptr.setAttribute("d", `M ${axisX + 32} ${currentBarY} L ${axisX + 160} ${currentBarY}`);
+            ptr.setAttribute("stroke", "#fbbf24");
+            ptr.setAttribute("stroke-width", "2");
+            ptr.setAttribute("stroke-dasharray", "3 3");
+            svg.appendChild(ptr);
+
+            // Glowing Label at pointer
+            const labelBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            labelBg.setAttribute("x", axisX + 165);
+            labelBg.setAttribute("y", currentBarY - 14);
+            labelBg.setAttribute("width", "75");
+            labelBg.setAttribute("height", "28");
+            labelBg.setAttribute("rx", "14");
+            labelBg.setAttribute("fill", "#f43f5e");
+            svg.appendChild(labelBg);
+
+            const labelTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelTxt.setAttribute("x", axisX + 202);
+            labelTxt.setAttribute("y", currentBarY + 4);
+            labelTxt.setAttribute("text-anchor", "middle");
+            labelTxt.setAttribute("font-size", "13");
+            labelTxt.setAttribute("font-weight", "900");
+            labelTxt.setAttribute("fill", "#ffffff");
+            labelTxt.textContent = totalVal;
+            svg.appendChild(labelTxt);
+
+            // Add SVG Gradient Defs
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.innerHTML = `
+                <linearGradient id="shinkaiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ec4899" />
+                    <stop offset="100%" stop-color="#8b5cf6" />
+                </linearGradient>
+            `;
+            svg.appendChild(defs);
+        }
+
+        // TAB 3: Quiz System Engine
+        function renderQuiz() {
+            const container = document.getElementById('quiz-list-container');
+            container.innerHTML = '';
+
+            quizData.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white/80 rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4";
+
+                const isAnswered = quizSubmitted[q.id];
+                const selectedOpt = quizUserAnswers[q.id];
+
+                let optionsHTML = '';
+                q.options.forEach((opt, optIdx) => {
+                    let btnStyle = "bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-700";
+                    if (selectedOpt === optIdx) {
+                        btnStyle = "bg-indigo-600 text-white border-indigo-600 font-bold";
+                    }
+
+                    if (isAnswered) {
+                        if (optIdx === q.correct) {
+                            btnStyle = "bg-emerald-500 text-white border-emerald-500 font-bold";
+                        } else if (selectedOpt === optIdx && selectedOpt !== q.correct) {
+                            btnStyle = "bg-rose-500 text-white border-rose-500 font-bold";
+                        }
+                    }
+
+                    optionsHTML += `
+                        <button onclick="selectQuizOption(${q.id}, ${optIdx})" 
+                                ${isAnswered ? 'disabled' : ''}
+                                class="w-full text-left p-3 rounded-xl border transition text-xs sm:text-sm flex items-center gap-3 ${btnStyle}">
+                            <span class="w-6 h-6 rounded-full border border-current flex items-center justify-center text-xs flex-shrink-0 font-bold">
+                                ${String.fromCharCode(65 + optIdx)}
+                            </span>
+                            <span>${opt}</span>
+                        </button>
+                    `;
+                });
+
+                let feedbackHTML = '';
+                if (isAnswered) {
+                    const isCorrect = selectedOpt === q.correct;
+                    feedbackHTML = `
+                        <div class="p-4 rounded-xl text-xs sm:text-sm mt-3 ${isCorrect ? 'bg-emerald-50 text-emerald-900 border border-emerald-200' : 'bg-rose-50 text-rose-900 border border-rose-200'}">
+                            <div class="font-bold flex items-center gap-2 mb-1">
+                                <i class="${isCorrect ? 'fa-solid fa-circle-check text-emerald-600' : 'fa-solid fa-circle-xmark text-rose-600'} text-base"></i>
+                                ${isCorrect ? '答對了！非常棒！' : '答錯囉！請看解析：'}
+                            </div>
+                            <p class="text-slate-700 mt-1">${q.explanation}</p>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="bg-indigo-100 text-indigo-700 font-black text-xs px-2.5 py-1 rounded-lg">第 ${index + 1} 題</span>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">${q.question}</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        ${optionsHTML}
+                    </div>
+                    ${feedbackHTML}
+                `;
+
+                container.appendChild(card);
+            });
+
+            updateQuizScore();
+        }
+
+        function selectQuizOption(qId, optIdx) {
+            quizUserAnswers[qId] = optIdx;
+            quizSubmitted[qId] = true;
+            renderQuiz();
+        }
+
+        function updateQuizScore() {
+            let score = 0;
+            quizData.forEach(q => {
+                if (quizSubmitted[q.id] && quizUserAnswers[q.id] === q.correct) {
+                    score += 20;
+                }
+            });
+            document.getElementById('quiz-score').innerText = score;
+        }
+
+        function resetQuiz() {
+            quizUserAnswers = {};
+            quizSubmitted = {};
+            renderQuiz();
+        }
+    </script>
+</body>
+</html>

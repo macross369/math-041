@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乘法算式的規律與簡化計算 - 互動探索教室</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 30%, #2c5364 60%, #e0c3fc 100%);
+            background-attachment: fixed;
+            color: #2d3748;
+            min-height: 100vh;
+        }
+
+        /* 新海誠夢幻天空風格背景 overlay */
+        .shinkai-bg {
+            background: linear-gradient(180deg, 
+                rgba(26, 42, 108, 0.85) 0%, 
+                rgba(178, 31, 31, 0.4) 50%, 
+                rgba(253, 187, 45, 0.3) 80%,
+                rgba(255, 255, 255, 0.9) 100%);
+        }
+
+        /* 玻璃擬態效果 Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .zero-pill {
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(236, 72, 153, 0.4); }
+            100% { transform: scale(1.08); box-shadow: 0 0 15px rgba(236, 72, 153, 0.8); }
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+        }
+
+        /* 淡入動畫 */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 自訂滑桿樣式 */
+        input[type=range] {
+            accent-color: #8b5cf6;
+        }
+    </style>
+</head>
+<body class="shinkai-bg min-h-screen flex flex-col pb-12">
+
+    <!-- 頂部導覽列 -->
+    <header class="glass-nav sticky top-0 z-50 text-white px-6 py-4 shadow-lg">
+        <div class="max-w-5xl mx-auto flex flex-col space-y-3">
+            <!-- 修改：加入「閒雲數學小棧」品牌標示 -->
+            <div class="w-full max-w-4xl flex items-center justify-start px-2 fade-in">
+                <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+                <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-pink-500 to-purple-500 p-2 rounded-xl text-white shadow-md">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-pink-200 to-amber-200">
+                            國小數學 2-3 乘法算式的規律
+                        </h1>
+                        <p class="text-xs text-sky-200 opacity-80">一站式觀念探究與即時評量網頁</p>
+                    </div>
+                </div>
+
+                <!-- 分頁切換鈕 -->
+                <nav class="flex space-x-2 mt-3 sm:mt-0 bg-slate-800/50 p-1.5 rounded-2xl border border-white/10">
+                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+                        <i class="fa-solid fa-calculator mr-1.5"></i>末尾0的規律
+                    </button>
+                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white transition-all">
+                        <i class="fa-solid fa-diagram-project mr-1.5"></i>前後項與拆解規律
+                    </button>
+                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white transition-all">
+                        <i class="fa-solid fa-pen-to-square mr-1.5"></i>歷程性評量 (5題)
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="container mx-auto px-4 mt-8 flex-grow max-w-5xl">
+
+        <!-- ================= 模組一：末尾0的規律 ================= -->
+        <section id="tab1" class="tab-content space-y-6">
+            <!-- 觀念引導卡片 -->
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-700 font-bold px-3 py-1 rounded-full text-sm">單元重點 1</span>
+                    <h2 class="text-2xl font-bold text-slate-800">整十、整百、整千相乘時，積的0個數規律</h2>
+                </div>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    拖動下方滑桿改變被乘數與乘數末尾的「0個數」，觀察積的變化！注意：當基礎數字相乘（例如 5 × 4 = 20）本身會產生0時，積的0個數會更多喔！
+                </p>
+
+                <!-- 互動控制面板 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-sky-50/60 p-6 rounded-2xl border border-sky-100">
+                    <!-- 被乘數設定 -->
+                    <div class="space-y-3">
+                        <label class="block font-bold text-slate-700 flex justify-between">
+                            <span>被乘數 (A): <span id="numA-display" class="text-indigo-600 font-mono text-xl">400</span></span>
+                            <span class="text-xs text-slate-500">基礎數: <span id="baseA">4</span></span>
+                        </label>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs font-semibold text-slate-500">基礎選取</span>
+                            <select id="baseA-select" onchange="updateZeroLab()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-sm bg-white">
+                                <option value="4">4 (如 4 × 3 = 12)</option>
+                                <option value="5">5 (如 5 × 4 = 20 💡陷阱題)</option>
+                                <option value="12">12 (如 12 × 3 = 36)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">末尾0的個數: <span id="zerosA-val" class="font-bold text-indigo-600">2</span> 個</span>
+                            <input type="range" id="zerosA" min="0" max="3" value="2" oninput="updateZeroLab()" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- 乘數設定 -->
+                    <div class="space-y-3">
+                        <label class="block font-bold text-slate-700 flex justify-between">
+                            <span>乘數 (B): <span id="numB-display" class="text-purple-600 font-mono text-xl">3000</span></span>
+                            <span class="text-xs text-slate-500">基礎數: <span id="baseB">3</span></span>
+                        </label>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs font-semibold text-slate-500">基礎選取</span>
+                            <select id="baseB-select" onchange="updateZeroLab()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-sm bg-white">
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">末尾0的個數: <span id="zerosB-val" class="font-bold text-purple-600">3</span> 個</span>
+                            <input type="range" id="zerosB" min="0" max="3" value="3" oninput="updateZeroLab()" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 動態計算視覺化展示區 -->
+                <div class="mt-6 bg-white p-6 rounded-2xl border border-purple-100 shadow-inner space-y-4">
+                    <div class="text-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-500 bg-purple-50 px-3 py-1 rounded-full">即時算式拆解</span>
+                    </div>
+
+                    <!-- 算式展示 -->
+                    <div class="flex flex-wrap items-center justify-center text-xl md:text-3xl font-mono font-bold text-slate-800 gap-2 py-4">
+                        <span id="formula-full" class="bg-slate-100 px-4 py-2 rounded-xl">400 × 3000</span>
+                        <span>=</span>
+                        <span id="formula-result" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl border border-indigo-200">1200000</span>
+                    </div>
+
+                    <!-- 0的數量對比卡片 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div class="bg-indigo-50/70 p-4 rounded-xl text-center border border-indigo-100">
+                            <div class="text-xs text-indigo-600 font-bold mb-1">被乘數的 0</div>
+                            <div class="text-2xl font-black text-indigo-700"><span id="cnt-a">2</span> 個</div>
+                        </div>
+                        <div class="bg-purple-50/70 p-4 rounded-xl text-center border border-purple-100">
+                            <div class="text-xs text-purple-600 font-bold mb-1">乘數的 0</div>
+                            <div class="text-2xl font-black text-purple-700"><span id="cnt-b">3</span> 個</div>
+                        </div>
+                        <div class="bg-pink-50/70 p-4 rounded-xl text-center border border-pink-100">
+                            <div class="text-xs text-pink-600 font-bold mb-1">答案末尾總共的 0</div>
+                            <div class="text-2xl font-black text-pink-600"><span id="cnt-total">5</span> 個</div>
+                        </div>
+                    </div>
+
+                    <!-- 原理解析提示說明 -->
+                    <div id="explanation-box" class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl text-sm text-amber-900 leading-relaxed">
+                        <!-- 動態填充 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 模組二：前後項與拆解規律 ================= -->
+        <section id="tab2" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <span class="bg-purple-100 text-purple-700 font-bold px-3 py-1 rounded-full text-sm">單元重點 2</span>
+                    <h2 class="text-2xl font-bold text-slate-800">前後項關係與近百/近千巧算</h2>
+                </div>
+                <p class="text-slate-600 leading-relaxed mb-6">
+                    當我們知道已知算式時，不必重頭計算！透過「多1個」或「少1個」基數，即可迅速推算出相鄰算式的解答。
+                </p>
+
+                <!-- 模式切換標籤 -->
+                <div class="flex space-x-3 mb-6">
+                    <button onclick="setRelMode('neighbor')" id="mode-neighbor" class="px-4 py-2 rounded-xl text-sm font-bold bg-purple-600 text-white shadow-md">
+                        模式 A：相鄰前後項 (如 78 × 60)
+                    </button>
+                    <button onclick="setRelMode('near')" id="mode-near" class="px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300">
+                        模式 B：近 1000 巧算 (如 300 × 999)
+                    </button>
+                </div>
+
+                <!-- 模式 A 內容 -->
+                <div id="rel-neighbor-container" class="space-y-6">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <label class="font-bold text-slate-700">基準算式被乘數 (A):</label>
+                            <input type="number" id="rel-a" value="78" min="10" max="99" onchange="updateRelA()" class="px-3 py-2 border rounded-xl w-32 text-center font-bold text-purple-700">
+                            <label class="font-bold text-slate-700">基準乘數 (B):</label>
+                            <input type="number" id="rel-b" value="60" min="10" max="90" step="10" onchange="updateRelA()" class="px-3 py-2 border rounded-xl w-32 text-center font-bold text-purple-700">
+                        </div>
+                    </div>
+
+                    <!-- 比較卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- 少 1 個 (A x (B-1)) -->
+                        <div class="bg-blue-50/80 p-5 rounded-2xl border border-blue-200 flex flex-col justify-between space-y-3">
+                            <div class="text-xs font-bold text-blue-600 uppercase">少 1 倍 (前項)</div>
+                            <div class="text-xl font-bold font-mono text-slate-800" id="math-minus">78 × 59</div>
+                            <div class="text-xs text-slate-600 leading-relaxed" id="desc-minus">
+                                比基準算式少 1 個 78<br>
+                                <span class="font-mono font-bold text-blue-700">4680 - 78 = 4602</span>
+                            </div>
+                        </div>
+
+                        <!-- 基準算式 -->
+                        <div class="bg-purple-100/80 p-5 rounded-2xl border-2 border-purple-400 flex flex-col justify-between space-y-3 shadow-md">
+                            <div class="text-xs font-bold text-purple-700 uppercase">已知基準算式</div>
+                            <div class="text-2xl font-black font-mono text-purple-900" id="math-base">78 × 60 = 4680</div>
+                            <div class="text-xs text-purple-800">
+                                作為推導的核心基準點
+                            </div>
+                        </div>
+
+                        <!-- 多 1 個 (A x (B+1)) -->
+                        <div class="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 flex flex-col justify-between space-y-3">
+                            <div class="text-xs font-bold text-emerald-600 uppercase">多 1 倍 (後項)</div>
+                            <div class="text-xl font-bold font-mono text-slate-800" id="math-plus">78 × 61</div>
+                            <div class="text-xs text-slate-600 leading-relaxed" id="desc-plus">
+                                比基準算式多 1 個 78<br>
+                                <span class="font-mono font-bold text-emerald-700">4680 + 78 = 4758</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模式 B 內容 (預設隱藏) -->
+                <div id="rel-near-container" class="hidden space-y-6">
+                    <div class="bg-amber-50/80 p-6 rounded-2xl border border-amber-200 space-y-4">
+                        <h3 class="font-bold text-amber-900 text-lg"><i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i>思考帽問題：300 × 999 怎麼算最快？</h3>
+                        <p class="text-sm text-amber-800 leading-relaxed">
+                            999 非常接近 1000！我們可以先算 300 × 1000 = 300000，再扣掉多算的 1 個 300 即可。
+                        </p>
+
+                        <div class="bg-white p-6 rounded-xl border border-amber-100 shadow-sm space-y-3 font-mono text-base md:text-lg">
+                            <div class="flex items-center space-x-2 text-slate-700">
+                                <span>原算式：</span>
+                                <span class="font-bold text-amber-600">300 × 999</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-slate-700">
+                                <span>轉化為：</span>
+                                <span>300 × (1000 − 1)</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-slate-700">
+                                <span>拆解計算：</span>
+                                <span>(300 × 1000) − (300 × 1)</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-indigo-700 font-bold text-xl pt-2 border-t">
+                                <span>＝ 300000 − 300 ＝</span>
+                                <span class="bg-indigo-100 px-3 py-1 rounded-lg text-indigo-900">299700</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 模組三：歷程性評量 (5題) ================= -->
+        <section id="tab3" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <span class="bg-pink-100 text-pink-700 font-bold px-3 py-1 rounded-full text-sm">自我挑戰</span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-1">乘法規律隨堂歷程測驗 (課本精選題)</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-500 block">目前得分</span>
+                        <span id="score-display" class="text-3xl font-black text-purple-600">0 / 5</span>
+                    </div>
+                </div>
+
+                <!-- 測驗題目列表 -->
+                <div class="space-y-6" id="quiz-container">
+                    <!-- Q1 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="font-bold text-slate-800">
+                            1. 【末尾0規律】計算 1500 × 600 時，答案末尾總共有幾個「0」？
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="checkQuiz(1, 'A', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 4 個（僅被乘數與乘數末尾的0相加）</button>
+                            <button onclick="checkQuiz(1, 'B', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 5 個（15 × 6 = 90 自帶1個0）</button>
+                            <button onclick="checkQuiz(1, 'C', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 6 個</button>
+                            <button onclick="checkQuiz(1, 'D', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 3 個</button>
+                        </div>
+                        <div id="quiz-feedback-1" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="font-bold text-slate-800">
+                            2. 【生活應用】貨架上有 500 袋紅豆，每袋重 1800 公克，共重多少公克？
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="checkQuiz(2, 'A', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 90000 公克</button>
+                            <button onclick="checkQuiz(2, 'B', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 900000 公克</button>
+                            <button onclick="checkQuiz(2, 'C', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 9000000 公克</button>
+                            <button onclick="checkQuiz(2, 'D', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 18500 公克</button>
+                        </div>
+                        <div id="quiz-feedback-2" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="font-bold text-slate-800">
+                            3. 【前後項規律】已知 82 × 100 = 8200，求 82 × 101 可以如何快速計算？
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="checkQuiz(3, 'A', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 8200 + 82 = 8282（多1個82）</button>
+                            <button onclick="checkQuiz(3, 'B', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 8200 − 82 = 8118（少1個82）</button>
+                            <button onclick="checkQuiz(3, 'C', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 8200 + 101 = 8301</button>
+                            <button onclick="checkQuiz(3, 'D', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 8200 × 101 = 828200</button>
+                        </div>
+                        <div id="quiz-feedback-3" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="font-bold text-slate-800">
+                            4. 【思考帽巧算】香水一瓶 300 元，買 999 瓶共要多少元？下列何者是最快的心算思考步驟？
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="checkQuiz(4, 'A', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 先算 300 × 1000 = 300000，再減去 300 得 299700</button>
+                            <button onclick="checkQuiz(4, 'B', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 先算 300 × 1000 = 300000，再加上 300 得 300300</button>
+                            <button onclick="checkQuiz(4, 'C', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 先算 300 × 900 = 270000，再加 99</button>
+                            <button onclick="checkQuiz(4, 'D', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 用直式慢慢計算 300 × 999 = 299700</button>
+                        </div>
+                        <div id="quiz-feedback-4" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="font-bold text-slate-800">
+                            5. 【素養題】媽媽給皮皮 3000 元買 15 盒點心，皮皮選每盒 198 元的 B 款點心，並說會剩下 30 元。他是怎麼想的？
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <button onclick="checkQuiz(5, 'A', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 把 198 看成 (200 − 2)，每盒省 2 元，15 盒省 30 元</button>
+                            <button onclick="checkQuiz(5, 'B', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 把 3000 直接減掉 198 得 2802，再除以 15</button>
+                            <button onclick="checkQuiz(5, 'C', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 因為 198 × 15 = 3030，所以會多出 30 元</button>
+                            <button onclick="checkQuiz(5, 'D', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 隨機估算出的結果，無法用乘法規律說明</button>
+                        </div>
+                        <div id="quiz-feedback-5" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center text-white/70 text-xs mt-8">
+        <p>設計專屬國小數學教學 · 支援 Google 協作平台嵌入使用</p>
+    </footer>
+
+    <!-- JavaScript 邏輯控制 -->
+    <script>
+        function switchTab(tabId) {
+            const tabs = ['tab1', 'tab2', 'tab3'];
+            tabs.forEach(id => {
+                const tabEl = document.getElementById(id);
+                const btnEl = document.getElementById(`btn-${id}`);
+                if (id === tabId) {
+                    tabEl.classList.remove('hidden');
+                    btnEl.classList.add('active');
+                    btnEl.classList.remove('text-slate-300');
+                    btnEl.classList.add('text-white');
+                } else {
+                    tabEl.classList.add('hidden');
+                    btnEl.classList.remove('active');
+                    btnEl.classList.add('text-slate-300');
+                    btnEl.classList.remove('text-white');
+                }
+            });
+        }
+
+        function updateZeroLab() {
+            const baseA = parseInt(document.getElementById('baseA-select').value) || 4;
+            const zerosA = parseInt(document.getElementById('zerosA').value) || 0;
+            const baseB = parseInt(document.getElementById('baseB-select').value) || 3;
+            const zerosB = parseInt(document.getElementById('zerosB').value) || 0;
+
+            document.getElementById('baseA').innerText = baseA;
+            document.getElementById('zerosA-val').innerText = zerosA;
+            document.getElementById('baseB').innerText = baseB;
+            document.getElementById('zerosB-val').innerText = zerosB;
+
+            const valA = baseA * Math.pow(10, zerosA);
+            const valB = baseB * Math.pow(10, zerosB);
+
+            document.getElementById('numA-display').innerText = valA;
+            document.getElementById('numB-display').innerText = valB;
+
+            const result = valA * valB;
+            
+            document.getElementById('formula-full').innerText = `${valA} × ${valB}`;
+            document.getElementById('formula-result').innerText = result.toLocaleString('en-US').replace(/,/g, '');
+
+            document.getElementById('cnt-a').innerText = zerosA;
+            document.getElementById('cnt-b').innerText = zerosB;
+
+            // 計算結果末尾的 0 個數
+            const resultStr = result.toString();
+            let totalTrailingZeros = 0;
+            for (let i = resultStr.length - 1; i >= 0; i--) {
+                if (resultStr[i] === '0') totalTrailingZeros++;
+                else break;
+            }
+
+            document.getElementById('cnt-total').innerText = totalTrailingZeros;
+
+            // 觀念解析動態說明
+            const baseProduct = baseA * baseB;
+            const baseProductZeros = (baseProduct.toString().match(/0+$/) || [''])[0].length;
+            const expBox = document.getElementById('explanation-box');
+
+            if (baseProductZeros > 0) {
+                expBox.innerHTML = `💡 <b>觀念亮點（陷阱題）：</b><br>` +
+                    `基礎數相乘：<b>${baseA} × ${baseB} = ${baseProduct}</b>（基礎乘積本身末尾有 ${baseProductZeros} 個 0）。<br>` +
+                    `末尾 0 總數 ＝ 被乘數 ${zerosA} 個 0 ＋ 乘數 ${zerosB} 個 0 ＋ 基礎數乘積自帶 ${baseProductZeros} 個 0 ＝ <b>${totalTrailingZeros} 個 0</b>。`;
+            } else {
+                expBox.innerHTML = `💡 <b>規律解析：</b><br>` +
+                    `基礎數相乘：<b>${baseA} × ${baseB} = ${baseProduct}</b>。<br>` +
+                    `答案末尾 0 的個數 ＝ 被乘數的 ${zerosA} 個 0 ＋ 乘數的 ${zerosB} 個 0 ＝ <b>${totalTrailingZeros} 個 0</b>。`;
+            }
+        }
+
+        function setRelMode(mode) {
+            const btnNeighbor = document.getElementById('mode-neighbor');
+            const btnNear = document.getElementById('mode-near');
+            const containerNeighbor = document.getElementById('rel-neighbor-container');
+            const containerNear = document.getElementById('rel-near-container');
+
+            if (mode === 'neighbor') {
+                containerNeighbor.classList.remove('hidden');
+                containerNear.classList.add('hidden');
+                btnNeighbor.className = "px-4 py-2 rounded-xl text-sm font-bold bg-purple-600 text-white shadow-md";
+                btnNear.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300";
+            } else {
+                containerNeighbor.classList.add('hidden');
+                containerNear.classList.remove('hidden');
+                btnNear.className = "px-4 py-2 rounded-xl text-sm font-bold bg-purple-600 text-white shadow-md";
+                btnNeighbor.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300";
+            }
+        }
+
+        function updateRelA() {
+            const a = parseInt(document.getElementById('rel-a').value) || 78;
+            const b = parseInt(document.getElementById('rel-b').value) || 60;
+
+            const baseVal = a * b;
+            const minusVal = a * (b - 1);
+            const plusVal = a * (b + 1);
+
+            document.getElementById('math-base').innerText = `${a} × ${b} = ${baseVal}`;
+            
+            document.getElementById('math-minus').innerText = `${a} × ${b - 1}`;
+            document.getElementById('desc-minus').innerHTML = `比基準算式少 1 個 ${a}<br><span class="font-mono font-bold text-blue-700">${baseVal} − ${a} = ${minusVal}</span>`;
+
+            document.getElementById('math-plus').innerText = `${a} × ${b + 1}`;
+            document.getElementById('desc-plus').innerHTML = `比基準算式多 1 個 ${a}<br><span class="font-mono font-bold text-emerald-700">${baseVal} ＋ ${a} = ${plusVal}</span>`;
+        }
+
+        // 模組三：歷程評量答題機制與詳細解析
+        const quizExplanations = {
+            1: "<b>正確解答：B (5 個 0)</b><br>因為 15 × 6 = 90 本身末尾就帶有 1 個 0，再加上 1500 的 2 個 0 與 600 的 2 個 0，總共是 1 + 2 + 2 = 5 個 0 (1500 × 600 = 900000)。",
+            2: "<b>正確解答：B (900000 公克)</b><br>先算 18 × 5 = 90，補上 1800 的 2 個 0 和 500 的 2 個 0，共補 4 個 0，得 900000 公克。",
+            3: "<b>正確解答：A (8200 + 82 = 8282)</b><br>82 × 101 代表有 101 個 82，比 100 個 82 多了 1 個 82，因此等於 8200 + 82 = 8282。",
+            4: "<b>正確解答：A (先算 300 × 1000，再減 300)</b><br>999 = 1000 − 1，所以 300 × 999 = 300 × 1000 − 300 × 1 = 300000 − 300 = 299700 元。",
+            5: "<b>正確解答：A (將 198 看成 200 − 2)</b><br>每盒比 200 元少 2 元，15 盒共少 2 × 15 = 30 元。若每盒 200 元剛好花完 3000 元（200 × 15 = 3000），因此會剩下 30 元！"
+        };
+
+        const correctAnswers = { 1: 'B', 2: 'B', 3: 'A', 4: 'A', 5: 'A' };
+        const scoreState = { 1: false, 2: false, 3: false, 4: false, 5: false };
+
+        function checkQuiz(qNum, userAns, btn) {
+            const feedbackEl = document.getElementById(`quiz-feedback-${qNum}`);
+            const isCorrect = userAns === correctAnswers[qNum];
+
+            // 停用該題按鈕
+            document.querySelectorAll(`.quiz-btn-${qNum}`).forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+
+            feedbackEl.classList.remove('hidden');
+
+            if (isCorrect) {
+                btn.classList.remove('opacity-50');
+                btn.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-800', 'font-bold');
+                feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 space-y-1";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i><b>太棒了，答對了！</b><br>${quizExplanations[qNum]}`;
+                scoreState[qNum] = true;
+            } else {
+                btn.classList.remove('opacity-50');
+                btn.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-800', 'font-bold');
+                feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-rose-50 text-rose-800 border border-rose-200 space-y-1";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i><b>再想想看：</b><br>${quizExplanations[qNum]}`;
+                scoreState[qNum] = false;
+            }
+
+            // 更新總分
+            const currentScore = Object.values(scoreState).filter(Boolean).length;
+            document.getElementById('score-display').innerText = `${currentScore} / 5`;
+        }
+
+        // 初始化執行一次
+        window.onload = function() {
+            updateZeroLab();
+            updateRelA();
+        };
+    </script>
+</body>
+</html>

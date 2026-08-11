@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探究數學：二位小數的奇幻世界</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 35%, #fbc2eb 75%, #a6c1ee 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Panels */
+        .shinkai-glass {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 20px 40px rgba(71, 103, 153, 0.15);
+        }
+
+        /* Glowing text accents */
+        .shinkai-title-glow {
+            text-shadow: 0 0 15px rgba(103, 155, 245, 0.6), 0 0 30px rgba(235, 178, 222, 0.4);
+        }
+
+        /* Custom Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+            margin-top: -10px;
+            border: 3px solid #ffffff;
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Floating Cloud Animation Background Effect */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 100px;
+            pointer-events: none;
+            animation: float 25s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(100vw); }
+        }
+
+        /* Hundred Grid Cell Styles */
+        .grid-cell {
+            transition: all 0.2s ease;
+        }
+        .grid-cell.active {
+            background-color: #ec4899;
+            box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 text-slate-800 relative overflow-x-hidden">
+
+    <!-- Background Animated Clouds -->
+    <div class="cloud top-10 w-48 h-12 opacity-60" style="animation-duration: 35s;"></div>
+    <div class="cloud top-32 w-72 h-16 opacity-40" style="animation-duration: 45s; animation-delay: -10s;"></div>
+    <div class="cloud top-3/4 w-60 h-14 opacity-50" style="animation-duration: 30s; animation-delay: -18s;"></div>
+
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto relative z-10">
+
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center my-4 md:my-6">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-white text-indigo-700 text-sm font-semibold mb-2 shadow-sm">
+                <i class="fa-solid fa-graduation-cap mr-1.5"></i>國小數學 9-1 互動教學網頁
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight shinkai-title-glow">
+                認識二位小數：百格板的奇幻旅程
+            </h1>
+            <p class="text-slate-600 mt-2 font-medium text-sm md:text-base">
+                滑動數值、觀察百格板變化，建立小數的命名與量感！
+            </p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center gap-2 md:gap-4 mb-6">
+            <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-4 md:px-6 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all duration-300 flex items-center gap-2">
+                <i class="fa-solid fa-shapes"></i> 1. 純小數探究 (0.01 ~ 0.99)
+            </button>
+            <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn bg-white/80 text-slate-700 hover:bg-white px-4 md:px-6 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all duration-300 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> 2. 帶小數與位值 (百格板+條+格)
+            </button>
+            <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn bg-white/80 text-slate-700 hover:bg-white px-4 md:px-6 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all duration-300 flex items-center gap-2">
+                <i class="fa-solid fa-circle-check"></i> 3. 歷程性評量 (小試身手)
+            </button>
+        </div>
+
+        <!-- ==================== TAB 1: PURE DECIMALS (純小數) ==================== -->
+        <div id="tab1" class="tab-content block">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: Controls & Dynamic Text -->
+                <div class="lg:col-span-5 flex flex-col gap-5">
+                    <div class="shinkai-glass p-6 rounded-2xl">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-600"></i> 移動滑桿改變塗色格數
+                        </h2>
+
+                        <!-- Slider -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="pure-slider" class="font-bold text-slate-700">選擇塗色小格數：</label>
+                                <span id="pure-grid-count" class="text-2xl font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">6 格</span>
+                            </div>
+                            <input type="range" id="pure-slider" min="1" max="100" value="6" class="w-full" oninput="updatePureDecimal(this.value)">
+                            <div class="flex justify-between text-xs text-slate-500 font-medium mt-1">
+                                <span>1格 (0.01)</span>
+                                <span>50格 (0.5)</span>
+                                <span>100格 (1)</span>
+                            </div>
+                        </div>
+
+                        <!-- Shortcut Quick Buttons -->
+                        <div class="mb-4">
+                            <span class="text-xs font-semibold text-slate-500 block mb-2">課本重點範例快速切換：</span>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="setPureValue(1)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.01張</button>
+                                <button onclick="setPureValue(2)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.02張</button>
+                                <button onclick="setPureValue(3)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.03張</button>
+                                <button onclick="setPureValue(6)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.06張</button>
+                                <button onclick="setPureValue(7)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.07張</button>
+                                <button onclick="setPureValue(9)" class="px-2.5 py-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 transition">0.09張</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Representation Card -->
+                    <div class="shinkai-glass p-6 rounded-2xl flex-1 flex flex-col justify-center gap-4">
+                        <div class="bg-gradient-to-r from-pink-500 to-rose-500 text-white p-4 rounded-xl shadow-md text-center relative">
+                            <div class="text-xs uppercase tracking-wider font-semibold opacity-90">小數記作</div>
+                            <div id="pure-decimal-display" class="text-4xl font-black my-1">0.06 張</div>
+                            <div id="pure-read-display" class="text-sm font-medium bg-white/20 py-1 px-3 rounded-full inline-block mt-1">
+                                讀作：零點零六
+                            </div>
+                            <button onclick="speakText(document.getElementById('pure-read-display').innerText)" class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white" title="朗讀讀音">
+                                <i class="fa-solid fa-volume-high text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-center">
+                            <div class="bg-indigo-50/80 p-3 rounded-xl border border-indigo-100">
+                                <div class="text-xs text-indigo-600 font-semibold">分數記作</div>
+                                <div id="pure-fraction-display" class="text-xl font-bold text-indigo-900 mt-1">6 / 100 張</div>
+                            </div>
+                            <div class="bg-purple-50/80 p-3 rounded-xl border border-purple-100">
+                                <div class="text-xs text-purple-600 font-semibold">組成含義</div>
+                                <div id="pure-composition-display" class="text-xl font-bold text-purple-900 mt-1">6 個 0.01</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Grid Visualizer -->
+                <div class="lg:col-span-7">
+                    <div class="shinkai-glass p-6 rounded-2xl h-full flex flex-col items-center justify-center">
+                        <div class="flex justify-between items-center w-full mb-3 px-2">
+                            <span class="font-bold text-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-table-cells text-pink-500"></i> 百格板視覺化 (1張 = 100等分)
+                            </span>
+                            <span class="text-xs text-slate-500">點擊百格板可直接手動選格</span>
+                        </div>
+
+                        <!-- 10x10 Grid Canvas / SVG Container -->
+                        <div class="relative bg-white p-3 rounded-2xl shadow-inner border border-slate-200 max-w-sm sm:max-w-md w-full aspect-square">
+                            <div id="pure-grid-container" class="grid grid-cols-10 grid-rows-10 gap-1 w-full h-full">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Explanation Footer -->
+                        <div id="pure-explanation" class="mt-4 text-center text-sm font-medium text-slate-600 bg-white/60 px-4 py-2 rounded-xl border border-white">
+                            把 1 張紙分成 100 等分，6 等分是 <span class="text-pink-600 font-bold">6/100 張</span>，也就是 <span class="text-pink-600 font-bold">0.06 張</span>。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: MIXED DECIMALS (帶小數與位值) ==================== -->
+        <div id="tab2" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Control Panel -->
+                <div class="lg:col-span-5 flex flex-col gap-5">
+                    <div class="shinkai-glass p-6 rounded-2xl">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-cubes text-purple-600"></i> 百格板位值組合器
+                        </h2>
+
+                        <!-- Incrementers for Whole, Tenth, Hundredth -->
+                        <div class="space-y-4">
+                            <!-- Whole Units (張: 1.0) -->
+                            <div class="flex items-center justify-between bg-white/70 p-3 rounded-xl border border-slate-100">
+                                <div>
+                                    <div class="font-bold text-slate-800 text-sm">個位 (整張百格板)</div>
+                                    <div class="text-xs text-slate-500">1 個百格板 = 1.0 張</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="adjustValue('whole', -1)" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 font-bold text-slate-700">-</button>
+                                    <span id="whole-val" class="w-8 text-center font-black text-lg text-indigo-600">1</span>
+                                    <button onclick="adjustValue('whole', 1)" class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-bold text-white">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Tenths (條: 0.1) -->
+                            <div class="flex items-center justify-between bg-white/70 p-3 rounded-xl border border-slate-100">
+                                <div>
+                                    <div class="font-bold text-slate-800 text-sm">十分位 (條)</div>
+                                    <div class="text-xs text-slate-500">1 條 = 10 格 = 0.1 張</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="adjustValue('tenth', -1)" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 font-bold text-slate-700">-</button>
+                                    <span id="tenth-val" class="w-8 text-center font-black text-lg text-indigo-600">4</span>
+                                    <button onclick="adjustValue('tenth', 1)" class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-bold text-white">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Hundredths (格: 0.01) -->
+                            <div class="flex items-center justify-between bg-white/70 p-3 rounded-xl border border-slate-100">
+                                <div>
+                                    <div class="font-bold text-slate-800 text-sm">百分位 (格)</div>
+                                    <div class="text-xs text-slate-500">1 格 = 0.01 張</div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="adjustValue('hundredth', -1)" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 font-bold text-slate-700">-</button>
+                                    <span id="hundredth-val" class="w-8 text-center font-black text-lg text-indigo-600">2</span>
+                                    <button onclick="adjustValue('hundredth', 1)" class="w-8 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-bold text-white">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Textbook Example Shortcuts -->
+                        <div class="mt-5">
+                            <span class="text-xs font-semibold text-slate-500 block mb-2">課本典型帶小數範例：</span>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setMixedPreset(1, 4, 2)" class="px-3 py-1.5 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 text-left">
+                                    <i class="fa-solid fa-bookmark text-indigo-400 mr-1"></i> 例1: 1.42 張
+                                </button>
+                                <button onclick="setMixedPreset(2, 5, 3)" class="px-3 py-1.5 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 text-left">
+                                    <i class="fa-solid fa-bookmark text-indigo-400 mr-1"></i> 例2: 2.53 張
+                                </button>
+                                <button onclick="setMixedPreset(7, 0, 4)" class="px-3 py-1.5 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 text-left">
+                                    <i class="fa-solid fa-bookmark text-indigo-400 mr-1"></i> 例3: 7.04 張
+                                </button>
+                                <button onclick="setMixedPreset(3, 1, 5)" class="px-3 py-1.5 bg-white hover:bg-indigo-50 border border-slate-200 rounded-lg text-xs font-bold text-indigo-600 text-left">
+                                    <i class="fa-solid fa-bookmark text-indigo-400 mr-1"></i> 例4: 3.15 張
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mixed Result Card -->
+                    <div class="shinkai-glass p-6 rounded-2xl flex flex-col justify-center gap-3">
+                        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-xl shadow-md text-center relative">
+                            <div class="text-xs uppercase tracking-wider font-semibold opacity-80">合起來是</div>
+                            <div id="mixed-decimal-display" class="text-4xl font-black my-1">1.42 張</div>
+                            <div id="mixed-read-display" class="text-sm font-medium bg-white/20 py-1 px-3 rounded-full inline-block mt-1">
+                                讀作：一點四二
+                            </div>
+                            <button onclick="speakText(document.getElementById('mixed-read-display').innerText)" class="absolute right-3 top-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white" title="朗讀讀音">
+                                <i class="fa-solid fa-volume-high text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="mixed-composition-text" class="text-center font-bold text-slate-700 bg-white/80 p-3 rounded-xl border border-slate-100 text-sm">
+                            1.4 張和 0.02 張合起來是 1.42 張
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Graphic Visualization Area -->
+                <div class="lg:col-span-7">
+                    <div class="shinkai-glass p-6 rounded-2xl h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-bold text-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-indigo-600"></i> 積木圖像動態呈現
+                            </span>
+                            <span class="text-xs text-slate-500">含整張、條與獨立小格</span>
+                        </div>
+
+                        <!-- Render canvas container -->
+                        <div id="mixed-visual-board" class="flex-1 bg-white/90 p-4 rounded-2xl border border-slate-200 overflow-y-auto max-h-[480px] flex flex-wrap gap-4 items-start justify-center">
+                            <!-- Dynamically generated block elements -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: QUIZ & ASSESSMENT (歷程評量) ==================== -->
+        <div id="tab3" class="tab-content hidden">
+            <div class="shinkai-glass p-6 md:p-8 rounded-2xl max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200/80 pb-4 mb-6 gap-2">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-question text-indigo-600"></i> 小試身手：二位小數自我檢測
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-500 mt-1">共有 5 題觀念測驗，每題回答後可立即獲得解說與回饋！</p>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-100 px-4 py-2 rounded-xl text-center">
+                        <span class="text-xs text-indigo-600 font-bold block">測驗得分</span>
+                        <span id="quiz-score" class="text-2xl font-black text-indigo-700">0 / 5</span>
+                    </div>
+                </div>
+
+                <!-- Questions Container -->
+                <div class="space-y-6" id="quiz-container">
+                    
+                    <!-- Q1 -->
+                    <div class="quiz-card bg-white/90 p-5 rounded-xl border border-slate-200" id="q1-card">
+                        <div class="font-bold text-slate-800 text-base mb-3 flex items-start gap-2">
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-black mt-0.5">第 1 題</span>
+                            <span>把 1 張紙分成 100 等分，3 個 0.01 張合起來是多少張？</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                            <button onclick="checkAnswer(1, 'A')" class="q1-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">A. 0.3 張</button>
+                            <button onclick="checkAnswer(1, 'B')" class="q1-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">B. 0.03 張</button>
+                            <button onclick="checkAnswer(1, 'C')" class="q1-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">C. 3.00 張</button>
+                            <button onclick="checkAnswer(1, 'D')" class="q1-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">D. 0.003 張</button>
+                        </div>
+                        <div id="q1-feedback" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="quiz-card bg-white/90 p-5 rounded-xl border border-slate-200" id="q2-card">
+                        <div class="font-bold text-slate-800 text-base mb-3 flex items-start gap-2">
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-black mt-0.5">第 2 題</span>
+                            <span>1.4 張百格板和 0.02 張百格板合起來是多少張？</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                            <button onclick="checkAnswer(2, 'A')" class="q2-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">A. 1.6 張</button>
+                            <button onclick="checkAnswer(2, 'B')" class="q2-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">B. 1.42 張</button>
+                            <button onclick="checkAnswer(2, 'C')" class="q2-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">C. 1.24 張</button>
+                            <button onclick="checkAnswer(2, 'D')" class="q2-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">D. 14.2 張</button>
+                        </div>
+                        <div id="q2-feedback" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="quiz-card bg-white/90 p-5 rounded-xl border border-slate-200" id="q3-card">
+                        <div class="font-bold text-slate-800 text-base mb-3 flex items-start gap-2">
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-black mt-0.5">第 3 題</span>
+                            <span>「7 張百格板和 0.04 張合起來是 7.04 張」，請問 7.04 讀作什麼？</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+                            <button onclick="checkAnswer(3, 'A')" class="q3-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">A. 七點零四</button>
+                            <button onclick="checkAnswer(3, 'B')" class="q3-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">B. 七點四零</button>
+                            <button onclick="checkAnswer(3, 'C')" class="q3-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">C. 七零四</button>
+                            <button onclick="checkAnswer(3, 'D')" class="q3-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">D. 七點四</button>
+                        </div>
+                        <div id="q3-feedback" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="quiz-card bg-white/90 p-5 rounded-xl border border-slate-200" id="q4-card">
+                        <div class="font-bold text-slate-800 text-base mb-3 flex items-start gap-2">
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-black mt-0.5">第 4 題</span>
+                            <span>若要在百格板上塗出 0.07 張色紙，需要塗上幾個 0.01 張（小格）？</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                            <button onclick="checkAnswer(4, 'A')" class="q4-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">A. 0.7 個</button>
+                            <button onclick="checkAnswer(4, 'B')" class="q4-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">B. 70 個</button>
+                            <button onclick="checkAnswer(4, 'C')" class="q4-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">C. 7 個</button>
+                            <button onclick="checkAnswer(4, 'D')" class="q4-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">D. 17 個</button>
+                        </div>
+                        <div id="q4-feedback" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="quiz-card bg-white/90 p-5 rounded-xl border border-slate-200" id="q5-card">
+                        <div class="font-bold text-slate-800 text-base mb-3 flex items-start gap-2">
+                            <span class="bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-black mt-0.5">第 5 題</span>
+                            <span>圈出 2 個百格板（整張）、5 個條（0.1張）與 3 個小格（0.01張），記作多少張？</span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                            <button onclick="checkAnswer(5, 'A')" class="q5-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">A. 25.3 張</button>
+                            <button onclick="checkAnswer(5, 'B')" class="q5-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">B. 2.53 張</button>
+                            <button onclick="checkAnswer(5, 'C')" class="q5-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">C. 2.35 張</button>
+                            <button onclick="checkAnswer(5, 'D')" class="q5-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition">D. 253 張</button>
+                        </div>
+                        <div id="q5-feedback" class="hidden p-3 rounded-lg text-xs font-semibold"></div>
+                    </div>
+
+                </div>
+
+                <!-- Reset Quiz Button -->
+                <div class="mt-8 text-center">
+                    <button onclick="resetQuiz()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> 重置測驗
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        
+        // Chinese number mapping for pronunciation reading
+        const zhNums = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+
+        function getChineseReading(numStr) {
+            if (!numStr.includes('.')) {
+                return zhNums[parseInt(numStr)];
+            }
+            const [intPart, decPart] = numStr.split('.');
+            let intZh = zhNums[parseInt(intPart)];
+            let decZh = '';
+            for (let char of decPart) {
+                decZh += zhNums[parseInt(char)];
+            }
+            return `${intZh}點${decZh}`;
+        }
+
+        // Global State for Mixed Decimal
+        let mixedState = {
+            whole: 1,
+            tenth: 4,
+            hundredth: 2
+        };
+
+        // Quiz answer tracker
+        let quizAnswers = { 1: null, 2: null, 3: null, 4: null, 5: null };
+        const correctAnswers = { 1: 'B', 2: 'B', 3: 'A', 4: 'C', 5: 'B' };
+        const explanations = {
+            1: "正確！3 個 0.01 合起來就是 0.03。",
+            2: "正確！1.4 是 1 個 1 與 4 個 0.1，加上 0.02 後為 1.42。",
+            3: "正確！7.04 中的 0 表示十分位沒有條，讀作「七點零四」。",
+            4: "正確！0.07 張就是 7 個 0.01 張（7 個小格）。",
+            5: "正確！2 個 1 + 5 個 0.1 + 3 個 0.01 = 2.53。"
+        };
+
+        // On Load Init
+        window.onload = function() {
+            initPureGrid();
+            updatePureDecimal(6);
+            renderMixedVisuals();
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-white/80', 'text-slate-700');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-white/80', 'text-slate-700');
+        }
+
+        // Initialize Pure Grid DOM (100 cells)
+        function initPureGrid() {
+            const container = document.getElementById('pure-grid-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell border border-pink-200 rounded-sm cursor-pointer hover:opacity-80';
+                cell.dataset.index = i;
+                cell.onclick = () => {
+                    document.getElementById('pure-slider').value = i;
+                    updatePureDecimal(i);
+                };
+                container.appendChild(cell);
+            }
+        }
+
+        // Update Pure Decimal (0.01 ~ 0.99)
+        function updatePureDecimal(val) {
+            val = parseInt(val);
+            document.getElementById('pure-grid-count').innerText = `${val} 格`;
+
+            // Highlight cells
+            const cells = document.querySelectorAll('#pure-grid-container .grid-cell');
+            cells.forEach((cell, idx) => {
+                if (idx < val) {
+                    cell.classList.add('active');
+                } else {
+                    cell.classList.remove('active');
+                }
+            });
+
+            // Mathematical formatting (automatically drop trailing zeros)
+            const numVal = val / 100;
+            const decStr = Number(numVal.toFixed(2)).toString();
+            const readStr = getChineseReading(decStr);
+
+            document.getElementById('pure-decimal-display').innerText = `${decStr} 張`;
+            document.getElementById('pure-fraction-display').innerText = `${val} / 100 張`;
+            document.getElementById('pure-composition-display').innerText = `${val} 個 0.01`;
+            document.getElementById('pure-read-display').innerText = `讀作：${readStr}`;
+            document.getElementById('pure-explanation').innerHTML = 
+                `把 1 張紙分成 100 等分，${val} 等分是 <span class="text-pink-600 font-bold">${val}/100 張</span>，也就是 <span class="text-pink-600 font-bold">${decStr} 張</span>。`;
+        }
+
+        function setPureValue(val) {
+            document.getElementById('pure-slider').value = val;
+            updatePureDecimal(val);
+        }
+
+        // Mixed Decimal Control Logic
+        function adjustValue(type, delta) {
+            let newVal = mixedState[type] + delta;
+            if (newVal >= 0 && newVal <= 9) {
+                mixedState[type] = newVal;
+                document.getElementById(`${type}-val`).innerText = newVal;
+                updateMixedDisplays();
+            }
+        }
+
+        function setMixedPreset(w, t, h) {
+            mixedState.whole = w;
+            mixedState.tenth = t;
+            mixedState.hundredth = h;
+            document.getElementById('whole-val').innerText = w;
+            document.getElementById('tenth-val').innerText = t;
+            document.getElementById('hundredth-val').innerText = h;
+            updateMixedDisplays();
+        }
+
+        function updateMixedDisplays() {
+            const rawNum = mixedState.whole + mixedState.tenth * 0.1 + mixedState.hundredth * 0.01;
+            const num = Number(rawNum.toFixed(2)).toString();
+            document.getElementById('mixed-decimal-display').innerText = `${num} 張`;
+
+            // Chinese Reading without trailing zero
+            const readStr = getChineseReading(num);
+            document.getElementById('mixed-read-display').innerText = `讀作：${readStr}`;
+
+            // Composition sentence
+            let compParts = [];
+            if (mixedState.whole > 0) compParts.push(`${mixedState.whole}個1`);
+            if (mixedState.tenth > 0) compParts.push(`${mixedState.tenth}個0.1`);
+            if (mixedState.hundredth > 0) compParts.push(`${mixedState.hundredth}個0.01`);
+            
+            document.getElementById('mixed-composition-text').innerText = 
+                `${num} 張是 ${compParts.join('、')} 合起來的。`;
+
+            renderMixedVisuals();
+        }
+
+        // Render dynamic SVG blocks for mixed decimal
+        function renderMixedVisuals() {
+            const board = document.getElementById('mixed-visual-board');
+            board.innerHTML = '';
+
+            // 1. Render Whole Sheets (1.0)
+            for (let w = 0; w < mixedState.whole; w++) {
+                const sheet = document.createElement('div');
+                sheet.className = 'w-24 h-24 bg-indigo-100 border-2 border-indigo-400 rounded-lg p-1 grid grid-cols-10 grid-rows-10 gap-0.5 shadow-sm relative group';
+                sheet.title = "1 張 (1.0)";
+                for (let i = 0; i < 100; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'bg-indigo-500 rounded-px';
+                    sheet.appendChild(c);
+                }
+                const label = document.createElement('span');
+                label.className = "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-indigo-700 bg-white px-1.5 rounded border border-indigo-200";
+                label.innerText = "1張";
+                sheet.appendChild(label);
+                board.appendChild(sheet);
+            }
+
+            // 2. Render Tenth Strips (0.1)
+            for (let t = 0; t < mixedState.tenth; t++) {
+                const strip = document.createElement('div');
+                strip.className = 'w-5 h-24 bg-amber-100 border-2 border-amber-400 rounded-md p-0.5 flex flex-col justify-between shadow-sm relative';
+                strip.title = "1 條 (0.1)";
+                for (let i = 0; i < 10; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'w-full h-1.5 bg-amber-500 rounded-px';
+                    strip.appendChild(c);
+                }
+                const label = document.createElement('span');
+                label.className = "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-amber-700 bg-white px-1 rounded border border-amber-200";
+                label.innerText = "0.1條";
+                strip.appendChild(label);
+                board.appendChild(strip);
+            }
+
+            // 3. Render Hundredth Squares (0.01)
+            if (mixedState.hundredth > 0) {
+                const sqContainer = document.createElement('div');
+                sqContainer.className = 'flex flex-wrap gap-1 max-w-[100px] p-1 bg-pink-50 border border-pink-200 rounded-lg relative';
+                for (let h = 0; h < mixedState.hundredth; h++) {
+                    const sq = document.createElement('div');
+                    sq.className = 'w-3 h-3 bg-pink-500 rounded-sm shadow-xs';
+                    sq.title = "1 格 (0.01)";
+                    sqContainer.appendChild(sq);
+                }
+                const label = document.createElement('span');
+                label.className = "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-pink-700 bg-white px-1 rounded border border-pink-200 whitespace-nowrap";
+                label.innerText = `${mixedState.hundredth}格 (0.0${mixedState.hundredth})`;
+                sqContainer.appendChild(label);
+                board.appendChild(sqContainer);
+            }
+
+            if (mixedState.whole === 0 && mixedState.tenth === 0 && mixedState.hundredth === 0) {
+                board.innerHTML = `<div class="text-slate-400 text-sm font-medium my-auto">請增加張、條或格數以檢視圖像。</div>`;
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const cleanText = text.replace('讀作：', '');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function checkAnswer(qNum, selected) {
+            if (quizAnswers[qNum] !== null) return; // Prevent re-answering
+            quizAnswers[qNum] = selected;
+
+            const isCorrect = selected === correctAnswers[qNum];
+            const opts = document.querySelectorAll(`.q${qNum}-opt`);
+            
+            opts.forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerText.startsWith(selected)) {
+                    if (isCorrect) {
+                        btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+                    } else {
+                        btn.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-800');
+                    }
+                }
+                if (btn.innerText.startsWith(correctAnswers[qNum]) && !isCorrect) {
+                    btn.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-700');
+                }
+            });
+
+            // Feedback display
+            const fb = document.getElementById(`q${qNum}-feedback`);
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                fb.className = "p-3 rounded-lg text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+                fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ${explanations[qNum]}`;
+            } else {
+                fb.className = "p-3 rounded-lg text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200";
+                fb.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> 答錯了喔！${explanations[qNum]}`;
+            }
+
+            updateScore();
+        }
+
+        function updateScore() {
+            let score = 0;
+            let answered = 0;
+            for (let i = 1; i <= 5; i++) {
+                if (quizAnswers[i] !== null) {
+                    answered++;
+                    if (quizAnswers[i] === correctAnswers[i]) score++;
+                }
+            }
+            document.getElementById('quiz-score').innerText = `${score} / 5`;
+
+            // Trigger confetti if all correct
+            if (answered === 5 && score === 5) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function resetQuiz() {
+            quizAnswers = { 1: null, 2: null, 3: null, 4: null, 5: null };
+            document.getElementById('quiz-score').innerText = `0 / 5`;
+
+            for (let i = 1; i <= 5; i++) {
+                const fb = document.getElementById(`q${i}-feedback`);
+                fb.classList.add('hidden');
+                
+                const opts = document.querySelectorAll(`.q${i}-opt`);
+                opts.forEach(btn => {
+                    btn.disabled = false;
+                    btn.className = `q${i}-opt text-left p-2.5 rounded-lg border border-slate-200 hover:bg-indigo-50 font-medium text-sm transition`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

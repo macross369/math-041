@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長度與二位小數 - 互動探究學習網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background: linear-gradient(135deg, #1a1c4b 0%, #3a3362 25%, #634c7d 50%, #b97394 75%, #f1bb97 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        /* Glassmorphism effects */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Shinkai style animated sparkles */
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatSparkle 6s infinite ease-in-out;
+            opacity: 0.7;
+        }
+
+        @keyframes floatSparkle {
+            0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.3; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 0.9; }
+        }
+
+        /* Custom Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #60a5fa, #a855f7, #ec4899);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            border: 2px solid #a855f7;
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Place Value Grid Styling */
+        .digit-box {
+            transition: all 0.3s ease;
+        }
+        .digit-box.highlight {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6 relative overflow-x-hidden min-h-screen">
+
+    <div id="sparkle-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10 space-y-6">
+
+        <!-- 閒雲數學小棧 品牌列 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <header class="glass-header rounded-3xl p-6 text-center text-white shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-pink-400 rounded-full blur-3xl opacity-50"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl opacity-50"></div>
+            
+            <h1 class="text-3xl md:text-5xl font-black tracking-wide drop-shadow-md text-white flex items-center justify-center gap-3">
+                <i class="fa-solid fa-ruler-combined text-yellow-300"></i>
+                9-3 長度與二位小數
+            </h1>
+            <p class="mt-2 text-blue-100 text-sm md:text-base font-bold tracking-wider">
+                ✨ 觀察公分與公尺的轉化・掌控二位小數大小比較 ✨
+            </p>
+        </header>
+
+        <nav class="flex justify-center gap-2 md:gap-4">
+            <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn px-5 py-3 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 bg-white text-purple-700 shadow-lg scale-105">
+                <i class="fa-solid fa-tape"></i> 長度與小數換算
+            </button>
+            <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-5 py-3 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 bg-white/40 text-white hover:bg-white/60">
+                <i class="fa-solid fa-trophy"></i> 小數大小比較模擬器
+            </button>
+            <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-5 py-3 rounded-2xl font-bold transition-all shadow-md flex items-center gap-2 bg-white/40 text-white hover:bg-white/60">
+                <i class="fa-solid fa-pen-to-square"></i> 隨堂小測驗 (5題)
+            </button>
+        </nav>
+
+        <section id="tab1" class="tab-content space-y-6">
+            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+                
+                <div class="border-b border-purple-200 pb-4 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-2xl font-black text-purple-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-pink-500"></i> 互動式長度換算尺
+                        </h2>
+                        <p class="text-xs md:text-sm text-gray-600">拉動滑桿或點擊快速按鈕，觀察公分 (cm) 如何換算為公尺 (m) 與位值變化！</p>
+                    </div>
+                    <div class="bg-purple-100 text-purple-800 px-4 py-1.5 rounded-full font-bold text-sm">
+                        1 公分 = 0.01 公尺
+                    </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span class="text-sm font-bold text-gray-700"><i class="fa-solid fa-bookmark text-purple-500"></i> 課本快速例題：</span>
+                    <button onclick="setLength(5)" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold border border-purple-200 transition">5 公分</button>
+                    <button onclick="setLength(27)" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold border border-purple-200 transition">27 公分</button>
+                    <button onclick="setLength(123)" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold border border-purple-200 transition">123 公分</button>
+                    <button onclick="setLength(443)" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold border border-purple-200 transition">443 公分</button>
+                    <button onclick="setLength(752)" class="px-3 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl text-sm font-bold border border-purple-200 transition">752 公分</button>
+                </div>
+
+                <!-- Slider Control -->
+                <div class="space-y-3 bg-white/60 p-4 rounded-2xl border border-purple-100 shadow-inner">
+                    <div class="flex justify-between font-bold text-gray-700 text-sm">
+                        <span>0 cm (0m)</span>
+                        <span id="slider-label-val" class="text-xl text-purple-700 font-black">123 cm</span>
+                        <span>1000 cm (10m)</span>
+                    </div>
+                    <input type="range" id="length-slider" min="0" max="1000" value="123" oninput="updateLength(this.value)">
+                </div>
+
+                <!-- Visual Tape Measure Representation -->
+                <div class="bg-amber-100 rounded-2xl p-4 border-2 border-amber-300 relative overflow-hidden shadow-md">
+                    <div class="text-xs font-bold text-amber-800 mb-2 flex items-center justify-between">
+                        <span><i class="fa-solid fa-ruler"></i> 視覺化捲尺 (Tape Measure View)</span>
+                        <span id="ruler-cm-display" class="bg-amber-200 px-2 py-0.5 rounded text-amber-900 font-black">123 cm</span>
+                    </div>
+                    <div class="w-full bg-amber-50 h-24 rounded-xl relative border border-amber-300 overflow-hidden select-none p-1">
+                        <svg id="ruler-svg" viewBox="0 0 1000 80" preserveAspectRatio="none" class="w-full h-full block">
+                            <!-- SVG Ticks, background fill & pointer lines generated dynamically -->
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Dynamic Conceptual Explanation Box -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-blue-50/90 rounded-2xl p-4 border border-blue-200 text-center space-y-1">
+                        <div class="text-xs font-bold text-blue-600">長度 (厘米)</div>
+                        <div id="exp-cm" class="text-2xl font-black text-blue-800">123 公分</div>
+                    </div>
+                    <div class="bg-purple-50/90 rounded-2xl p-4 border border-purple-200 text-center space-y-1">
+                        <div class="text-xs font-bold text-purple-600">包含幾個 0.01 公尺 (1cm)</div>
+                        <div id="exp-count" class="text-2xl font-black text-purple-800">123 個 0.01 公尺</div>
+                    </div>
+                    <div class="bg-pink-50/90 rounded-2xl p-4 border border-pink-200 text-center space-y-1">
+                        <div class="text-xs font-bold text-pink-600">合起來是多少公尺</div>
+                        <div id="exp-m" class="text-2xl font-black text-pink-800">1.23 公尺</div>
+                    </div>
+                </div>
+
+                <!-- Place Value Table (位值表) -->
+                <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-md space-y-3">
+                    <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-indigo-500"></i> 位值表 (Place Value Table)
+                    </h3>
+                    <div class="grid grid-cols-5 text-center border-2 border-indigo-200 rounded-xl overflow-hidden font-bold w-full">
+                        <!-- Header (5 Equal Columns) -->
+                        <div class="bg-indigo-100 p-2 text-indigo-900 border-r border-b border-indigo-200 text-xs md:text-sm flex items-center justify-center">十位</div>
+                        <div class="bg-indigo-100 p-2 text-indigo-900 border-r border-b border-indigo-200 text-xs md:text-sm flex items-center justify-center">個位</div>
+                        <div class="bg-pink-200 p-2 text-pink-900 border-r border-b border-indigo-200 text-xs md:text-sm flex items-center justify-center">
+                            . 小數點
+                        </div>
+                        <div class="bg-indigo-100 p-2 text-indigo-900 border-r border-b border-indigo-200 text-xs md:text-sm flex items-center justify-center">十分位<br><span class="text-[10px] text-gray-500">(0.1)</span></div>
+                        <div class="bg-indigo-100 p-2 text-indigo-900 border-b border-indigo-200 text-xs md:text-sm flex items-center justify-center">百分位<br><span class="text-[10px] text-gray-500">(0.01)</span></div>
+
+                        <!-- Values -->
+                        <div id="pv-tens" class="p-3 text-xl md:text-2xl font-black text-gray-700 bg-gray-50 border-r border-indigo-100 flex items-center justify-center">0</div>
+                        <div id="pv-units" class="p-3 text-xl md:text-2xl font-black text-indigo-600 bg-indigo-50/50 border-r border-indigo-100 flex items-center justify-center">1</div>
+                        <div class="p-3 text-2xl font-black text-pink-600 bg-pink-50 border-r border-indigo-100 flex items-center justify-center">.</div>
+                        <div id="pv-tenths" class="p-3 text-xl md:text-2xl font-black text-purple-600 bg-purple-50/50 border-r border-indigo-100 flex items-center justify-center">2</div>
+                        <div id="pv-hundredths" class="p-3 text-xl md:text-2xl font-black text-pink-600 bg-pink-50/50 flex items-center justify-center">3</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="tab2" class="tab-content space-y-6 hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+                
+                <div class="border-b border-purple-200 pb-4">
+                    <h2 class="text-2xl font-black text-purple-900 flex items-center gap-2">
+                        <i class="fa-solid fa-ranking-star text-amber-500"></i> 二位小數大小比較模擬器
+                    </h2>
+                    <p class="text-xs md:text-sm text-gray-600">重現運動會比賽場景！觀察如何順序比較「個位 → 十分位 → 百分位」。</p>
+                </div>
+
+                <!-- Scenario Selection Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <button onclick="loadScenario(1)" id="scen-btn-1" class="p-3 rounded-2xl border-2 text-left transition font-bold border-purple-500 bg-purple-50 text-purple-900 shadow">
+                        <div class="text-xs text-purple-600">例題 1：跳遠比賽</div>
+                        <div class="text-sm font-black">1.95m (皮皮) vs 2.1m (多多)</div>
+                    </button>
+                    <button onclick="loadScenario(2)" id="scen-btn-2" class="p-3 rounded-2xl border-2 border-gray-200 hover:border-purple-300 text-left transition font-bold text-gray-700">
+                        <div class="text-xs text-gray-500">例題 2：跳高比賽</div>
+                        <div class="text-sm font-black">1.2m (皮皮) vs 1.09m (妮妮)</div>
+                    </button>
+                    <button onclick="loadScenario(3)" id="scen-btn-3" class="p-3 rounded-2xl border-2 border-gray-200 hover:border-purple-300 text-left transition font-bold text-gray-700">
+                        <div class="text-xs text-gray-500">例題 3：壘球擲遠 (三人比較)</div>
+                        <div class="text-sm font-black">34.21m vs 34.28m vs 34.2m</div>
+                    </button>
+                </div>
+
+                <!-- Visual Competition Track -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 border border-teal-200 shadow-inner space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span id="comp-title" class="font-black text-teal-900"><i class="fa-solid fa-person-running text-teal-600"></i> 跳遠比賽長度視覺化</span>
+                        <span class="text-xs text-teal-700 font-bold">長度越長，條狀圖越長！</span>
+                    </div>
+
+                    <div id="comp-bars-container" class="space-y-3">
+                        <!-- Bars dynamically rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Alignment & Step-by-Step Comparison Explanation -->
+                <div class="bg-white rounded-2xl p-5 border border-purple-100 shadow-md space-y-4">
+                    <h3 class="text-base font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-chart text-purple-600"></i> 位值對齊與思考步驟解析
+                    </h3>
+
+                    <!-- Aligned Place Value Table -->
+                    <div id="aligned-pv-table" class="overflow-x-auto">
+                        <!-- Table rendered via JS -->
+                    </div>
+
+                    <!-- Step explanation callout -->
+                    <div id="comparison-step-box" class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-2xl text-amber-900 space-y-2">
+                        <!-- Explanation rendered via JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="tab3" class="tab-content space-y-6 hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+                
+                <div class="border-b border-purple-200 pb-4 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-2xl font-black text-purple-900 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-pink-500"></i> 隨堂小測驗 (5題)
+                        </h2>
+                        <p class="text-xs md:text-sm text-gray-600">複習長度換算與小數比較概念，選出正確答案並檢視解析！</p>
+                    </div>
+                    <div id="quiz-score-badge" class="bg-purple-100 text-purple-800 px-4 py-1.5 rounded-full font-bold text-sm hidden">
+                        得分：<span id="quiz-score-num">0</span> / 100
+                    </div>
+                </div>
+
+                <!-- Quiz Questions Container -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Dynamic Question Cards -->
+                </div>
+
+                <!-- Quiz Control Buttons -->
+                <div class="flex justify-center gap-4 pt-4">
+                    <button onclick="submitQuiz()" id="btn-submit-quiz" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold rounded-2xl shadow-lg transform transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> 提交測驗
+                    </button>
+                    <button onclick="resetQuiz()" id="btn-reset-quiz" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-2xl shadow transition flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> 重置測驗
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Sparkles generator for Makoto Shinkai background effect
+        function createSparkles() {
+            const container = document.getElementById('sparkle-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const count = 25;
+            for (let i = 0; i < count; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                const size = Math.random() * 4 + 2;
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                sparkle.style.left = `${Math.random() * 100}%`;
+                sparkle.style.top = `${Math.random() * 100}%`;
+                sparkle.style.animationDelay = `${Math.random() * 5}s`;
+                sparkle.style.animationDuration = `${3 + Math.random() * 5}s`;
+                container.appendChild(sparkle);
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-purple-700', 'shadow-lg', 'scale-105');
+                btn.classList.add('bg-white/40', 'text-white');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/40', 'text-white');
+                activeBtn.classList.add('bg-white', 'text-purple-700', 'shadow-lg', 'scale-105');
+            }
+        }
+
+        function updateRuler(cm) {
+            const svg = document.getElementById('ruler-svg');
+            if (!svg) return;
+            
+            let svgContent = '';
+            
+            // 1. Measured Fill (0 to cm)
+            svgContent += `<rect x="0" y="0" width="${cm}" height="80" fill="url(#tapeGradient)" opacity="0.75" />`;
+
+            // SVG Gradient
+            svgContent += `
+                <defs>
+                    <linearGradient id="tapeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#fcd34d" />
+                        <stop offset="50%" stop-color="#fbbf24" />
+                        <stop offset="100%" stop-color="#f59e0b" />
+                    </linearGradient>
+                </defs>
+            `;
+
+            // 2. Precise Ticks (0 to 1000 cm)
+            for (let i = 0; i <= 1000; i += 10) {
+                if (i % 100 === 0) {
+                    // 1m Major Tick
+                    svgContent += `<line x1="${i}" y1="0" x2="${i}" y2="42" stroke="#78350f" stroke-width="2.5" />`;
+                    const mVal = i / 100;
+                    let textAnchor = "middle";
+                    let textX = i;
+                    if (i === 0) { textAnchor = "start"; textX = 5; }
+                    if (i === 1000) { textAnchor = "end"; textX = 995; }
+                    svgContent += `<text x="${textX}" y="62" font-size="16" font-weight="900" fill="#78350f" text-anchor="${textAnchor}">${mVal}m</text>`;
+                } else if (i % 50 === 0) {
+                    // 50cm Medium Tick
+                    svgContent += `<line x1="${i}" y1="0" x2="${i}" y2="30" stroke="#b45309" stroke-width="2" />`;
+                } else {
+                    // 10cm Minor Tick
+                    svgContent += `<line x1="${i}" y1="0" x2="${i}" y2="18" stroke="#d97706" stroke-width="1.2" opacity="0.7" />`;
+                }
+            }
+
+            // 3. Current Pointer Line & Indicator
+            svgContent += `<line x1="${cm}" y1="0" x2="${cm}" y2="80" stroke="#dc2626" stroke-width="3" />`;
+            svgContent += `<polygon points="${cm-8},0 ${cm+8},0 ${cm},14" fill="#dc2626" />`;
+            svgContent += `<circle cx="${cm}" cy="70" r="5" fill="#dc2626" stroke="#ffffff" stroke-width="1.5" />`;
+
+            svg.innerHTML = svgContent;
+        }
+
+        function updateLength(val) {
+            const cm = parseInt(val) || 0;
+            const m = (cm / 100).toFixed(2);
+            
+            // Labels & Expressions
+            document.getElementById('slider-label-val').innerText = `${cm} cm`;
+            document.getElementById('ruler-cm-display').innerText = `${cm} cm`;
+            document.getElementById('exp-cm').innerText = `${cm} 公分`;
+            document.getElementById('exp-count').innerText = `${cm} 個 0.01 公尺`;
+            document.getElementById('exp-m').innerText = `${m} 公尺`;
+
+            // Render SVG precision ruler
+            updateRuler(cm);
+
+            // Place Value Parsing (Tens, Units, Tenths, Hundredths)
+            const mStr = parseFloat(m).toFixed(2);
+            const parts = mStr.split('.');
+            const integerPart = parts[0];
+            const decimalPart = parts[1];
+
+            const intVal = parseInt(integerPart);
+            const tens = Math.floor(intVal / 10) % 10;
+            const units = intVal % 10;
+
+            const tenths = parseInt(decimalPart[0]);
+            const hundredths = parseInt(decimalPart[1]);
+
+            document.getElementById('pv-tens').innerText = tens;
+            document.getElementById('pv-units').innerText = units;
+            document.getElementById('pv-tenths').innerText = tenths;
+            document.getElementById('pv-hundredths').innerText = hundredths;
+        }
+
+        function setLength(cm) {
+            document.getElementById('length-slider').value = cm;
+            updateLength(cm);
+        }
+
+        // Scenario Data for Tab 2 Comparison Simulator
+        const scenarios = {
+            1: {
+                title: "跳遠比賽長度視覺化 (1.95m vs 2.1m)",
+                items: [
+                    { name: "皮皮", val: 1.95, color: "from-purple-500 to-indigo-500" },
+                    { name: "多多", val: 2.10, color: "from-blue-500 to-cyan-500" }
+                ],
+                max: 2.5,
+                rows: [
+                    { name: "皮皮 (1.95m)", tens: "0", units: "1", point: ".", tenths: "9", hundredths: "5" },
+                    { name: "多多 (2.1m)", tens: "0", units: "2", point: ".", tenths: "1", hundredths: "0" }
+                ],
+                explanation: `
+                    <div class="font-bold text-base text-amber-900 mb-1"><i class="fa-solid fa-lightbulb text-amber-500"></i> 解題邏輯步驟：</div>
+                    <ol class="list-decimal list-inside space-y-1 text-sm text-amber-950 font-medium">
+                        <li><b>比位值（個位）：</b>皮皮的個位是 <span class="text-purple-700 font-black">1</span>，多多的個位是 <span class="text-blue-700 font-black">2</span>。</li>
+                        <li><b>比較大小：</b>個位數字 <span class="font-black text-red-600">2 > 1</span>，所以不用看小數點後面的數字即可判斷！</li>
+                        <li><b>結論：</b>2.1 公尺 > 1.95 公尺，<span class="font-black text-emerald-700">多多跳得比較遠！</span></li>
+                    </ol>
+                `
+            },
+            2: {
+                title: "跳高比賽高度視覺化 (1.2m vs 1.09m)",
+                items: [
+                    { name: "皮皮", val: 1.20, color: "from-purple-500 to-indigo-500" },
+                    { name: "妮妮", val: 1.09, color: "from-pink-500 to-rose-400" }
+                ],
+                max: 1.5,
+                rows: [
+                    { name: "皮皮 (1.2m)", tens: "0", units: "1", point: ".", tenths: "2", hundredths: "0" },
+                    { name: "妮妮 (1.09m)", tens: "0", units: "1", point: ".", tenths: "0", hundredths: "9" }
+                ],
+                explanation: `
+                    <div class="font-bold text-base text-amber-900 mb-1"><i class="fa-solid fa-lightbulb text-amber-500"></i> 解題邏輯步驟：</div>
+                    <ol class="list-decimal list-inside space-y-1 text-sm text-amber-950 font-medium">
+                        <li><b>比位值（個位）：</b>兩人的個位都是 <span class="font-black">1</span>（相同）。</li>
+                        <li><b>比位值（十分位）：</b>皮皮的十分位是 <span class="text-purple-700 font-black">2</span>，妮妮的十分位是 <span class="text-pink-600 font-black">0</span>。</li>
+                        <li><b>比較大小：</b>十分位數字 <span class="font-black text-red-600">2 > 0</span>。</li>
+                        <li><b>結論：</b>1.2 公尺 > 1.09 公尺，<span class="font-black text-emerald-700">皮皮跳得比較高！</span></li>
+                    </ol>
+                `
+            },
+            3: {
+                title: "壘球擲遠距離視覺化 (34.21m vs 34.28m vs 34.2m)",
+                items: [
+                    { name: "皮皮", val: 34.21, color: "from-purple-500 to-indigo-500" },
+                    { name: "多多", val: 34.28, color: "from-blue-500 to-cyan-500" },
+                    { name: "妮妮", val: 34.20, color: "from-pink-500 to-rose-400" }
+                ],
+                max: 40,
+                rows: [
+                    { name: "皮皮 (34.21m)", tens: "3", units: "4", point: ".", tenths: "2", hundredths: "1" },
+                    { name: "多多 (34.28m)", tens: "3", units: "4", point: ".", tenths: "2", hundredths: "8" },
+                    { name: "妮妮 (34.2m)", tens: "3", units: "4", point: ".", tenths: "2", hundredths: "0" }
+                ],
+                explanation: `
+                    <div class="font-bold text-base text-amber-900 mb-1"><i class="fa-solid fa-lightbulb text-amber-500"></i> 解題邏輯步驟：</div>
+                    <ol class="list-decimal list-inside space-y-1 text-sm text-amber-950 font-medium">
+                        <li><b>比整數與十分位：</b>三人的十位（3）、個位（4）、十分位（2）完全相同！</li>
+                        <li><b>比位值（百分位）：</b>多多的百分位是 <span class="text-blue-700 font-black">8</span>，皮皮是 <span class="text-purple-700 font-black">1</span>，妮妮是 <span class="text-pink-600 font-black">0</span>。</li>
+                        <li><b>比較大小：</b>百分位數字 <span class="font-black text-red-600">8 > 1 > 0</span>。</li>
+                        <li><b>結論：</b>34.28m > 34.21m > 34.2m，<span class="font-black text-emerald-700">多多擲得最遠！</span></li>
+                    </ol>
+                `
+            }
+        };
+
+        function loadScenario(scenId) {
+            const data = scenarios[scenId];
+            if (!data) return;
+
+            // Highlight Scenario Buttons
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`scen-btn-${i}`);
+                if (btn) {
+                    if (i === scenId) {
+                        btn.className = 'p-3 rounded-2xl border-2 text-left transition font-bold border-purple-500 bg-purple-50 text-purple-900 shadow';
+                    } else {
+                        btn.className = 'p-3 rounded-2xl border-2 border-gray-200 hover:border-purple-300 text-left transition font-bold text-gray-700';
+                    }
+                }
+            }
+
+            // Render Title & Visual Bars
+            document.getElementById('comp-title').innerHTML = `<i class="fa-solid fa-person-running text-teal-600"></i> ${data.title}`;
+            const barsContainer = document.getElementById('comp-bars-container');
+            barsContainer.innerHTML = '';
+
+            data.items.forEach(item => {
+                const pct = Math.min(100, (item.val / data.max) * 100);
+                const barHtml = `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-bold text-gray-700">
+                            <span>${item.name}</span>
+                            <span class="font-black text-purple-900">${item.val} m</span>
+                        </div>
+                        <div class="w-full bg-white/70 h-6 rounded-full overflow-hidden p-1 shadow-inner border border-teal-100">
+                            <div class="h-full bg-gradient-to-r ${item.color} rounded-full transition-all duration-700 flex items-center justify-end pr-2 text-[10px] text-white font-bold" style="width: ${pct}%">
+                                ${item.val}m
+                            </div>
+                        </div>
+                    </div>
+                `;
+                barsContainer.innerHTML += barHtml;
+            });
+
+            // Render Aligned Place Value Table
+            const pvTableContainer = document.getElementById('aligned-pv-table');
+            let tableHtml = `
+                <table class="w-full max-w-lg mx-auto text-center border-collapse table-fixed">
+                    <colgroup>
+                        <col class="w-[36%]">
+                        <col class="w-[14%]">
+                        <col class="w-[14%]">
+                        <col class="w-[8%]">
+                        <col class="w-[14%]">
+                        <col class="w-[14%]">
+                    </colgroup>
+                    <thead>
+                        <tr class="bg-indigo-100 text-indigo-900 font-bold text-xs md:text-sm">
+                            <th class="p-2 border border-indigo-200 rounded-tl-xl">參賽者</th>
+                            <th class="p-2 border border-indigo-200">十位</th>
+                            <th class="p-2 border border-indigo-200">個位</th>
+                            <th class="p-1 border border-indigo-200 bg-pink-100 text-pink-900">.</th>
+                            <th class="p-2 border border-indigo-200">十分位</th>
+                            <th class="p-2 border border-indigo-200 rounded-tr-xl">百分位</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-bold text-sm md:text-base">
+            `;
+
+            data.rows.forEach(r => {
+                tableHtml += `
+                    <tr class="border-b border-indigo-100 bg-white hover:bg-purple-50 transition">
+                        <td class="p-2 text-center font-black text-gray-800 border-l border-r border-indigo-100 truncate">${r.name}</td>
+                        <td class="p-2 text-gray-600 border-r border-indigo-100">${r.tens}</td>
+                        <td class="p-2 text-indigo-700 font-black border-r border-indigo-100">${r.units}</td>
+                        <td class="p-1 text-pink-600 font-black bg-pink-50/50 border-r border-indigo-100">.</td>
+                        <td class="p-2 text-purple-700 font-black border-r border-indigo-100">${r.tenths}</td>
+                        <td class="p-2 text-pink-700 font-black border-r border-indigo-100">${r.hundredths}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += `</tbody></table>`;
+            pvTableContainer.innerHTML = tableHtml;
+
+            // Render Explanation Box
+            document.getElementById('comparison-step-box').innerHTML = data.explanation;
+        }
+
+        // Quiz Data
+        const quizQuestions = [
+            {
+                id: 1,
+                question: "1. 課本題：443 公分換算成小數是多少公尺？",
+                options: ["0.443 公尺", "4.43 公尺", "44.3 公尺", "443 公尺"],
+                answer: 1,
+                explanation: "443 公分包含 443 個 0.01 公尺，合起來是 4.43 公尺。"
+            },
+            {
+                id: 2,
+                question: "2. 805 公分是多少個 0.01 公尺？合起來是多少公尺？",
+                options: ["80.5 個，80.5 公尺", "805 個，8.05 公尺", "85 個，8.5 公尺", "805 個，80.5 公尺"],
+                answer: 1,
+                explanation: "1 公分 = 0.01 公尺，805 公分包含 805 個 0.01 公尺，也就是 8.05 公尺。"
+            },
+            {
+                id: 3,
+                question: "3. 皮皮跳高 1.2 公尺，妮妮跳高 1.09 公尺，誰跳得比較高？",
+                options: ["妮妮比較高", "皮皮比較高", "兩人一樣高", "無法比較"],
+                answer: 1,
+                explanation: "比較個位相同 (1=1)，十分位數字皮皮是 2，妮妮是 0。2 > 0，所以 1.2 > 1.09，皮皮比較高。"
+            },
+            {
+                id: 4,
+                question: "4. 壘球擲遠比賽中，34.21m、34.28m、34.2m 三個成績，誰最遠？",
+                options: ["34.21m", "34.28m", "34.2m", "三個一樣遠"],
+                answer: 1,
+                explanation: "比較百分位數字：34.28 的百分位是 8，34.21 是 1，34.20 是 0。8 最重，所以 34.28m 最遠。"
+            },
+            {
+                id: 5,
+                question: "5. 下列哪一個長度的表示法是正確的？",
+                options: [
+                    "374公分 = 37.4公尺",
+                    "125公分 = 1.25公尺",
+                    "520公分 = 52公尺",
+                    "5公分 = 0.5公尺"
+                ],
+                answer: 1,
+                explanation: "125 公分 = 125 個 0.01 公尺 = 1.25 公尺。其餘選項：374cm=3.74m、520cm=5.2m、5cm=0.05m。"
+            }
+        ];
+
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, qIndex) => {
+                let optionsHtml = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHtml += `
+                        <label class="quiz-option-item flex items-center p-3 rounded-xl border border-purple-100 bg-white/70 hover:bg-purple-50 cursor-pointer transition select-none">
+                            <input type="radio" name="q_${qIndex}" value="${optIndex}" onchange="selectOption(${qIndex}, ${optIndex})" class="w-4 h-4 text-purple-600 focus:ring-purple-400">
+                            <span class="ml-3 font-bold text-gray-700 text-sm md:text-base">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                const qCard = `
+                    <div id="quiz-card-${qIndex}" class="bg-white/80 rounded-2xl p-5 border border-purple-100 shadow-sm space-y-3">
+                        <div class="font-black text-purple-900 text-base md:text-lg flex items-start gap-2">
+                            <span>${q.question}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${optionsHtml}
+                        </div>
+                        <div id="quiz-feedback-${qIndex}" class="hidden p-3 rounded-xl text-sm font-bold"></div>
+                    </div>
+                `;
+                container.innerHTML += qCard;
+            });
+        }
+
+        function selectOption(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            quizQuestions.forEach((q, qIndex) => {
+                const selected = userAnswers[qIndex];
+                const feedbackEl = document.getElementById(`quiz-feedback-${qIndex}`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-900', 'bg-rose-100', 'text-rose-900');
+
+                if (selected === undefined) {
+                    feedbackEl.classList.add('bg-amber-100', 'text-amber-900');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> 請選擇一個答案！`;
+                } else if (selected === q.answer) {
+                    score += 20;
+                    feedbackEl.classList.add('bg-emerald-100', 'text-emerald-900');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> 回答正確！ ${q.explanation}`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-100', 'text-rose-900');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i> 回答錯誤。 正確答案是：「${q.options[q.answer]}」。 解析：${q.explanation}`;
+                }
+            });
+
+            const scoreBadge = document.getElementById('quiz-score-badge');
+            const scoreNum = document.getElementById('quiz-score-num');
+            if (scoreBadge && scoreNum) {
+                scoreNum.innerText = score;
+                scoreBadge.classList.remove('hidden');
+            }
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            const scoreBadge = document.getElementById('quiz-score-badge');
+            if (scoreBadge) scoreBadge.classList.add('hidden');
+            renderQuiz();
+        }
+
+        window.onload = function() {
+            createSparkles();
+            updateLength(123);
+            loadScenario(1);
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

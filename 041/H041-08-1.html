@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>併式紀錄與括號的魔法 - 互動學習網頁</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 35%, #6dd5ed 70%, #ffffff 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Shinkai Cloud Background Effect */
+        .sky-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.35;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 25%),
+                radial-gradient(circle at 80% 30%, rgba(255, 225, 180, 0.6) 0%, transparent 30%),
+                radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.5) 0%, transparent 40%);
+        }
+
+        /* Glassmorphic Panel styling */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Highlight animation for formula steps */
+        @keyframes pulse-highlight {
+            0% { background-color: rgba(59, 130, 246, 0.15); }
+            50% { background-color: rgba(245, 158, 11, 0.3); }
+            100% { background-color: rgba(59, 130, 246, 0.15); }
+        }
+
+        .highlight-step {
+            animation: pulse-highlight 2s infinite;
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            accent-color: #2563eb;
+        }
+
+        /* Floating Cloud Animation */
+        @keyframes floatCloud {
+            0% { transform: translateX(-10%); }
+            50% { transform: translateX(10%); }
+            100% { transform: translateX(-10%); }
+        }
+        .floating-cloud {
+            animation: floatCloud 25s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-12">
+
+    <!-- Background Clouds Overlay -->
+    <div class="sky-bg">
+        <div class="absolute top-10 left-10 w-72 h-36 bg-white/30 rounded-full blur-xl floating-cloud"></div>
+        <div class="absolute top-40 right-20 w-96 h-48 bg-amber-100/30 rounded-full blur-2xl floating-cloud" style="animation-delay: -5s;"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-5xl mx-auto px-4 py-6">
+
+        <!-- 閒雲數學小棧 Logo 與標題 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <!-- Header Banner -->
+        <header class="glass-panel rounded-3xl p-6 mb-8 text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-blue-900 pointer-events-none">
+                <i class="fa-solid fa-calculator"></i>
+            </div>
+            <span class="inline-block px-4 py-1 bg-blue-600 text-white font-bold rounded-full text-xs tracking-wider mb-2 shadow">國小四年級數學 8-1 互動教學網頁</span>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950 tracking-wide mb-2">
+                ✨ 兩步驟併式與括號魔法教室
+            </h1>
+            <p class="text-slate-600 text-sm md:text-base max-w-2xl mx-auto">
+                移動滑桿、觀察數字變換，理解「先算什麼」與「括號」在併式中的神奇魔力！
+            </p>
+
+            <!-- Navigation Tabs -->
+            <div class="flex justify-center flex-wrap gap-2 mt-6">
+                <button onclick="switchTab('concept1')" id="tab-concept1" class="tab-btn px-5 py-2.5 rounded-2xl font-bold text-sm transition-all bg-blue-600 text-white shadow-md hover:bg-blue-700">
+                    <i class="fa-solid fa-cookie-bite mr-2"></i>情境 1：先加再減／先減再加
+                </button>
+                <button onclick="switchTab('concept2')" id="tab-concept2" class="tab-btn px-5 py-2.5 rounded-2xl font-bold text-sm transition-all bg-white/80 text-slate-700 hover:bg-white shadow">
+                    <i class="fa-solid fa-store mr-2"></i>情境 2：兩中解法與括號位置
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-5 py-2.5 rounded-2xl font-bold text-sm transition-all bg-white/80 text-slate-700 hover:bg-white shadow">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>隨堂小測驗 (5題)
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: 併式基礎觀念與滑桿互動 -->
+        <div id="section-concept1" class="tab-content space-y-6">
+            
+            <!-- Context Control Card -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-2xl bg-cyan-500 text-white flex items-center justify-center font-bold text-xl shadow">
+                        1
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800">綠豆沙飲品店情境動態探索</h2>
+                </div>
+
+                <!-- Scenario Selector -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <button onclick="setScenarioMode('addThenSub')" id="mode-addSub" class="p-4 rounded-2xl border-2 border-blue-500 bg-blue-50/80 text-left transition hover:border-blue-600 flex items-center space-x-3">
+                        <i class="fa-solid fa-circle-plus text-blue-600 text-2xl"></i>
+                        <div>
+                            <div class="font-bold text-blue-900">模式 A：先加再減</div>
+                            <div class="text-xs text-slate-500">（原本有 ➜ 又放進 ➜ 賣掉／用掉）</div>
+                        </div>
+                    </button>
+                    <button onclick="setScenarioMode('subThenAdd')" id="mode-subAdd" class="p-4 rounded-2xl border-2 border-slate-200 bg-white/60 text-left transition hover:border-blue-400 flex items-center space-x-3">
+                        <i class="fa-solid fa-circle-minus text-amber-600 text-2xl"></i>
+                        <div>
+                            <div class="font-bold text-slate-800">模式 B：先減再加</div>
+                            <div class="text-xs text-slate-500">（原本有 ➜ 借出／用掉 ➜ 又借進）</div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Interactive Sliders -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white/70 p-5 rounded-2xl border border-slate-200/80 mb-6">
+                    <!-- Slider 1 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label id="lbl-val1" class="font-bold text-slate-700 text-sm">原本杯數 (A)</label>
+                            <span id="disp-val1" class="text-lg font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-xl">75</span>
+                        </div>
+                        <input type="range" id="input-val1" min="10" max="200" value="75" step="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="updateConcept1()">
+                    </div>
+
+                    <!-- Slider 2 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label id="lbl-val2" class="font-bold text-slate-700 text-sm">放進杯數 (B)</label>
+                            <span id="disp-val2" class="text-lg font-extrabold text-teal-600 bg-teal-50 px-3 py-1 rounded-xl">25</span>
+                        </div>
+                        <input type="range" id="input-val2" min="5" max="100" value="25" step="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="updateConcept1()">
+                    </div>
+
+                    <!-- Slider 3 -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label id="lbl-val3" class="font-bold text-slate-700 text-sm">賣掉杯數 (C)</label>
+                            <span id="disp-val3" class="text-lg font-extrabold text-rose-600 bg-rose-50 px-3 py-1 rounded-xl">70</span>
+                        </div>
+                        <input type="range" id="input-val3" min="5" max="100" value="70" step="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer" oninput="updateConcept1()">
+                    </div>
+                </div>
+
+                <!-- Live Dynamic Equation Visualization -->
+                <div class="bg-gradient-to-r from-slate-900 to-blue-950 rounded-2xl p-6 text-white shadow-inner">
+                    <h3 class="text-amber-300 text-xs font-bold tracking-widest uppercase mb-3 flex items-center">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>兩步驟算式 ➔ 併式紀錄分解
+                    </h3>
+                    
+                    <!-- Step 1 & Step 2 Breakdown -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10">
+                            <div class="text-xs text-cyan-300 font-bold mb-1">【分步算式 1】：先算</div>
+                            <div id="step1-expr" class="text-xl font-bold font-mono">75 + 25 = <span class="text-amber-400">100</span></div>
+                            <div id="step1-desc" class="text-xs text-slate-300 mt-1">放進去之後的杯數</div>
+                        </div>
+
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10">
+                            <div class="text-xs text-emerald-300 font-bold mb-1">【分步算式 2】：再算</div>
+                            <div id="step2-expr" class="text-xl font-bold font-mono"><span class="text-amber-400">100</span> - 70 = <span class="text-emerald-400">30</span></div>
+                            <div id="step2-desc" class="text-xs text-slate-300 mt-1">賣掉後剩下的杯數</div>
+                        </div>
+                    </div>
+
+                    <!-- Merged Combined Equation -->
+                    <div class="bg-blue-950/90 border border-cyan-500/50 p-5 rounded-2xl text-center">
+                        <div class="text-xs text-cyan-300 mb-2 font-bold tracking-wider">🌟 最終併成一個算式（用括號把「先算的部分」包起來）</div>
+                        <div class="text-2xl md:text-3xl font-extrabold font-mono tracking-wide text-white">
+                            <span id="combined-expr-text" class="px-3 py-1 bg-cyan-900/60 rounded-xl border border-cyan-400/30">
+                                (<span class="text-cyan-300">75 + 25</span>) - 70 = <span class="text-amber-300">30</span>
+                            </span>
+                        </div>
+                        <div id="combined-explanation" class="text-xs text-slate-300 mt-3 max-w-lg mx-auto bg-white/5 py-2 px-4 rounded-xl">
+                            因為 <span class="text-amber-300 font-bold font-mono">100</span> 是由 <span class="text-cyan-300 font-bold font-mono">(75 + 25)</span> 算出來的，所以將 100 用 <span class="text-cyan-300 font-bold font-mono">(75 + 25)</span> 替換！
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Teaching Tip Card -->
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-l-amber-500 flex items-start space-x-4">
+                <div class="text-amber-500 text-2xl mt-1">
+                    <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-800">教學重點溫馨提示：</h4>
+                    <p class="text-sm text-slate-600 mt-1">
+                        在兩步驟問題中，當我們要把兩個算式合併時，<strong>「先算的算式」要用括號 <span class="text-blue-600 font-bold font-mono">( )</span> 包起來</strong>。括號代表要「最優先計算」的意思哦！
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB 2: 先減再減與括號位置比對 (皮皮 vs 美美) -->
+        <div id="section-concept2" class="tab-content space-y-6 hidden">
+            
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-500 text-white flex items-center justify-center font-bold text-xl shadow">
+                        2
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">果汁與購物情境：兩種不同的併式思考</h2>
+                        <p class="text-xs text-slate-500">一箱果汁有 48 瓶，阿姨拿走 12 瓶，媽媽拿走 8 瓶，還剩下幾瓶？</p>
+                    </div>
+                </div>
+
+                <!-- Live Number Sliders for Scenario 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/70 p-4 rounded-2xl border border-slate-200 mb-6">
+                    <div>
+                        <label class="font-bold text-xs text-slate-600">原本總瓶數</label>
+                        <input type="range" id="juice-total" min="30" max="100" value="48" step="2" class="w-full mt-1" oninput="updateConcept2()">
+                        <span id="disp-j-total" class="font-bold text-blue-600">48 瓶</span>
+                    </div>
+                    <div>
+                        <label class="font-bold text-xs text-slate-600">阿姨拿走瓶數</label>
+                        <input type="range" id="juice-aunt" min="2" max="25" value="12" step="1" class="w-full mt-1" oninput="updateConcept2()">
+                        <span id="disp-j-aunt" class="font-bold text-amber-600">12 瓶</span>
+                    </div>
+                    <div>
+                        <label class="font-bold text-xs text-slate-600">媽媽拿走瓶數</label>
+                        <input type="range" id="juice-mom" min="2" max="25" value="8" step="1" class="w-full mt-1" oninput="updateConcept2()">
+                        <span id="disp-j-mom" class="font-bold text-rose-600">8 瓶</span>
+                    </div>
+                </div>
+
+                <!-- Two Methods Comparison Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Pipi's Method -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-5 shadow-sm relative">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">皮</span>
+                            <div>
+                                <h3 class="font-bold text-blue-950">皮皮的解法：連續扣除</h3>
+                                <div class="text-xs text-blue-600">（先算拿走阿姨的，再算拿走媽媽的）</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 rounded-xl p-3 mb-3 text-sm space-y-1 font-mono">
+                            <div>先算：<span id="pipi-s1">48 - 12 = 36</span></div>
+                            <div>再算：<span id="pipi-s2">36 - 8 = 28</span></div>
+                        </div>
+
+                        <div class="bg-blue-600 text-white p-3 rounded-xl font-mono text-center font-bold text-lg">
+                            併式：<span id="pipi-combined">(48 - 12) - 8 = 28</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">
+                            💡 括號 <span class="font-mono font-bold text-blue-700">(48 - 12)</span> 表示阿姨拿走後剩下的瓶數。
+                        </p>
+                    </div>
+
+                    <!-- Meimei's Method -->
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-5 shadow-sm relative">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm">美</span>
+                            <div>
+                                <h3 class="font-bold text-amber-950">美美的解法：先加總再扣</h3>
+                                <div class="text-xs text-amber-700">（先算兩人一共拿走幾瓶，再統一扣除）</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 rounded-xl p-3 mb-3 text-sm space-y-1 font-mono">
+                            <div>先算：<span id="meimei-s1">12 + 8 = 20</span></div>
+                            <div>再算：<span id="meimei-s2">48 - 20 = 28</span></div>
+                        </div>
+
+                        <div class="bg-amber-600 text-white p-3 rounded-xl font-mono text-center font-bold text-lg">
+                            併式：<span id="meimei-combined">48 - (12 + 8) = 28</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">
+                            💡 括號 <span class="font-mono font-bold text-amber-700">(12 + 8)</span> 表示阿姨和媽媽一共拿走總瓶數！
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Result Equality Banner -->
+                <div class="mt-6 bg-emerald-500 text-white rounded-2xl p-4 text-center font-bold shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-circle-check text-2xl"></i>
+                    <span>兩種想法都能算對！結果都是 <span id="final-result-sync" class="text-2xl font-mono underline">28</span> 瓶！</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TAB 3: 隨堂測驗 (5題與即時回饋) -->
+        <div id="section-quiz" class="tab-content space-y-6 hidden">
+            
+            <div class="glass-panel rounded-3xl p-6 shadow-xl">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-bold text-xl shadow">
+                            <i class="fa-solid fa-pen-ruler"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">併式學習效果測驗</h2>
+                            <p class="text-xs text-slate-500">回答以下 5 道題目，獲得即時學習評量回饋！</p>
+                        </div>
+                    </div>
+                    <div id="quiz-score-badge" class="hidden px-4 py-2 bg-purple-100 border border-purple-300 rounded-2xl font-bold text-purple-700">
+                        得分：<span id="quiz-score">0</span> / 100
+                    </div>
+                </div>
+
+                <!-- Quiz Questions Container -->
+                <div id="quiz-list" class="space-y-6">
+                    <!-- Dynamic rendering by JS -->
+                </div>
+
+                <!-- Submit & Reset Buttons -->
+                <div class="mt-8 text-center space-x-4">
+                    <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>提交答案並評分
+                    </button>
+                    <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition">
+                        <i class="fa-solid fa-rotate-right mr-2"></i>重新作答
+                    </button>
+                </div>
+
+                <!-- Quiz Feedback Modal Result -->
+                <div id="quiz-result-box" class="hidden mt-6 p-6 rounded-2xl border text-center transition-all">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-xs text-slate-600 font-medium">
+        </footer>
+
+    </div>
+
+    <script>
+        // Current Scenario Mode: 'addThenSub' or 'subThenAdd'
+        let currentMode = 'addThenSub';
+
+        // Initialize App on Load
+        window.onload = function() {
+            updateConcept1();
+            updateConcept2();
+            renderQuiz();
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-white/80', 'text-slate-700');
+            });
+
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            activeTab.classList.remove('bg-white/80', 'text-slate-700');
+            activeTab.classList.add('bg-blue-600', 'text-white');
+        }
+
+        // Set Mode for Concept 1
+        function setScenarioMode(mode) {
+            currentMode = mode;
+            const btnAddSub = document.getElementById('mode-addSub');
+            const btnSubAdd = document.getElementById('mode-subAdd');
+
+            if(mode === 'addThenSub') {
+                btnAddSub.className = "p-4 rounded-2xl border-2 border-blue-500 bg-blue-50/80 text-left transition hover:border-blue-600 flex items-center space-x-3";
+                btnSubAdd.className = "p-4 rounded-2xl border-2 border-slate-200 bg-white/60 text-left transition hover:border-blue-400 flex items-center space-x-3";
+                
+                document.getElementById('lbl-val1').innerText = "原本杯數 (A)";
+                document.getElementById('lbl-val2').innerText = "放進杯數 (B)";
+                document.getElementById('lbl-val3').innerText = "賣掉杯數 (C)";
+            } else {
+                btnSubAdd.className = "p-4 rounded-2xl border-2 border-blue-500 bg-blue-50/80 text-left transition hover:border-blue-600 flex items-center space-x-3";
+                btnAddSub.className = "p-4 rounded-2xl border-2 border-slate-200 bg-white/60 text-left transition hover:border-blue-400 flex items-center space-x-3";
+
+                document.getElementById('lbl-val1').innerText = "原本書本 (A)";
+                document.getElementById('lbl-val2').innerText = "借出書本 (B)";
+                document.getElementById('lbl-val3').innerText = "放進書本 (C)";
+            }
+
+            updateConcept1();
+        }
+
+        // Concept 1 Calculation & UI Update
+        function updateConcept1() {
+            let v1 = parseInt(document.getElementById('input-val1').value);
+            let v2 = parseInt(document.getElementById('input-val2').value);
+            let v3 = parseInt(document.getElementById('input-val3').value);
+
+            if (currentMode === 'addThenSub') {
+                // 防負數機制：當賣掉/用掉杯數 (v3) 超過總數 (v1 + v2) 時自動限制在 0
+                if (v3 > v1 + v2) {
+                    v3 = v1 + v2;
+                    document.getElementById('input-val3').value = v3;
+                }
+
+                const step1Result = v1 + v2;
+                const finalResult = Math.max(0, step1Result - v3);
+
+                document.getElementById('disp-val1').innerText = v1;
+                document.getElementById('disp-val2').innerText = v2;
+                document.getElementById('disp-val3').innerText = v3;
+
+                document.getElementById('step1-expr').innerHTML = `${v1} + ${v2} = <span class="text-amber-400 font-bold">${step1Result}</span>`;
+                document.getElementById('step1-desc').innerText = "放進去之後的總杯數";
+
+                document.getElementById('step2-expr').innerHTML = `<span class="text-amber-400 font-bold">${step1Result}</span> - ${v3} = <span class="text-emerald-400 font-bold">${finalResult}</span>`;
+                document.getElementById('step2-desc').innerText = "賣掉後剩下的杯數";
+
+                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} + ${v2}</span>) - ${v3} = <span class="text-amber-300">${finalResult}</span>`;
+                document.getElementById('combined-explanation').innerHTML = `因為 <span class="text-amber-300 font-bold font-mono">${step1Result}</span> 是由 <span class="text-cyan-300 font-bold font-mono">(${v1} + ${v2})</span> 算出來的，所以將 ${step1Result} 用 <span class="text-cyan-300 font-bold font-mono">(${v1} + ${v2})</span> 替換！`;
+            } else {
+                // SubThenAdd 模式：防負數機制（借出數 v2 不可大於原本書本數 v1）
+                if (v2 > v1) {
+                    v2 = v1;
+                    document.getElementById('input-val2').value = v2;
+                }
+
+                const step1Result = v1 - v2;
+                const finalResult = step1Result + v3;
+
+                document.getElementById('disp-val1').innerText = v1;
+                document.getElementById('disp-val2').innerText = v2;
+                document.getElementById('disp-val3').innerText = v3;
+
+                document.getElementById('step1-expr').innerHTML = `${v1} - ${v2} = <span class="text-amber-400 font-bold">${step1Result}</span>`;
+                document.getElementById('step1-desc').innerText = "借出之後剩下的書本數";
+
+                document.getElementById('step2-expr').innerHTML = `<span class="text-amber-400 font-bold">${step1Result}</span> + ${v3} = <span class="text-emerald-400 font-bold">${finalResult}</span>`;
+                document.getElementById('step2-desc').innerText = "再放進後現在的書本數";
+
+                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} - ${v2}</span>) + ${v3} = <span class="text-amber-300">${finalResult}</span>`;
+                document.getElementById('combined-explanation').innerHTML = `因為 <span class="text-amber-300 font-bold font-mono">${step1Result}</span> 是由 <span class="text-cyan-300 font-bold font-mono">(${v1} - ${v2})</span> 算出來的，所以將 ${step1Result} 用 <span class="text-cyan-300 font-bold font-mono">(${v1} - ${v2})</span> 替換！`;
+            }
+        }
+
+        // Concept 2 Calculation & UI Update
+        function updateConcept2() {
+            let total = parseInt(document.getElementById('juice-total').value);
+            let aunt = parseInt(document.getElementById('juice-aunt').value);
+            let mom = parseInt(document.getElementById('juice-mom').value);
+
+            // 防負數機制：阿姨與媽媽拿走總和不可超過果汁總瓶數
+            if (aunt + mom > total) {
+                if (aunt > total) {
+                    aunt = total;
+                    document.getElementById('juice-aunt').value = aunt;
+                }
+                if (aunt + mom > total) {
+                    mom = total - aunt;
+                    document.getElementById('juice-mom').value = mom;
+                }
+            }
+
+            document.getElementById('disp-j-total').innerText = `${total} 瓶`;
+            document.getElementById('disp-j-aunt').innerText = `${aunt} 瓶`;
+            document.getElementById('disp-j-mom').innerText = `${mom} 瓶`;
+
+            // Pipi: (total - aunt) - mom
+            const pipiS1 = total - aunt;
+            const pipiFinal = Math.max(0, pipiS1 - mom);
+            document.getElementById('pipi-s1').innerText = `${total} - ${aunt} = ${pipiS1}`;
+            document.getElementById('pipi-s2').innerText = `${pipiS1} - ${mom} = ${pipiFinal}`;
+            document.getElementById('pipi-combined').innerText = `(${total} - ${aunt}) - ${mom} = ${pipiFinal}`;
+
+            // Meimei: total - (aunt + mom)
+            const meimeiS1 = aunt + mom;
+            const meimeiFinal = Math.max(0, total - meimeiS1);
+            document.getElementById('meimei-s1').innerText = `${aunt} + ${mom} = ${meimeiS1}`;
+            document.getElementById('meimei-s2').innerText = `${total} - ${meimeiS1} = ${meimeiFinal}`;
+            document.getElementById('meimei-combined').innerText = `${total} - (${aunt} + ${mom}) = ${meimeiFinal}`;
+
+            document.getElementById('final-result-sync').innerText = pipiFinal;
+        }
+
+        const quizData = [
+            {
+                id: 1,
+                question: "冰箱裡原本有 75 杯綠豆沙，又放進 25 杯，賣掉 70 杯後，還剩下幾杯？下列哪一個併式最正確？",
+                options: [
+                    "( 75 + 25 ) - 70 = 30",
+                    "75 + ( 25 - 70 ) = 30",
+                    "( 75 - 70 ) + 25 = 30",
+                    "75 + 25 - 70"
+                ],
+                answer: 0,
+                explanation: "題目要先算『放進去後的總數』(75 + 25)，所以需要將 (75 + 25) 加括號先算，再減去 70。"
+            },
+            {
+                id: 2,
+                question: "書架上原有 128 本書，借出 24 本後，又放進 15 本。將兩步驟合在一起寫成併式，應該記作什麼？",
+                options: [
+                    "128 - ( 24 + 15 ) = 119",
+                    "( 128 - 24 ) + 15 = 119",
+                    "( 128 + 15 ) - 24 = 119",
+                    "128 - 24 + 15 = 119"
+                ],
+                answer: 1,
+                explanation: "先算借出後的數量為 (128 - 24)，再加上又放進的 15 本，故併式為 ( 128 - 24 ) + 15 = 119。"
+            },
+            {
+                id: 3,
+                question: "一個湯鍋原價 1250 元，打折後比原價便宜了 125 元。媽媽付了 1500 元，會找回多少元？併式應為？",
+                options: [
+                    "( 1500 - 1250 ) - 125 = 125",
+                    "1500 - ( 1250 - 125 ) = 375",
+                    "1250 - ( 1500 - 125 ) = 375",
+                    "( 1250 - 125 ) - 1500 = 375"
+                ],
+                answer: 1,
+                explanation: "要算出找回的錢，必須先算出折價後的售價 (1250 - 125)，再用付的 1500 元去減，即 1500 - ( 1250 - 125 ) = 375。"
+            },
+            {
+                id: 4,
+                question: "一箱果汁 48 瓶，阿姨拿走 12 瓶，媽媽拿走 8 瓶。若美美想『先算出兩人一共拿走幾瓶』，她的併式應為？",
+                options: [
+                    "( 48 - 12 ) - 8 = 28",
+                    "48 - 12 + 8 = 44",
+                    "48 - ( 12 + 8 ) = 28",
+                    "( 48 - 8 ) - 12 = 28"
+                ],
+                answer: 2,
+                explanation: "先算兩人拿走總數 (12 + 8)，再從 48 瓶扣除，併式記為 48 - ( 12 + 8 ) = 28。"
+            },
+            {
+                id: 5,
+                question: "哥哥原有 130 元，買早餐花掉 65 元，媽媽又給哥哥 100 元，現在哥哥有幾元？併式應寫成？",
+                options: [
+                    "( 130 - 65 ) + 100 = 165",
+                    "130 - ( 65 + 100 ) = 165",
+                    "( 130 + 100 ) - 65 = 165",
+                    "130 - 65 = 65"
+                ],
+                answer: 0,
+                explanation: "先算花掉早餐後的錢 (130 - 65)，再加上媽媽給的 100 元，併式為 ( 130 - 65 ) + 100 = 165。"
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-list');
+            container.innerHTML = quizData.map((q, idx) => `
+                <div class="bg-white/80 p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="font-bold text-slate-800 text-base mb-3">
+                        <span class="inline-block px-2.5 py-1 bg-purple-100 text-purple-700 text-xs rounded-lg mr-2 font-mono">Q${idx + 1}</span>
+                        ${q.question}
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="flex items-center p-3 rounded-xl border border-slate-200 bg-white hover:bg-purple-50 cursor-pointer transition">
+                                <input type="radio" name="q_${q.id}" value="${oIdx}" class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                                <span class="ml-3 text-sm font-mono text-slate-700 font-medium">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-${q.id}" class="hidden mt-3 text-xs p-3 rounded-xl"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkQuizAnswers() {
+            let score = 0;
+            let answeredAll = true;
+
+            quizData.forEach(q => {
+                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                const fb = document.getElementById(`feedback-${q.id}`);
+                fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+                if (!selected) {
+                    answeredAll = false;
+                    fb.classList.add('bg-amber-100', 'text-amber-800');
+                    fb.innerHTML = `⚠️ 請選擇此題答案。`;
+                    fb.classList.remove('hidden');
+                    return;
+                }
+
+                const userAns = parseInt(selected.value);
+                if (userAns === q.answer) {
+                    score += 20;
+                    fb.classList.add('bg-emerald-100', 'text-emerald-800');
+                    fb.innerHTML = `✅ <strong>回答正確！</strong> ${q.explanation}`;
+                } else {
+                    fb.classList.add('bg-rose-100', 'text-rose-800');
+                    fb.innerHTML = `❌ <strong>回答錯誤。</strong> 正確答案為：<span class="font-mono font-bold">${q.options[q.answer]}</span>。<br>${q.explanation}`;
+                }
+                fb.classList.remove('hidden');
+            });
+
+            const scoreBadge = document.getElementById('quiz-score-badge');
+            const scoreText = document.getElementById('quiz-score');
+            const resultBox = document.getElementById('quiz-result-box');
+
+            scoreBadge.classList.remove('hidden');
+            scoreText.innerText = score;
+
+            resultBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-amber-50', 'border-amber-200');
+
+            if (score === 100) {
+                resultBox.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-900');
+                resultBox.innerHTML = `
+                    <div class="text-3xl mb-1">🎉 滿分太棒了！</div>
+                    <div class="font-bold text-lg">你已經完全掌握「併式紀錄與括號」的計算邏輯囉！</div>
+                `;
+            } else {
+                resultBox.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-900');
+                resultBox.innerHTML = `
+                    <div class="text-2xl mb-1">💪 得分：${score} 分！</div>
+                    <div class="text-sm">請參考每題下方解析，點擊頂部滑桿重新操作學習，就能更加熟練哦！</div>
+                `;
+            }
+        }
+
+        function resetQuiz() {
+            quizData.forEach(q => {
+                const radios = document.querySelectorAll(`input[name="q_${q.id}"]`);
+                radios.forEach(r => r.checked = false);
+                const fb = document.getElementById(`feedback-${q.id}`);
+                fb.classList.add('hidden');
+            });
+
+            document.getElementById('quiz-score-badge').classList.add('hidden');
+            document.getElementById('quiz-result-box').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

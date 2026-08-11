@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四年級數學：乘除兩步驟與括號探究網頁</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #312e81 70%, #4c1d95 100%);
+            background-attachment: fixed;
+            color: #1e293b;
+        }
+
+        /* 新海誠天空夢幻漸層背景背景 */
+        .shinkai-bg {
+            background: linear-gradient(180deg, 
+                rgba(14, 165, 233, 0.15) 0%, 
+                rgba(99, 102, 241, 0.2) 40%, 
+                rgba(217, 70, 239, 0.15) 70%, 
+                rgba(244, 63, 94, 0.1) 100%);
+        }
+
+        /* 玻璃擬物風格卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .glass-card-dark {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* 自訂可愛滑桿軌道 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #f43f5e);
+            border-radius: 8px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -7px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 3px solid #6366f1;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #e0e7ff;
+        }
+
+        /* 高亮波浪與動畫效果 */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(244, 63, 94, 0.6); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        .bracket-highlight {
+            background-color: #fef08a;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-weight: 700;
+            color: #854d0e;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* 甜甜圈網格視覺 (適度縮小以利一次看清完整分組) */
+        .donut-item {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fbbf24, #d97706);
+            border: 2px solid #78350f;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .donut-item::after {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #ffffff;
+            opacity: 0.8;
+        }
+
+        /* 新海誠星空與雲朵效果 */
+        .cloud-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            filter: blur(20px);
+            animation: floatCloud 25s infinite linear;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-200px); }
+            100% { transform: translateX(100vw); }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-800 pb-16">
+
+    <div class="cloud-bg">
+        <div class="cloud w-96 h-32 top-10 left-10" style="animation-duration: 35s;"></div>
+        <div class="cloud w-80 h-28 top-40 right-20" style="animation-duration: 45s; animation-delay: -10s;"></div>
+        <div class="cloud w-[500px] h-40 bottom-20 left-1/3" style="animation-duration: 50s; animation-delay: -5s;"></div>
+    </div>
+
+    <header class="relative z-10 max-w-6xl mx-auto px-4 pt-8 pb-4 text-center">
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-pink-200 to-amber-100 tracking-tight drop-shadow-md mb-3">
+            四年級數學 8-3 乘與除兩步驟併式與括號
+        </h1>
+        <p class="text-sky-100/80 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            拉動滑桿觀察「算式順序」與「括號應用」的奧秘，體驗皮皮與小甲不同的思考視角！
+        </p>
+
+        <!-- 分頁/模組切換頁籤 (淺紅、淺黃、淺綠、淺藍) -->
+        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mt-6">
+            <button onclick="switchTab('donutTab')" id="btn-donutTab" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg bg-rose-200 text-rose-950 border border-rose-300 scale-105 ring-2 ring-rose-400">
+                <i class="fa-solid fa-store mr-1.5"></i> 1. 甜甜圈盒裝 (乘法結合)
+            </button>
+            <button onclick="switchTab('ribbonTab')" id="btn-ribbonTab" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md bg-yellow-100/70 text-yellow-950 border border-yellow-200 opacity-80 hover:opacity-100">
+                <i class="fa-solid fa-ribbon mr-1.5"></i> 2. 彩帶分段 (乘除併式)
+            </button>
+            <button onclick="switchTab('tissueTab')" id="btn-tissueTab" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md bg-emerald-100/70 text-emerald-950 border border-emerald-200 opacity-80 hover:opacity-100">
+                <i class="fa-solid fa-box-open mr-1.5"></i> 3. 衛生紙連除 (連除與括號)
+            </button>
+            <button onclick="switchTab('quizTab')" id="btn-quizTab" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md bg-sky-100/70 text-sky-950 border border-sky-200 opacity-80 hover:opacity-100">
+                <i class="fa-solid fa-circle-question mr-1.5"></i> 4. 歷程性小評量 (5題)
+            </button>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto px-4 mt-4">
+        
+        <!-- 模組 1: 甜甜圈盒裝探究 (對應課本 p.124) -->
+        <section id="donutTab" class="tab-content transition-opacity duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制面板 -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 border-b border-indigo-100 pb-3 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold">8-3</span>
+                            <h2 class="text-xl font-bold text-indigo-950">爸爸買甜甜圈問題探究</h2>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-6 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                            💡 <strong>教學目標：</strong>理解當問題涉及「單價」、「每盒個數」、「盒數」時，先算一盒金額或是先算總個數，併式結果皆相同。
+                        </p>
+
+                        <!-- 滑桿參數調整 -->
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>🍩 每個甜甜圈單價：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="donutPriceVal">45 元</span>
+                                </div>
+                                <input type="range" id="donutPrice" min="10" max="100" step="5" value="45" oninput="updateDonutLab()">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>📦 每盒甜甜圈個數：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="perBoxVal">6 個</span>
+                                </div>
+                                <input type="range" id="perBox" min="2" max="12" step="1" value="6" oninput="updateDonutLab()">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>🛒 買了幾盒：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="boxCountVal">5 盒</span>
+                                </div>
+                                <input type="range" id="boxCount" min="1" max="10" step="1" value="5" oninput="updateDonutLab()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 數據彙總 -->
+                    <div class="mt-6 pt-4 border-t border-indigo-100 bg-indigo-50/70 p-4 rounded-xl text-center">
+                        <span class="text-xs text-indigo-800 font-semibold uppercase tracking-wider">總共需要支付金額</span>
+                        <div class="text-3xl font-black text-rose-600 mt-1" id="donutTotalResult">1350 元</div>
+                    </div>
+                </div>
+
+                <!-- 右側視角比較與視覺化 -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- 動態實體視覺化 -->
+                    <div class="glass-card rounded-2xl p-6 shadow-xl">
+                        <h3 class="font-bold text-sm text-slate-500 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-eye text-sky-500"></i> 甜甜圈實體排列圖 (共 <span id="donutTotalCount" class="text-indigo-600 font-bold">30</span> 個)
+                        </h3>
+                        <div id="donutVisualBox" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto p-3 bg-amber-50/50 rounded-xl border border-amber-200">
+                            <!-- 由 JS 動態生成甜甜圈盒裝視覺 -->
+                        </div>
+                    </div>
+
+                    <!-- 兩位小朋友解法對比卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- 皮皮法 -->
+                        <div class="glass-card rounded-2xl p-5 border-l-4 border-l-sky-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-sky-100 text-sky-800 text-xs font-bold px-2.5 py-1 rounded-md">皮皮的做法</span>
+                                <span class="text-xs text-slate-500">先算1盒價格</span>
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-1 mb-3">
+                                <div>先算 1 盒：<span id="pipiStep1" class="font-bold text-sky-700">45 × 6 = 270</span></div>
+                                <div>再算 5 盒：<span id="pipiStep2" class="font-bold text-sky-700">270 × 5 = 1350</span></div>
+                            </div>
+                            <div class="bg-sky-50 p-3 rounded-lg border border-sky-200">
+                                <div class="text-xs font-bold text-sky-900 mb-1">合併成一個算式：</div>
+                                <div class="text-base font-extrabold text-sky-700 font-mono" id="pipiCombined">
+                                    (<span class="bracket-highlight">45 × 6</span>) × 5 = 1350
+                                </div>
+                                <p class="text-[11px] text-sky-800/80 mt-1">括號表示先算出買「1盒的錢」</p>
+                            </div>
+                        </div>
+
+                        <!-- 小甲法 -->
+                        <div class="glass-card rounded-2xl p-5 border-l-4 border-l-purple-500">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-md">小甲的做法</span>
+                                <span class="text-xs text-slate-500">先算總個數</span>
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-1 mb-3">
+                                <div>先算總個數：<span id="xiaojiaStep1" class="font-bold text-purple-700">6 × 5 = 30</span></div>
+                                <div>再算總金額：<span id="xiaojiaStep2" class="font-bold text-purple-700">45 × 30 = 1350</span></div>
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                <div class="text-xs font-bold text-purple-900 mb-1">合併成一個算式：</div>
+                                <div class="text-base font-extrabold text-purple-700 font-mono" id="xiaojiaCombined">
+                                    45 × (<span class="bracket-highlight" style="background:#fef08a; color:#713f12">6 × 5</span>) = 1350
+                                </div>
+                                <p class="text-[11px] text-purple-800/80 mt-1">括號表示先算出買「30個甜甜圈」</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模組 2: 彩帶分段探究 (對應課本 p.125) -->
+        <section id="ribbonTab" class="tab-content hidden transition-opacity duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制面板 -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 border-b border-indigo-100 pb-3 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-teal-500 text-white flex items-center justify-center font-bold">8-3</span>
+                            <h2 class="text-xl font-bold text-indigo-950">彩帶長度與分段探究</h2>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-6 bg-teal-50 p-3 rounded-lg border border-teal-200">
+                            💡 <strong>教學目標：</strong>體驗「先乘再除」與「先除再乘」的圖像意義。觀察彩帶拼接與等分分割的動態變化。
+                        </p>
+
+                        <!-- 切換彩帶情境 -->
+                        <div class="flex bg-slate-200 p-1 rounded-xl mb-6">
+                            <button onclick="setRibbonMode('mode1')" id="rMode1Btn" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-teal-700 shadow-sm">
+                                情境 1: 先乘再除
+                            </button>
+                            <button onclick="setRibbonMode('mode2')" id="rMode2Btn" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600">
+                                情境 2: 先除再乘
+                            </button>
+                        </div>
+
+                        <!-- 參數滑桿 -->
+                        <div class="space-y-5" id="ribbonControls">
+                            <!-- 動態渲染控制項 -->
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-indigo-100 bg-teal-50/70 p-4 rounded-xl text-center">
+                        <span class="text-xs text-teal-800 font-semibold uppercase tracking-wider">最後計算結果</span>
+                        <div class="text-3xl font-black text-teal-600 mt-1" id="ribbonResult">8 公分</div>
+                    </div>
+                </div>
+
+                <!-- 右側彩帶視覺與併式說明 -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-500 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-ruler-horizontal text-teal-500"></i> 彩帶分割圖像模擬
+                        </h3>
+
+                        <!-- 彩帶動態示意圖區域 -->
+                        <div class="space-y-4 bg-slate-900/5 p-4 rounded-xl border border-slate-200 mb-6">
+                            <div>
+                                <span class="text-xs font-bold text-slate-600 block mb-1" id="ribbonVisTitle1">藍色彩帶 (6段，每段12cm)</span>
+                                <div id="ribbonBar1" class="h-10 bg-sky-400 rounded-lg flex overflow-hidden shadow-inner border border-sky-500">
+                                    <!-- JS 動態填入區塊 -->
+                                </div>
+                            </div>
+
+                            <div>
+                                <span class="text-xs font-bold text-slate-600 block mb-1" id="ribbonVisTitle2">平分成 9 段橘色彩帶</span>
+                                <div id="ribbonBar2" class="h-10 bg-amber-400 rounded-lg flex overflow-hidden shadow-inner border border-amber-500">
+                                    <!-- JS 動態填入區塊 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 步驟說明與併式卡片 -->
+                        <div class="bg-gradient-to-r from-teal-50 to-emerald-50 p-5 rounded-xl border border-teal-200">
+                            <h4 class="font-bold text-teal-900 mb-2 text-sm">解題步驟與併式紀錄：</h4>
+                            <div class="space-y-2 text-xs text-slate-700">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-[10px]">1</span>
+                                    <span id="rStep1Text">先算 6 段藍色彩帶合起來的長：12 × 6 = 72 (cm)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-5 h-5 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-[10px]">2</span>
+                                    <span id="rStep2Text">再算 1 段橘色彩帶長度：72 ÷ 9 = 8 (cm)</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-teal-200/60">
+                                <span class="text-xs font-bold text-slate-500">併成一個算式：</span>
+                                <div class="text-xl font-black text-teal-800 font-mono mt-1" id="ribbonCombinedExpr">
+                                    (12 × 6) ÷ 9 = 8
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模組 3: 衛生紙連除與括號 (對應課本 p.127) -->
+        <section id="tissueTab" class="tab-content hidden transition-opacity duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制面板 -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 border-b border-indigo-100 pb-3 mb-4">
+                            <span class="w-8 h-8 rounded-lg bg-indigo-500 text-white flex items-center justify-center font-bold">8-3</span>
+                            <h2 class="text-xl font-bold text-indigo-950">衛生紙特價與連除併式</h2>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-6 bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                            💡 <strong>核心重點：</strong>連續除以兩個數，等於除以這兩個數的「乘積」！即 <code class="bg-indigo-100 px-1 py-0.5 rounded font-bold">a ÷ b ÷ c = a ÷ (b × c)</code>。
+                        </p>
+
+                        <!-- 參數控制項 -->
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>💰 總特價金額 (元)：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="tissueTotalPriceVal">224 元</span>
+                                </div>
+                                <input type="range" id="tissueTotalPrice" min="60" max="600" step="12" value="224" oninput="updateTissueLab()">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>📦 買幾串衛生紙：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="bundleCountVal">2 串</span>
+                                </div>
+                                <input type="range" id="bundleCount" min="2" max="6" step="1" value="2" oninput="updateTissueLab()">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                                    <span>🧻 每串有幾包：</span>
+                                    <span class="text-indigo-600 font-extrabold text-base" id="perBundleVal">8 包</span>
+                                </div>
+                                <input type="range" id="perBundle" min="2" max="12" step="1" value="8" oninput="updateTissueLab()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-indigo-100 bg-indigo-50/70 p-4 rounded-xl text-center">
+                        <span class="text-xs text-indigo-800 font-semibold uppercase tracking-wider">一包衛生紙價格</span>
+                        <div class="text-3xl font-black text-indigo-600 mt-1" id="tissueSingleResult">14 元</div>
+                    </div>
+                </div>
+
+                <!-- 右側皮皮與美美解法對比 -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- 解法一：皮皮（逐次除以） -->
+                    <div class="glass-card rounded-2xl p-6 border-l-4 border-l-cyan-500 shadow-xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-cyan-100 text-cyan-800 font-bold text-xs px-3 py-1 rounded-full">皮皮的做法（先算一串再算一包）</span>
+                            <span class="text-xs font-semibold text-slate-400">連除法</span>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-1 mb-4">
+                            <div>步驟1：先算一串金額：<span id="tissuePipiS1" class="font-bold text-cyan-700">224 ÷ 2 = 112</span> 元</div>
+                            <div>步驟2：再算一包金額：<span id="tissuePipiS2" class="font-bold text-cyan-700">112 ÷ 8 = 14</span> 元</div>
+                        </div>
+                        <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-200">
+                            <span class="text-xs font-bold text-cyan-900 block mb-1">併成一個算式 (不需括號)：</span>
+                            <div class="text-lg font-black text-cyan-700 font-mono" id="tissuePipiCombined">
+                                224 ÷ 2 ÷ 8 = 14
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 解法二：美美（先算總包數） -->
+                    <div class="glass-card rounded-2xl p-6 border-l-4 border-l-rose-500 shadow-xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-rose-100 text-rose-800 font-bold text-xs px-3 py-1 rounded-full">美美的做法（先算全部有幾包）</span>
+                            <span class="text-xs font-semibold text-slate-400">括號法</span>
+                        </div>
+                        <div class="text-sm text-slate-700 space-y-1 mb-4">
+                            <div>步驟1：先算全部包數：<span id="tissueMeiS1" class="font-bold text-rose-700">8 × 2 = 16</span> 包</div>
+                            <div>步驟2：再算一包金額：<span id="tissueMeiS2" class="font-bold text-rose-700">224 ÷ 16 = 14</span> 元</div>
+                        </div>
+                        <div class="bg-rose-50 p-4 rounded-xl border border-rose-200">
+                            <span class="text-xs font-bold text-rose-900 block mb-1">併成一個算式 (加括號表優先)：</span>
+                            <div class="text-lg font-black text-rose-700 font-mono" id="tissueMeiCombined">
+                                224 ÷ (<span class="bracket-highlight" style="background:#fecdd3; color:#9f1239">8 × 2</span>) = 14
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模組 4: 歷程性小評量 (5 題) -->
+        <section id="quizTab" class="tab-content hidden transition-opacity duration-300">
+            <div class="glass-card rounded-2xl p-6 md:p-8 shadow-2xl">
+                <!-- 評量標頭與分數 -->
+                <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 pb-4 mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-indigo-950 flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-amber-500"></i> 乘除併式與括號 ‧ 概念理解測驗
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">選出正確答案並觀察即時詳細解析，挑戰獲得 100 分！</p>
+                    </div>
+                    <div class="bg-indigo-900 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-3 shadow-md">
+                        <span class="text-xs text-indigo-200">目前得分</span>
+                        <span id="quizScore" class="text-2xl text-amber-300 font-black">0 / 100</span>
+                    </div>
+                </div>
+
+                <!-- 題目清單 -->
+                <div id="quizContainer" class="space-y-8">
+                    <!-- JS 動態生成 5 題測驗 -->
+                </div>
+
+                <!-- 重測按鈕 -->
+                <div class="mt-8 text-center border-t border-slate-200 pt-6">
+                    <button onclick="resetQuiz()" class="px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all">
+                        <i class="fa-solid fa-rotate-right mr-2"></i> 重新作答所有題目
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="relative z-10 max-w-6xl mx-auto px-4 mt-12 text-center text-sky-100/70 text-xs">
+    </footer>
+
+    <script>
+        // 切換頁籤邏輯
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // 四個頁籤配色定義：淺紅(rose)、淺黃(yellow)、淺綠(emerald)、淺藍(sky)
+            const tabs = [
+                { id: 'donutTab', activeBg: 'bg-rose-200', inactiveBg: 'bg-rose-100/70', text: 'text-rose-950', ring: 'ring-2 ring-rose-400' },
+                { id: 'ribbonTab', activeBg: 'bg-yellow-200', inactiveBg: 'bg-yellow-100/70', text: 'text-yellow-950', ring: 'ring-2 ring-yellow-400' },
+                { id: 'tissueTab', activeBg: 'bg-emerald-200', inactiveBg: 'bg-emerald-100/70', text: 'text-emerald-950', ring: 'ring-2 ring-emerald-400' },
+                { id: 'quizTab', activeBg: 'bg-sky-200', inactiveBg: 'bg-sky-100/70', text: 'text-sky-950', ring: 'ring-2 ring-sky-400' }
+            ];
+
+            tabs.forEach(tab => {
+                const btn = document.getElementById('btn-' + tab.id);
+                if (tab.id === tabId) {
+                    btn.className = `tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg ${tab.activeBg} ${tab.text} border border-white/60 scale-105 ${tab.ring}`;
+                } else {
+                    btn.className = `tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md ${tab.inactiveBg} ${tab.text} border border-white/30 hover:scale-102 opacity-80 hover:opacity-100`;
+                }
+            });
+        }
+
+        // ==========================================
+        // 模組 1: 甜甜圈動態邏輯
+        // ==========================================
+        function updateDonutLab() {
+            const price = parseInt(document.getElementById('donutPrice').value);
+            const perBox = parseInt(document.getElementById('perBox').value);
+            const boxCount = parseInt(document.getElementById('boxCount').value);
+
+            // 更新顯示數值
+            document.getElementById('donutPriceVal').innerText = price + " 元";
+            document.getElementById('perBoxVal').innerText = perBox + " 個";
+            document.getElementById('boxCountVal').innerText = boxCount + " 盒";
+
+            const totalDonuts = perBox * boxCount;
+            const pipiBoxPrice = price * perBox;
+            const totalPrice = pipiBoxPrice * boxCount;
+
+            document.getElementById('donutTotalCount').innerText = totalDonuts;
+            document.getElementById('donutTotalResult').innerText = totalPrice + " 元";
+
+            // 皮皮算法更新
+            document.getElementById('pipiStep1').innerText = `${price} × ${perBox} = ${pipiBoxPrice}`;
+            document.getElementById('pipiStep2').innerText = `${pipiBoxPrice} × ${boxCount} = ${totalPrice}`;
+            document.getElementById('pipiCombined').innerHTML = `(<span class="bracket-highlight">${price} × ${perBox}</span>) × ${boxCount} = ${totalPrice}`;
+
+            // 小甲算法更新
+            document.getElementById('xiaojiaStep1').innerText = `${perBox} × ${boxCount} = ${totalDonuts}`;
+            document.getElementById('xiaojiaStep2').innerText = `${price} × ${totalDonuts} = ${totalPrice}`;
+            document.getElementById('xiaojiaCombined').innerHTML = `${price} × (<span class="bracket-highlight" style="background:#fef08a; color:#713f12">${perBox} × ${boxCount}</span>) = ${totalPrice}`;
+
+            // 動態渲染甜甜圈盒子視覺 (精簡尺寸方便學生快速掌握全局)
+            const visualBox = document.getElementById('donutVisualBox');
+            visualBox.innerHTML = '';
+            for (let b = 1; b <= boxCount; b++) {
+                const boxDiv = document.createElement('div');
+                boxDiv.className = "bg-amber-100/90 border border-amber-300 p-1.5 rounded-lg flex flex-col items-center gap-1 shadow-sm";
+                
+                const title = document.createElement('span');
+                title.className = "text-[9px] font-bold text-amber-900";
+                title.innerText = `第 ${b} 盒 (${perBox}個)`;
+                boxDiv.appendChild(title);
+
+                const donutGrid = document.createElement('div');
+                donutGrid.className = "flex flex-wrap gap-0.5 max-w-[85px] justify-center";
+                for (let d = 0; d < perBox; d++) {
+                    const donut = document.createElement('div');
+                    donut.className = "donut-item";
+                    donutGrid.appendChild(donut);
+                }
+                boxDiv.appendChild(donutGrid);
+                visualBox.appendChild(boxDiv);
+            }
+        }
+
+        // ==========================================
+        // 模組 2: 彩帶動態邏輯
+        // ==========================================
+        let currentRibbonMode = 'mode1';
+
+        function setRibbonMode(mode) {
+            currentRibbonMode = mode;
+            const btn1 = document.getElementById('rMode1Btn');
+            const btn2 = document.getElementById('rMode2Btn');
+
+            if (mode === 'mode1') {
+                btn1.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-teal-700 shadow-sm";
+                btn2.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600";
+            } else {
+                btn2.className = "flex-1 py-1.5 text-xs font-bold rounded-lg bg-white text-teal-700 shadow-sm";
+                btn1.className = "flex-1 py-1.5 text-xs font-bold rounded-lg text-slate-600";
+            }
+            renderRibbonControls();
+            updateRibbonLab();
+        }
+
+        function renderRibbonControls() {
+            const container = document.getElementById('ribbonControls');
+            if (currentRibbonMode === 'mode1') {
+                // 情境 1: (12cm x 6段) ÷ 9段 = 8cm
+                container.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>📏 每段藍色彩帶長度 (公分)：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rSegLenVal">12 cm</span>
+                        </div>
+                        <input type="range" id="rSegLen" min="5" max="30" value="12" oninput="updateRibbonLab()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>✂️ 藍色彩帶段數：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rSegCountVal">6 段</span>
+                        </div>
+                        <input type="range" id="rSegCount" min="2" max="12" value="6" oninput="updateRibbonLab()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>🍊 平分成的橘色彩帶段數：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rTargetPartsVal">9 段</span>
+                        </div>
+                        <input type="range" id="rTargetParts" min="2" max="16" value="9" oninput="updateRibbonLab()">
+                    </div>
+                `;
+            } else {
+                // 情境 2: (120cm ÷ 5段) × 3段 = 72cm
+                container.innerHTML = `
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>📏 綠色彩帶總長 (公分)：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rTotalLenVal">120 cm</span>
+                        </div>
+                        <input type="range" id="rTotalLen" min="30" max="300" step="10" value="120" oninput="updateRibbonLab()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>🧩 平分成的總段數：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rTotalPartsVal">5 段</span>
+                        </div>
+                        <input type="range" id="rTotalParts" min="2" max="10" value="5" oninput="updateRibbonLab()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-semibold text-sm mb-1 text-slate-700">
+                            <span>✨ 想要計算幾段合起來：</span>
+                            <span class="text-teal-600 font-extrabold text-base" id="rTakePartsVal">3 段</span>
+                        </div>
+                        <input type="range" id="rTakeParts" min="1" max="5" value="3" oninput="updateRibbonLab()">
+                    </div>
+                `;
+            }
+        }
+
+        function updateRibbonLab() {
+            if (currentRibbonMode === 'mode1') {
+                const segLen = parseInt(document.getElementById('rSegLen').value);
+                const segCount = parseInt(document.getElementById('rSegCount').value);
+                const targetParts = parseInt(document.getElementById('rTargetParts').value);
+
+                document.getElementById('rSegLenVal').innerText = segLen + " cm";
+                document.getElementById('rSegCountVal').innerText = segCount + " 段";
+                document.getElementById('rTargetPartsVal').innerText = targetParts + " 段";
+
+                const totalLen = segLen * segCount;
+                const result = (totalLen / targetParts).toFixed(1);
+
+                document.getElementById('ribbonResult').innerText = result + " 公分";
+
+                document.getElementById('ribbonVisTitle1').innerText = `藍色彩帶 (共 ${segCount} 段，每段 ${segLen}cm，總長 ${totalLen}cm)`;
+                document.getElementById('ribbonVisTitle2').innerText = `平分成 ${targetParts} 段橘色彩帶 (每段約 ${result}cm)`;
+
+                // 畫條狀圖 1
+                const bar1 = document.getElementById('ribbonBar1');
+                bar1.innerHTML = '';
+                for(let i=0; i<segCount; i++) {
+                    const seg = document.createElement('div');
+                    seg.className = "flex-1 border-r border-sky-200 flex items-center justify-center text-[10px] text-white font-bold";
+                    seg.innerText = `${segLen}cm`;
+                    bar1.appendChild(seg);
+                }
+
+                // 畫條狀圖 2
+                const bar2 = document.getElementById('ribbonBar2');
+                bar2.innerHTML = '';
+                for(let i=0; i<targetParts; i++) {
+                    const seg = document.createElement('div');
+                    seg.className = "flex-1 border-r border-amber-200 flex items-center justify-center text-[10px] text-amber-900 font-bold";
+                    seg.innerText = `${result}`;
+                    bar2.appendChild(seg);
+                }
+
+                document.getElementById('rStep1Text').innerText = `先算 ${segCount} 段藍色彩帶總長：${segLen} × ${segCount} = ${totalLen} (cm)`;
+                document.getElementById('rStep2Text').innerText = `再算 1 段橘色彩帶長度：${totalLen} ÷ ${targetParts} = ${result} (cm)`;
+                document.getElementById('ribbonCombinedExpr').innerHTML = `(<span class="bracket-highlight">${segLen} × ${segCount}</span>) ÷ ${targetParts} = ${result}`;
+
+            } else {
+                const totalLen = parseInt(document.getElementById('rTotalLen').value);
+                const totalParts = parseInt(document.getElementById('rTotalParts').value);
+                const takeParts = parseInt(document.getElementById('rTakeParts').value);
+
+                document.getElementById('rTotalLenVal').innerText = totalLen + " cm";
+                document.getElementById('rTotalPartsVal').innerText = totalParts + " 段";
+                document.getElementById('rTakePartsVal').innerText = takeParts + " 段";
+
+                const unitLen = (totalLen / totalParts).toFixed(1);
+                const result = (unitLen * takeParts).toFixed(1);
+
+                document.getElementById('ribbonResult').innerText = result + " 公分";
+
+                document.getElementById('ribbonVisTitle1').innerText = `綠色彩帶總長 ${totalLen}cm，平分成 ${totalParts} 段 (每段 ${unitLen}cm)`;
+                document.getElementById('ribbonVisTitle2').innerText = `取其中的 ${takeParts} 段綠色彩帶 (總長 ${result}cm)`;
+
+                // 畫條狀圖 1
+                const bar1 = document.getElementById('ribbonBar1');
+                bar1.innerHTML = '';
+                for(let i=0; i<totalParts; i++) {
+                    const seg = document.createElement('div');
+                    seg.className = "flex-1 border-r border-emerald-200 bg-emerald-400 flex items-center justify-center text-[10px] text-white font-bold";
+                    seg.innerText = `${unitLen}`;
+                    bar1.appendChild(seg);
+                }
+
+                // 畫條狀圖 2
+                const bar2 = document.getElementById('ribbonBar2');
+                bar2.innerHTML = '';
+                for(let i=0; i<totalParts; i++) {
+                    const seg = document.createElement('div');
+                    if (i < takeParts) {
+                        seg.className = "flex-1 border-r border-purple-200 bg-purple-500 flex items-center justify-center text-[10px] text-white font-bold";
+                        seg.innerText = `${unitLen}`;
+                    } else {
+                        seg.className = "flex-1 border-r border-slate-200 bg-slate-200 opacity-40";
+                    }
+                    bar2.appendChild(seg);
+                }
+
+                document.getElementById('rStep1Text').innerText = `先算 1 段綠色彩帶長度：${totalLen} ÷ ${totalParts} = ${unitLen} (cm)`;
+                document.getElementById('rStep2Text').innerText = `再算 ${takeParts} 段綠色彩帶總長：${unitLen} × ${takeParts} = ${result} (cm)`;
+                document.getElementById('ribbonCombinedExpr').innerHTML = `(<span class="bracket-highlight">${totalLen} ÷ ${totalParts}</span>) × ${takeParts} = ${result}`;
+            }
+        }
+
+        // ==========================================
+        // 模組 3: 衛生紙連除邏輯
+        // ==========================================
+        function updateTissueLab() {
+            const totalPrice = parseInt(document.getElementById('tissueTotalPrice').value);
+            const bundleCount = parseInt(document.getElementById('bundleCount').value);
+            const perBundle = parseInt(document.getElementById('perBundle').value);
+
+            document.getElementById('tissueTotalPriceVal').innerText = totalPrice + " 元";
+            document.getElementById('bundleCountVal').innerText = bundleCount + " 串";
+            document.getElementById('perBundleVal').innerText = perBundle + " 包";
+
+            const oneBundlePrice = (totalPrice / bundleCount).toFixed(1);
+            const singlePrice = (oneBundlePrice / perBundle).toFixed(1);
+            const totalPacks = bundleCount * perBundle;
+
+            document.getElementById('tissueSingleResult').innerText = singlePrice + " 元";
+
+            // 皮皮
+            document.getElementById('tissuePipiS1').innerText = `${totalPrice} ÷ ${bundleCount} = ${oneBundlePrice}`;
+            document.getElementById('tissuePipiS2').innerText = `${oneBundlePrice} ÷ ${perBundle} = ${singlePrice}`;
+            document.getElementById('tissuePipiCombined').innerText = `${totalPrice} ÷ ${bundleCount} ÷ ${perBundle} = ${singlePrice}`;
+
+            // 美美
+            document.getElementById('tissueMeiS1').innerText = `${perBundle} × ${bundleCount} = ${totalPacks}`;
+            document.getElementById('tissueMeiS2').innerText = `${totalPrice} ÷ ${totalPacks} = ${singlePrice}`;
+            document.getElementById('tissueMeiCombined').innerHTML = `${totalPrice} ÷ (<span class="bracket-highlight" style="background:#fecdd3; color:#9f1239">${perBundle} × ${bundleCount}</span>) = ${singlePrice}`;
+        }
+
+        // ==========================================
+        // 模組 4: 歷程性評量 (5 題)
+        // ==========================================
+        const quizData = [
+            {
+                id: 1,
+                question: "1. 1組牛奶有4瓶，每瓶賣18元，媽媽買了6組牛奶，共要付幾元？下列哪一個併式是正確的？",
+                options: [
+                    "A. (18 × 4) × 6",
+                    "B. 18 ÷ (6 × 4)",
+                    "C. 18 × 4 ÷ 6",
+                    "D. (18 + 4) × 6"
+                ],
+                answer: 0,
+                explanation: "正確！先算1組牛奶要 18 × 4 = 72元，再買6組即 (18 × 4) × 6 = 432元。或先算總瓶數 18 × (4 × 6) 亦可。"
+            },
+            {
+                id: 2,
+                question: "2. 彩帶原本長 120 公分，平分成 5 段後，取其中 3 段接在一起長幾公分？下列併式何者正確？",
+                options: [
+                    "A. (120 × 5) ÷ 3",
+                    "B. (120 ÷ 5) × 3",
+                    "C. 120 ÷ (5 × 3)",
+                    "D. 120 × (5 ÷ 3)"
+                ],
+                answer: 1,
+                explanation: "正確！先算出 1 段彩帶長度 (120 ÷ 5)，再乘以 3 段，合併為 (120 ÷ 5) × 3 = 72 公分。"
+            },
+            {
+                id: 3,
+                question: "3. 衛生紙 2 串特價 224 元，每串有 8 包，求一包衛生紙多少元？下列哪兩種併式算出來答案都正確？",
+                options: [
+                    "A. 224 ÷ 2 ÷ 8 與 224 ÷ (8 × 2)",
+                    "B. 224 ÷ 2 × 8 與 224 ÷ (8 ÷ 2)",
+                    "C. 224 × 2 ÷ 8 與 224 ÷ 2 ÷ 8",
+                    "D. (224 ÷ 2) × 8 與 224 × (8 × 2)"
+                ],
+                answer: 0,
+                explanation: "正確！連除法 224 ÷ 2 ÷ 8 = 14；先算總包數法 224 ÷ (8 × 2) = 14。兩者皆可正確求得一包價格。"
+            },
+            {
+                id: 4,
+                question: "4. 老師把 600 本手冊平分裝進 5 個紙箱，1 本重 30 公克，1 個紙箱裡的全部手冊共重多少公克？併式應為？",
+                options: [
+                    "A. 600 ÷ (5 × 30)",
+                    "B. 30 × (600 ÷ 5)",
+                    "C. (30 × 5) ÷ 600",
+                    "D. 600 × 30 × 5"
+                ],
+                answer: 1,
+                explanation: "正確！先算 1 個紙箱裝了幾本 (600 ÷ 5 = 120本)，再乘以每本重量 30 公克，併式為 30 × (600 ÷ 5) = 3600 公克。"
+            },
+            {
+                id: 5,
+                question: "5. 【素養題】算式 100 ÷ (20 ÷ 5) = 25 可以解決下列哪一個問題？",
+                options: [
+                    "A. 阿姨買了100克巧克力，每20克裝一袋，再平分給5個小孩，每人得幾袋？",
+                    "B. 植樹活動中，四年乙班分到 100 棵樹苗，班上 20 個小朋友每 5 個人一組，每一組可以分到幾棵樹苗？",
+                    "C. 100 塊餅乾分給 20 人，每人再分給 5 個朋友，每人得幾塊？",
+                    "D. 以上問題皆不適用"
+                ],
+                answer: 1,
+                explanation: "正確！乙問題中，先算全班分成幾組 (20 ÷ 5 = 4組)，再算每組分得幾棵 (100 ÷ 4 = 25棵)，符合算式 100 ÷ (20 ÷ 5)。"
+            }
+        ];
+
+        let userAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = "bg-slate-50/80 p-5 rounded-2xl border border-slate-200 space-y-3";
+
+                let optionsHTML = '';
+                q.options.forEach((opt, optIdx) => {
+                    optionsHTML += `
+                        <button onclick="selectOption(${q.id}, ${optIdx})" id="btn-q${q.id}-opt${optIdx}" 
+                            class="quiz-opt-btn w-full text-left p-3 rounded-xl border border-slate-300 bg-white hover:bg-indigo-50 hover:border-indigo-300 font-medium text-sm transition-all flex items-center justify-between">
+                            <span>${opt}</span>
+                            <i class="fa-regular fa-circle text-slate-300 check-icon"></i>
+                        </button>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <h3 class="font-bold text-base text-indigo-950">${q.question}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
+                        ${optionsHTML}
+                    </div>
+                    <div id="explain-q${q.id}" class="hidden mt-3 p-3.5 rounded-xl text-xs leading-relaxed"></div>
+                `;
+                container.appendChild(qDiv);
+            });
+        }
+
+        function selectOption(qId, optIdx) {
+            const q = quizData.find(item => item.id === qId);
+            userAnswers[qId] = optIdx;
+
+            // 清除該題按鈕狀態
+            for(let i=0; i<q.options.length; i++) {
+                const btn = document.getElementById(`btn-q${qId}-opt${i}`);
+                btn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border border-slate-300 bg-white font-medium text-sm transition-all flex items-center justify-between opacity-70";
+                btn.querySelector('.check-icon').className = "fa-regular fa-circle text-slate-300";
+            }
+
+            const selectedBtn = document.getElementById(`btn-q${qId}-opt${optIdx}`);
+            const explainBox = document.getElementById(`explain-q${qId}`);
+            explainBox.classList.remove('hidden');
+
+            if (optIdx === q.answer) {
+                selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-sm transition-all flex items-center justify-between";
+                selectedBtn.querySelector('.check-icon').className = "fa-solid fa-circle-check text-emerald-600 text-base";
+                
+                explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-100/80 text-emerald-900 border border-emerald-300";
+                explainBox.innerHTML = `<strong>✨ 正確答案！</strong> ${q.explanation}`;
+            } else {
+                selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-sm transition-all flex items-center justify-between";
+                selectedBtn.querySelector('.check-icon').className = "fa-solid fa-circle-xmark text-rose-600 text-base";
+
+                explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-100/80 text-rose-900 border border-rose-300";
+                explainBox.innerHTML = `<strong>❌ 再想想看喔！</strong> ${q.explanation}`;
+            }
+
+            calculateScore();
+        }
+
+        function calculateScore() {
+            let score = 0;
+            quizData.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    score += 20;
+                }
+            });
+            document.getElementById('quizScore').innerText = `${score} / 100`;
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            document.getElementById('quizScore').innerText = `0 / 100`;
+            renderQuiz();
+        }
+
+        // 頁面初始化
+        window.onload = function() {
+            updateDonutLab();
+            renderRibbonControls();
+            updateRibbonLab();
+            updateTissueLab();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>

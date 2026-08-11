@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夢幻星空小數實驗室 - 認識二位小數與百分位</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 30%, #415a77 60%, #778da9 85%, #e0e1dd 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Shinkai Sky Effect Overlay */
+        .shinkai-bg {
+            background: linear-gradient(180deg, 
+                rgba(15, 23, 42, 0.85) 0%, 
+                rgba(30, 58, 138, 0.75) 40%, 
+                rgba(147, 51, 234, 0.65) 70%, 
+                rgba(244, 114, 182, 0.55) 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card-subtle {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px rgba(125, 211, 252, 0.8), 0 0 30px rgba(167, 139, 250, 0.5);
+        }
+
+        .glow-box {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Hundred Grid Styles - Standardized 10px Cell Basis */
+        .hundred-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 10px);
+            grid-template-rows: repeat(10, 10px);
+            gap: 1px;
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 2px;
+            border-radius: 4px;
+            width: fit-content;
+            height: fit-content;
+        }
+        .grid-cell {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(56, 189, 248, 0.85);
+            border-radius: 1px;
+            transition: all 0.2s ease;
+        }
+        .strip-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 2px;
+            border-radius: 4px;
+            width: fit-content;
+            height: fit-content;
+        }
+        .strip-cell {
+            width: 10px;
+            height: 10px;
+            background-color: rgba(244, 114, 182, 0.9);
+            border-radius: 1px;
+        }
+        .single-cell {
+            width: 10px;
+            height: 10px;
+            background-color: #facc15;
+            border-radius: 1px;
+            box-shadow: 0 0 4px #facc15;
+        }
+
+        /* Regrouping Merge Glow Effect */
+        @keyframes mergeGlow {
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(250, 204, 21, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(244, 114, 182, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(250, 204, 21, 0.5); }
+        }
+        .merge-group {
+            animation: mergeGlow 2s infinite ease-in-out;
+            border: 2px dashed #f472b6;
+            padding: 4px;
+            border-radius: 8px;
+            background: rgba(244, 114, 182, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(125, 211, 252, 0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="shinkai-bg min-h-screen pb-12 relative">
+
+    <!-- Decorative Glowing Stars / Clouds -->
+    <div class="absolute top-10 left-10 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-40 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <header class="relative z-10 pt-6 pb-6 text-center px-4 max-w-6xl mx-auto">
+        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <div class="w-full flex items-center justify-start mb-4 px-2 fade-in">
+            <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+            <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-sm mb-3 shadow-lg">
+            <i class="fa-solid fa-cloud-moon text-pink-300"></i>
+            <span>國小數學 9-2 二位小數與百分位</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight glow-text text-white">
+            星空下的小數化聚實驗室
+        </h1>
+        <p class="mt-2 text-sky-100/80 text-sm md:text-base max-w-2xl mx-auto">
+            透過動態百格板與積木，探索「個位、十分位、百分位」的數值變化與進位奧秘
+        </p>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 relative z-10">
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center mb-8">
+            <div class="glass-card p-1.5 rounded-2xl flex gap-2 w-full max-w-md">
+                <button onclick="switchTab('explorer')" id="tab-explorer" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 to-indigo-500 text-white shadow-md">
+                    <i class="fa-solid fa-cubes"></i> 具像積木與位值表
+                </button>
+                <button onclick="switchTab('lab')" id="tab-lab" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 text-sky-100 hover:text-white">
+                    <i class="fa-solid fa-bolt text-amber-300"></i> 進位與化聚實驗
+                </button>
+                <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 text-sky-100 hover:text-white">
+                    <i class="fa-solid fa-graduation-cap text-pink-300"></i> 歷程性評量
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 1: VISUAL BLOCKS & PLACE VALUE EXPLORER ================= -->
+        <div id="section-explorer" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Control Panel -->
+                <div class="lg:col-span-5 glass-card rounded-3xl p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+                            <h2 class="text-xl font-bold flex items-center gap-2 text-sky-200">
+                                <i class="fa-solid fa-sliders text-cyan-300"></i> 數值參數控制
+                            </h2>
+                            <button onclick="resetExplorer()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg transition text-sky-200">
+                                <i class="fa-solid fa-rotate-left"></i> 重設
+                            </button>
+                        </div>
+
+                        <!-- Presets -->
+                        <div class="mb-6">
+                            <label class="text-xs text-sky-200/80 mb-2 block">課本快速發想案例：</label>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="setExplorerPreset(2, 4, 3)" class="px-3 py-1.5 rounded-lg text-xs bg-sky-500/20 hover:bg-sky-500/40 border border-sky-400/30 text-sky-100 transition">
+                                    2.43 (課本例2)
+                                </button>
+                                <button onclick="setExplorerPreset(6, 0, 2)" class="px-3 py-1.5 rounded-lg text-xs bg-sky-500/20 hover:bg-sky-500/40 border border-sky-400/30 text-sky-100 transition">
+                                    6.02 (課本例3)
+                                </button>
+                                <button onclick="setExplorerPreset(0, 2, 0)" class="px-3 py-1.5 rounded-lg text-xs bg-pink-500/20 hover:bg-pink-500/40 border border-pink-400/30 text-pink-100 transition">
+                                    0.20 與 0.2 比較
+                                </button>
+                                <button onclick="setExplorerPreset(3, 9, 9)" class="px-3 py-1.5 rounded-lg text-xs bg-indigo-500/20 hover:bg-indigo-500/40 border border-indigo-400/30 text-indigo-100 transition">
+                                    3.99 挑戰
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sliders -->
+                        <div class="space-y-5">
+                            <!-- Ones (1) -->
+                            <div class="glass-card-subtle p-4 rounded-2xl">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-semibold text-cyan-200 flex items-center gap-2">
+                                        <span class="w-3 h-3 bg-sky-400 rounded-sm inline-block"></span> 個位 ( 1 )
+                                    </span>
+                                    <span class="text-lg font-bold text-cyan-300" id="val-ones-display">2</span>
+                                </div>
+                                <input type="range" id="slider-ones" min="0" max="9" value="2" step="1"
+                                    oninput="updateExplorer()"
+                                    class="w-full accent-cyan-400 cursor-pointer h-2 bg-white/20 rounded-lg">
+                                <p class="text-[11px] text-white/60 mt-1">代表完整的 1 張 100 格百格板</p>
+                            </div>
+
+                            <!-- Tenths (0.1) -->
+                            <div class="glass-card-subtle p-4 rounded-2xl">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-semibold text-pink-200 flex items-center gap-2">
+                                        <span class="w-3 h-3 bg-pink-400 rounded-sm inline-block"></span> 十分位 ( 0.1 )
+                                    </span>
+                                    <span class="text-lg font-bold text-pink-300" id="val-tenths-display">4</span>
+                                </div>
+                                <input type="range" id="slider-tenths" min="0" max="9" value="4" step="1"
+                                    oninput="updateExplorer()"
+                                    class="w-full accent-pink-400 cursor-pointer h-2 bg-white/20 rounded-lg">
+                                <p class="text-[11px] text-white/60 mt-1">代表 10 個 0.01 合起來的 1 條長條</p>
+                            </div>
+
+                            <!-- Hundredths (0.01) -->
+                            <div class="glass-card-subtle p-4 rounded-2xl">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-sm font-semibold text-amber-200 flex items-center gap-2">
+                                        <span class="w-3 h-3 bg-amber-400 rounded-sm inline-block"></span> 百分位 ( 0.01 )
+                                    </span>
+                                    <span class="text-lg font-bold text-amber-300" id="val-hundredths-display">3</span>
+                                </div>
+                                <input type="range" id="slider-hundredths" min="0" max="9" value="3" step="1"
+                                    oninput="updateExplorer()"
+                                    class="w-full accent-amber-400 cursor-pointer h-2 bg-white/20 rounded-lg">
+                                <p class="text-[11px] text-white/60 mt-1">代表單一格 0.01 的小方塊</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Readout Box -->
+                    <div class="mt-6 pt-4 border-t border-white/10 text-center">
+                        <div class="text-xs text-sky-200/80 mb-1">合起來的小數結果為</div>
+                        <div class="text-4xl font-black text-amber-300 tracking-wider glow-text" id="total-decimal-display">
+                            2.43
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual Area & Place Value Chart -->
+                <div class="lg:col-span-7 space-y-6">
+
+                    <!-- Place Value Table (位值表) -->
+                    <div class="glass-card rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-sky-200 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-indigo-300"></i> 位值表 (Place Value Chart)
+                        </h3>
+
+                        <div class="grid grid-cols-3 text-center border-2 border-white/20 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-md">
+                            <!-- Table Headers -->
+                            <div class="bg-gradient-to-b from-sky-600/50 to-sky-800/50 p-3 font-bold text-sky-100 border-r border-b border-white/20">
+                                個 位
+                            </div>
+                            <div class="bg-gradient-to-b from-pink-600/50 to-pink-800/50 p-3 font-bold text-pink-100 border-r border-b border-white/20">
+                                十分位 (0.1)
+                            </div>
+                            <div class="bg-gradient-to-b from-amber-600/50 to-amber-800/50 p-3 font-bold text-amber-100 border-b border-white/20">
+                                百分位 (0.01)
+                            </div>
+
+                            <!-- Values -->
+                            <div class="p-4 text-3xl font-black text-cyan-300 border-r border-white/20 flex items-center justify-center min-h-[70px]" id="chart-ones">
+                                2
+                            </div>
+                            <div class="p-4 text-3xl font-black text-pink-300 border-r border-white/20 flex items-center justify-center min-h-[70px]" id="chart-tenths">
+                                4
+                            </div>
+                            <div class="p-4 text-3xl font-black text-amber-300 flex items-center justify-center min-h-[70px]" id="chart-hundredths">
+                                3
+                            </div>
+                        </div>
+
+                        <!-- Special Proof Alert for 0.20 = 0.2 -->
+                        <div id="equivalence-alert" class="mt-4 p-3 rounded-xl bg-pink-500/20 border border-pink-400/30 text-pink-100 text-xs flex items-center gap-3 hidden">
+                            <i class="fa-solid fa-lightbulb text-amber-300 text-xl"></i>
+                            <div>
+                                <strong>核心觀念發現：</strong> 0.20 記了 0個1、2個0.1 和 0個0.01。因為 0.01 的數量是 0，所以 <span class="font-bold underline text-amber-300">0.20 和 0.2 一樣大</span>，通常簡記為 0.2！
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Visual Blocks Container -->
+                    <div class="glass-card rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-sky-200 mb-3 flex items-center justify-between">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-sky-300"></i> 百格板與積木視覺化
+                            </span>
+                            <span class="text-xs text-sky-200/60 font-normal">藍:個張(1) | 粉:條(0.1) | 黃:塊(0.01)</span>
+                        </h3>
+
+                        <div class="min-h-[220px] p-4 rounded-2xl bg-slate-950/40 border border-white/10 flex flex-wrap gap-6 items-start justify-start overflow-x-auto" id="blocks-visual-container">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 2: REGROUPING & CARRY-OVER LAB ================= -->
+        <div id="section-lab" class="space-y-6 hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="max-w-3xl mx-auto text-center mb-8">
+                    <h2 class="text-2xl md:text-3xl font-black text-amber-300 mb-2 glow-text">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 小數進位與化聚實驗室
+                    </h2>
+                    <p class="text-sm text-sky-100/80">
+                        「當百分位累積滿 10 個 0.01 時，就可以換成 1 個 0.1 進到十分位！」<br>請在下方嘗試超額輸入，體驗動態圖示化聚過程。
+                    </p>
+                </div>
+
+                <!-- Input Controls for Over-capacity -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 max-w-4xl mx-auto">
+                    <div class="glass-card-subtle p-5 rounded-2xl text-center">
+                        <label class="block text-sm font-bold text-cyan-200 mb-2">個位 (幾個 1)</label>
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="adjustLabInput('lab-ones', -1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">-</button>
+                            <input type="number" id="lab-ones" value="3" min="0" max="20" oninput="updateLabLivePreview()" class="w-16 text-center bg-slate-900/80 border border-cyan-400/40 rounded-lg p-2 text-xl font-bold text-cyan-300">
+                            <button onclick="adjustLabInput('lab-ones', 1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">+</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card-subtle p-5 rounded-2xl text-center">
+                        <label class="block text-sm font-bold text-pink-200 mb-2">十分位 (幾個 0.1)</label>
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="adjustLabInput('lab-tenths', -1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">-</button>
+                            <input type="number" id="lab-tenths" value="12" min="0" max="50" oninput="updateLabLivePreview()" class="w-16 text-center bg-slate-900/80 border border-pink-400/40 rounded-lg p-2 text-xl font-bold text-pink-300">
+                            <button onclick="adjustLabInput('lab-tenths', 1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">+</button>
+                        </div>
+                        <span class="text-[11px] text-pink-300/80 mt-1 block">可嘗試設定 > 9 (如 12)</span>
+                    </div>
+
+                    <div class="glass-card-subtle p-5 rounded-2xl text-center">
+                        <label class="block text-sm font-bold text-amber-200 mb-2">百分位 (幾個 0.01)</label>
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="adjustLabInput('lab-hundredths', -1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">-</button>
+                            <input type="number" id="lab-hundredths" value="14" min="0" max="50" oninput="updateLabLivePreview()" class="w-16 text-center bg-slate-900/80 border border-amber-400/40 rounded-lg p-2 text-xl font-bold text-amber-300">
+                            <button onclick="adjustLabInput('lab-hundredths', 1)" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold">+</button>
+                        </div>
+                        <span class="text-[11px] text-amber-300/80 mt-1 block">可嘗試設定 > 9 (如 14)</span>
+                    </div>
+                </div>
+
+                <!-- Synchronized Visual Preview Area BEFORE regrouping -->
+                <div class="max-w-4xl mx-auto glass-card-subtle p-4 rounded-2xl mb-8 border border-white/10">
+                    <div class="text-xs font-bold text-sky-200 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-eye text-cyan-300"></i> 當前未進位原始圖示狀態：
+                    </div>
+                    <div id="lab-raw-visual-container" class="flex flex-wrap gap-4 items-start justify-start p-3 bg-slate-950/50 rounded-xl min-h-[100px]">
+                        <!-- Injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="text-center mb-8">
+                    <button onclick="runRegroupSimulation()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-pink-500 to-indigo-500 text-slate-950 font-black text-lg hover:scale-105 transition-all shadow-xl glow-box">
+                        <i class="fa-solid fa-play mr-2"></i> 開始進行位值化聚與進位換算！
+                    </button>
+                </div>
+
+                <!-- Dynamic Transformation Explanation Area with Visual Steps -->
+                <div id="regroup-result-area" class="max-w-4xl mx-auto glass-card-subtle p-6 rounded-3xl border border-white/20 hidden">
+                    <h3 class="text-lg font-bold text-sky-200 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-amber-300"></i> 圖示動態化聚推導步驟與解答
+                    </h3>
+
+                    <div class="space-y-6 text-sm leading-relaxed" id="regroup-steps-content">
+                        <!-- JS Dynamic Injection -->
+                    </div>
+                </div>
+
+                <!-- Special Interactive Challenge: 3.99 + 0.01 Case -->
+                <div class="mt-8 max-w-4xl mx-auto glass-card p-6 rounded-3xl border border-pink-400/30">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-bold text-pink-300 uppercase tracking-widest block mb-1">思考帽思辨對決</span>
+                            <h4 class="text-lg font-bold text-white">「3.99 再多 1 個 0.01 是多少？」</h4>
+                            <p class="text-xs text-sky-200/80 mt-1">皮皮說是 0.100？美美說是 1.00？丹丹說是 4？你覺得呢？</p>
+                        </div>
+                        <button onclick="showSpecial399Case()" class="px-5 py-2.5 rounded-xl bg-pink-500/30 hover:bg-pink-500/50 border border-pink-400/40 text-pink-100 font-bold text-sm whitespace-nowrap transition">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> 查看正確解答與分析
+                        </button>
+                    </div>
+                    <div id="case-399-result" class="mt-4 pt-4 border-t border-white/10 text-sm hidden">
+                        <div class="p-4 rounded-2xl bg-slate-900/80 text-sky-100 space-y-2">
+                            <p><strong class="text-amber-300">解析：</strong> 3.99 代表有 399 個 0.01。</p>
+                            <p>再多 1 個 0.01，就是 400 個 0.01。</p>
+                            <p>400 個 0.01 合起來就是 <strong class="text-pink-300 text-lg">4 (或 4.00)</strong>。</p>
+                            <p class="text-xs text-emerald-300 mt-2">✨ 丹丹說「4」及美美說「1.00」(若探討0.99+0.01=1.00) 的概念正確！皮皮的 0.100 是常見的小數點迷思喔！</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= SECTION 3: QUIZ (歷程性評量 5題) ================= -->
+        <div id="section-quiz" class="space-y-6 hidden">
+            <div class="glass-card rounded-3xl p-6 md:p-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 border-b border-white/10 pb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-pink-300 flex items-center gap-2 glow-text">
+                            <i class="fa-solid fa-clipboard-question"></i> 小數學習評量 (5 題)
+                        </h2>
+                        <p class="text-xs text-sky-100/80 mt-1">回答題目驗證學習成果，完成後可查看得分與詳細解析！</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <div class="text-xs text-sky-200/70">目前得分</div>
+                            <div class="text-2xl font-black text-amber-300" id="quiz-score">0 / 100</div>
+                        </div>
+                        <button onclick="resetQuiz()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-sky-200 transition">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> 重測
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Questions Container -->
+                <div class="space-y-6 max-w-4xl mx-auto" id="quiz-container">
+                    <!-- Q1 -->
+                    <div class="glass-card-subtle p-6 rounded-2xl border border-white/10" id="q-card-1">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">1</span>
+                            <h3 class="font-bold text-base text-white">關於「2.43」這個數，下列敘述何者正確？</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q1" value="A" class="mr-3 accent-pink-400">
+                                <span>(A) 是由 2 個 1、4 個 0.1 和 3 個 0.01 合起來的</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q1" value="B" class="mr-3 accent-pink-400">
+                                <span>(B) 是由 24 個 0.1 和 3 個 1 合起來的</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q1" value="C" class="mr-3 accent-pink-400">
+                                <span>(C) 百分位數字是 4，十分位數字是 3</span>
+                            </label>
+                        </div>
+                        <div id="q1-feedback" class="mt-3 text-xs p-3 rounded-xl hidden"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="glass-card-subtle p-6 rounded-2xl border border-white/10" id="q-card-2">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">2</span>
+                            <h3 class="font-bold text-base text-white">「234 個 0.01」合起來是多少？</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q2" value="A" class="mr-3 accent-pink-400">
+                                <span>(A) 23.4</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q2" value="B" class="mr-3 accent-pink-400">
+                                <span>(B) 2.34</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q2" value="C" class="mr-3 accent-pink-400">
+                                <span>(C) 0.234</span>
+                            </label>
+                        </div>
+                        <div id="q2-feedback" class="mt-3 text-xs p-3 rounded-xl hidden"></div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="glass-card-subtle p-6 rounded-2xl border border-white/10" id="q-card-3">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">3</span>
+                            <h3 class="font-bold text-base text-white">8 個 1、6 個 0.1 和 12 個 0.01 合起來是多少？</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q3" value="A" class="mr-3 accent-pink-400">
+                                <span>(A) 8.612</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q3" value="B" class="mr-3 accent-pink-400">
+                                <span>(B) 8.72 (其中 12 個 0.01 化聚為 1個0.1 和 2個0.01)</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q3" value="C" class="mr-3 accent-pink-400">
+                                <span>(C) 8.62</span>
+                            </label>
+                        </div>
+                        <div id="q3-feedback" class="mt-3 text-xs p-3 rounded-xl hidden"></div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="glass-card-subtle p-6 rounded-2xl border border-white/10" id="q-card-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">4</span>
+                            <h3 class="font-bold text-base text-white">關於「0.20 與 0.2」的大小比較，下列何者正確？</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q4" value="A" class="mr-3 accent-pink-400">
+                                <span>(A) 0.20 比 0.2 大，因為 20 比 2 大</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q4" value="B" class="mr-3 accent-pink-400">
+                                <span>(B) 0.20 和 0.2 一樣大，因為兩者都是 2 個 0.1 (且0.20的百分位為0)</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q4" value="C" class="mr-3 accent-pink-400">
+                                <span>(C) 0.2 比 0.20 大</span>
+                            </label>
+                        </div>
+                        <div id="q4-feedback" class="mt-3 text-xs p-3 rounded-xl hidden"></div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="glass-card-subtle p-6 rounded-2xl border border-white/10" id="q-card-5">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">5</span>
+                            <h3 class="font-bold text-base text-white">「3.99 再多 1 個 0.01」，合起來是多少？</h3>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q5" value="A" class="mr-3 accent-pink-400">
+                                <span>(A) 3.100</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q5" value="B" class="mr-3 accent-pink-400">
+                                <span>(B) 3.991</span>
+                            </label>
+                            <label class="flex items-center p-3 rounded-xl bg-slate-900/40 hover:bg-slate-900/70 border border-white/10 cursor-pointer transition">
+                                <input type="radio" name="q5" value="C" class="mr-3 accent-pink-400">
+                                <span>(C) 4 (或 4.00)</span>
+                            </label>
+                        </div>
+                        <div id="q5-feedback" class="mt-3 text-xs p-3 rounded-xl hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Submit Quiz Button -->
+                <div class="text-center mt-8">
+                    <button onclick="submitQuiz()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-pink-400 text-slate-950 font-black text-base hover:scale-105 transition shadow-lg">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> 送出答案並檢視對錯回饋
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-sky-100/60 py-8">
+    </footer>
+
+    <script>
+        function switchTab(tabName) {
+            const tabs = ['explorer', 'lab', 'quiz'];
+            tabs.forEach(tab => {
+                const section = document.getElementById(`section-${tab}`);
+                const tabBtn = document.getElementById(`tab-${tab}`);
+                if (tab === tabName) {
+                    section.classList.remove('hidden');
+                    tabBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 to-indigo-500 text-white shadow-md';
+                } else {
+                    section.classList.add('hidden');
+                    tabBtn.className = 'flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 text-sky-100 hover:text-white';
+                }
+            });
+        }
+
+        function setExplorerPreset(ones, tenths, hundredths) {
+            document.getElementById('slider-ones').value = ones;
+            document.getElementById('slider-tenths').value = tenths;
+            document.getElementById('slider-hundredths').value = hundredths;
+            updateExplorer();
+        }
+
+        function resetExplorer() {
+            setExplorerPreset(2, 4, 3);
+        }
+
+        function adjustLabInput(id, delta) {
+            const el = document.getElementById(id);
+            let val = parseInt(el.value) || 0;
+            val = Math.max(0, val + delta);
+            el.value = val;
+            updateLabLivePreview();
+        }
+
+        function updateExplorer() {
+            const ones = parseInt(document.getElementById('slider-ones').value) || 0;
+            const tenths = parseInt(document.getElementById('slider-tenths').value) || 0;
+            const hundredths = parseInt(document.getElementById('slider-hundredths').value) || 0;
+
+            // Update slider displays
+            document.getElementById('val-ones-display').innerText = ones;
+            document.getElementById('val-tenths-display').innerText = tenths;
+            document.getElementById('val-hundredths-display').innerText = hundredths;
+
+            // Update place value table
+            document.getElementById('chart-ones').innerText = ones;
+            document.getElementById('chart-tenths').innerText = tenths;
+            document.getElementById('chart-hundredths').innerText = hundredths;
+
+            // Update decimal readout
+            const total = (ones + tenths * 0.1 + hundredths * 0.01).toFixed(2);
+            document.getElementById('total-decimal-display').innerText = total;
+
+            // Equivalence alert for 0.20 = 0.2
+            const alertEl = document.getElementById('equivalence-alert');
+            if (ones === 0 && tenths === 2 && hundredths === 0) {
+                alertEl.classList.remove('hidden');
+            } else {
+                alertEl.classList.add('hidden');
+            }
+
+            // Render dynamic visual blocks
+            const container = document.getElementById('blocks-visual-container');
+            container.innerHTML = '';
+
+            // 1. Ones Grids (100-cell grids)
+            if (ones > 0) {
+                const onesWrap = document.createElement('div');
+                onesWrap.className = 'flex flex-col items-center gap-1.5';
+                onesWrap.innerHTML = `<span class="text-xs text-cyan-300 font-bold">${ones} 個 1 (張)</span>`;
+                const onesGridBox = document.createElement('div');
+                onesGridBox.className = 'flex flex-wrap gap-2 p-2.5 bg-sky-950/40 rounded-xl border border-sky-500/30';
+                
+                for (let i = 0; i < ones; i++) {
+                    const grid = document.createElement('div');
+                    grid.className = 'hundred-grid';
+                    for (let c = 0; c < 100; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        grid.appendChild(cell);
+                    }
+                    onesGridBox.appendChild(grid);
+                }
+                onesWrap.appendChild(onesGridBox);
+                container.appendChild(onesWrap);
+            }
+
+            // 2. Tenths Strips (10-cell strips)
+            if (tenths > 0) {
+                const tenthsWrap = document.createElement('div');
+                tenthsWrap.className = 'flex flex-col items-center gap-1.5';
+                tenthsWrap.innerHTML = `<span class="text-xs text-pink-300 font-bold">${tenths} 個 0.1 (條)</span>`;
+                const tenthsBox = document.createElement('div');
+                tenthsBox.className = 'flex flex-wrap gap-1.5 p-2.5 bg-pink-950/40 rounded-xl border border-pink-500/30';
+
+                for (let i = 0; i < tenths; i++) {
+                    const strip = document.createElement('div');
+                    strip.className = 'strip-grid';
+                    for (let c = 0; c < 10; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'strip-cell';
+                        strip.appendChild(cell);
+                    }
+                    tenthsBox.appendChild(strip);
+                }
+                tenthsWrap.appendChild(tenthsBox);
+                container.appendChild(tenthsWrap);
+            }
+
+            // 3. Hundredths Single Cubes
+            if (hundredths > 0) {
+                const hundredthsWrap = document.createElement('div');
+                hundredthsWrap.className = 'flex flex-col items-center gap-1.5';
+                hundredthsWrap.innerHTML = `<span class="text-xs text-amber-300 font-bold">${hundredths} 個 0.01 (塊)</span>`;
+                const hundredthsBox = document.createElement('div');
+                hundredthsBox.className = 'flex flex-wrap gap-1.5 p-2.5 bg-amber-950/40 rounded-xl border border-amber-500/30 max-w-[200px]';
+
+                for (let i = 0; i < hundredths; i++) {
+                    const cube = document.createElement('div');
+                    cube.className = 'single-cell';
+                    hundredthsBox.appendChild(cube);
+                }
+                hundredthsWrap.appendChild(hundredthsBox);
+                container.appendChild(hundredthsWrap);
+            }
+
+            if (ones === 0 && tenths === 0 && hundredths === 0) {
+                container.innerHTML = `<span class="text-white/40 text-xs italic p-4">請移動左側滑桿以觀察圖像變化...</span>`;
+            }
+        }
+
+        function updateLabLivePreview() {
+            const rawOnes = parseInt(document.getElementById('lab-ones').value) || 0;
+            const rawTenths = parseInt(document.getElementById('lab-tenths').value) || 0;
+            const rawHundredths = parseInt(document.getElementById('lab-hundredths').value) || 0;
+
+            const container = document.getElementById('lab-raw-visual-container');
+            container.innerHTML = '';
+
+            // Display Ones
+            if (rawOnes > 0) {
+                const onesDiv = document.createElement('div');
+                onesDiv.className = 'flex flex-col items-center gap-1';
+                onesDiv.innerHTML = `<span class="text-[10px] text-cyan-300 font-bold">${rawOnes} 個 1 (百格板)</span>`;
+                const holder = document.createElement('div');
+                holder.className = 'flex flex-wrap gap-1.5 p-2 bg-sky-950/40 rounded-lg border border-sky-500/20';
+                for (let i = 0; i < Math.min(rawOnes, 10); i++) {
+                    const grid = document.createElement('div');
+                    grid.className = 'hundred-grid';
+                    for (let c = 0; c < 100; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        grid.appendChild(cell);
+                    }
+                    holder.appendChild(grid);
+                }
+                if (rawOnes > 10) {
+                    const more = document.createElement('span');
+                    more.className = 'text-xs text-cyan-300 font-bold self-center px-1';
+                    more.innerText = `+${rawOnes - 10}`;
+                    holder.appendChild(more);
+                }
+                onesDiv.appendChild(holder);
+                container.appendChild(onesDiv);
+            }
+
+            // Display Tenths
+            if (rawTenths > 0) {
+                const tenthsDiv = document.createElement('div');
+                tenthsDiv.className = 'flex flex-col items-center gap-1';
+                tenthsDiv.innerHTML = `<span class="text-[10px] text-pink-300 font-bold">${rawTenths} 個 0.1 (長條)</span>`;
+                const holder = document.createElement('div');
+                holder.className = 'flex flex-wrap gap-1 p-2 bg-pink-950/40 rounded-lg border border-pink-500/20 max-w-[280px]';
+                for (let i = 0; i < Math.min(rawTenths, 20); i++) {
+                    const strip = document.createElement('div');
+                    strip.className = 'strip-grid';
+                    for (let c = 0; c < 10; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'strip-cell';
+                        strip.appendChild(cell);
+                    }
+                    holder.appendChild(strip);
+                }
+                if (rawTenths > 20) {
+                    const more = document.createElement('span');
+                    more.className = 'text-xs text-pink-300 font-bold self-center px-1';
+                    more.innerText = `+${rawTenths - 20}`;
+                    holder.appendChild(more);
+                }
+                tenthsDiv.appendChild(holder);
+                container.appendChild(tenthsDiv);
+            }
+
+            // Display Hundredths
+            if (rawHundredths > 0) {
+                const hundredthsDiv = document.createElement('div');
+                hundredthsDiv.className = 'flex flex-col items-center gap-1';
+                hundredthsDiv.innerHTML = `<span class="text-[10px] text-amber-300 font-bold">${rawHundredths} 個 0.01 (小塊)</span>`;
+                const holder = document.createElement('div');
+                holder.className = 'flex flex-wrap gap-1 p-2 bg-amber-950/40 rounded-lg border border-amber-500/20 max-w-[220px]';
+                for (let i = 0; i < Math.min(rawHundredths, 30); i++) {
+                    const cube = document.createElement('div');
+                    cube.className = 'single-cell';
+                    holder.appendChild(cube);
+                }
+                if (rawHundredths > 30) {
+                    const more = document.createElement('span');
+                    more.className = 'text-xs text-amber-300 font-bold self-center px-1';
+                    more.innerText = `+${rawHundredths - 30}`;
+                    holder.appendChild(more);
+                }
+                hundredthsDiv.appendChild(holder);
+                container.appendChild(hundredthsDiv);
+            }
+
+            if (rawOnes === 0 && rawTenths === 0 && rawHundredths === 0) {
+                container.innerHTML = `<span class="text-white/40 text-xs italic">請調整上方數值以預覽圖示...</span>`;
+            }
+        }
+
+        // Helper Functions to Render Blocks Box for Step Derivation
+        function createCubesBoxHtml(count, highlighted = false, label = '') {
+            let cubes = '';
+            for (let i = 0; i < count; i++) {
+                cubes += `<div class="single-cell"></div>`;
+            }
+            return `
+                <div class="flex flex-col items-center">
+                    ${label ? `<span class="text-[10px] text-amber-300 font-bold mb-1">${label}</span>` : ''}
+                    <div class="flex flex-wrap gap-1 p-1.5 rounded-lg bg-amber-950/40 border border-amber-500/40 ${highlighted ? 'merge-group' : ''}">${cubes}</div>
+                </div>
+            `;
+        }
+
+        function createStripsBoxHtml(count, highlighted = false, label = '') {
+            let strips = '';
+            for (let i = 0; i < count; i++) {
+                strips += `
+                    <div class="strip-grid">
+                        ${'<div class="strip-cell"></div>'.repeat(10)}
+                    </div>`;
+            }
+            return `
+                <div class="flex flex-col items-center">
+                    ${label ? `<span class="text-[10px] text-pink-300 font-bold mb-1">${label}</span>` : ''}
+                    <div class="flex flex-wrap gap-1 p-1.5 rounded-lg bg-pink-950/40 border border-pink-500/40 ${highlighted ? 'merge-group' : ''}">${strips}</div>
+                </div>
+            `;
+        }
+
+        function createGridsBoxHtml(count, highlighted = false, label = '') {
+            let boards = '';
+            for (let i = 0; i < count; i++) {
+                let cells = '';
+                for (let c = 0; c < 100; c++) cells += '<div class="grid-cell"></div>';
+                boards += `<div class="hundred-grid">${cells}</div>`;
+            }
+            return `
+                <div class="flex flex-col items-center">
+                    ${label ? `<span class="text-[10px] text-cyan-300 font-bold mb-1">${label}</span>` : ''}
+                    <div class="flex flex-wrap gap-1.5 p-1.5 rounded-lg bg-sky-950/40 border border-sky-500/40 ${highlighted ? 'merge-group' : ''}">${boards}</div>
+                </div>
+            `;
+        }
+
+        function runRegroupSimulation() {
+            const rawOnes = parseInt(document.getElementById('lab-ones').value) || 0;
+            const rawTenths = parseInt(document.getElementById('lab-tenths').value) || 0;
+            const rawHundredths = parseInt(document.getElementById('lab-hundredths').value) || 0;
+
+            const area = document.getElementById('regroup-result-area');
+            const stepsContent = document.getElementById('regroup-steps-content');
+            area.classList.remove('hidden');
+
+            // Calculation logic
+            const hundredthsCarry = Math.floor(rawHundredths / 10);
+            const finalHundredths = rawHundredths % 10;
+
+            const totalTenths = rawTenths + hundredthsCarry;
+            const tenthsCarry = Math.floor(totalTenths / 10);
+            const finalTenths = totalTenths % 10;
+
+            const finalOnes = rawOnes + tenthsCarry;
+            const finalDecimal = (finalOnes + (finalTenths * 0.1) + (finalHundredths * 0.01)).toFixed(2);
+
+            // Build Step 1 Visual (Hundredths Carry)
+            let step1Visual = '';
+            if (hundredthsCarry > 0) {
+                let conversionRows = '';
+                for (let k = 0; k < hundredthsCarry; k++) {
+                    conversionRows += `
+                        <div class="flex items-center gap-2 md:gap-3 bg-slate-900/70 p-2.5 rounded-xl border border-amber-500/30 shadow-md">
+                            ${createCubesBoxHtml(10, true, `滿 10 個 0.01`)}
+                            <div class="flex flex-col items-center text-pink-400 font-bold text-xs">
+                                <i class="fa-solid fa-right-long text-base"></i>
+                                <span>化聚</span>
+                            </div>
+                            ${createStripsBoxHtml(1, false, `1 條 0.1 (進位)`)}
+                        </div>
+                    `;
+                }
+
+                step1Visual = `
+                    <div class="mt-3 space-y-2">
+                        <div class="text-xs text-amber-200 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-layer-group"></i> 百分位共有 ${rawHundredths} 個 0.01 (每 10 個可化聚為 1 條 0.1)：
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                ${conversionRows}
+                            </div>
+                            ${finalHundredths > 0 ? `
+                            <div class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-xl border border-white/10">
+                                <span class="text-xs text-white/60 font-bold">+</span>
+                                ${createCubesBoxHtml(finalHundredths, false, `保留 ${finalHundredths} 個 0.01`)}
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                step1Visual = `
+                    <div class="mt-3 p-3 bg-slate-900/70 rounded-xl border border-white/10 flex items-center gap-3">
+                        <span class="text-xs text-amber-200">未滿 10 個（共 ${rawHundredths} 個 0.01），不需要進位：</span>
+                        ${rawHundredths > 0 ? createCubesBoxHtml(rawHundredths, false, `保留 ${rawHundredths} 個 0.01`) : '<span class="text-xs text-white/40">無</span>'}
+                    </div>
+                `;
+            }
+
+            // Build Step 2 Visual (Tenths Carry)
+            let step2Visual = '';
+            if (tenthsCarry > 0) {
+                let conversionRows = '';
+                for (let k = 0; k < tenthsCarry; k++) {
+                    conversionRows += `
+                        <div class="flex items-center gap-2 md:gap-3 bg-slate-900/70 p-2.5 rounded-xl border border-pink-500/30 shadow-md">
+                            ${createStripsBoxHtml(10, true, `滿 10 條 0.1`)}
+                            <div class="flex flex-col items-center text-cyan-400 font-bold text-xs">
+                                <i class="fa-solid fa-right-long text-base"></i>
+                                <span>化聚</span>
+                            </div>
+                            ${createGridsBoxHtml(1, false, `1 張 1.0 (進位)`)}
+                        </div>
+                    `;
+                }
+
+                step2Visual = `
+                    <div class="mt-3 space-y-2">
+                        <div class="text-xs text-pink-200 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-layer-group"></i> 十分位共有 ${totalTenths} 條 0.1 ${hundredthsCarry > 0 ? `(含原本 ${rawTenths} 條 + 進位 ${hundredthsCarry} 條)` : ''}：
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                ${conversionRows}
+                            </div>
+                            ${finalTenths > 0 ? `
+                            <div class="flex items-center gap-2 bg-slate-900/70 p-2.5 rounded-xl border border-white/10">
+                                <span class="text-xs text-white/60 font-bold">+</span>
+                                ${createStripsBoxHtml(finalTenths, false, `保留 ${finalTenths} 條 0.1`)}
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                step2Visual = `
+                    <div class="mt-3 p-3 bg-slate-900/70 rounded-xl border border-white/10 flex items-center gap-3">
+                        <span class="text-xs text-pink-200">
+                            十分位共有 ${totalTenths} 條 0.1 ${hundredthsCarry > 0 ? `(含原本 ${rawTenths} 條 + 進位 ${hundredthsCarry} 條)` : ''}，未滿 10 條，不需要進位：
+                        </span>
+                        ${totalTenths > 0 ? createStripsBoxHtml(totalTenths, false, `保留 ${totalTenths} 條 0.1`) : '<span class="text-xs text-white/40">無</span>'}
+                    </div>
+                `;
+            }
+
+            // Build Final Visual
+            let finalVisual = `
+                <div class="flex flex-wrap items-center justify-center gap-4 mt-2 p-3 bg-slate-900/80 rounded-xl">
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs text-cyan-300 font-bold">個位 (${finalOnes} 個 1)</span>
+                        ${finalOnes > 0 ? createGridsBoxHtml(finalOnes, false) : '<span class="text-xs text-white/40">無</span>'}
+                    </div>
+                    <span class="text-xl text-white/40 font-bold">+</span>
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs text-pink-300 font-bold">十分位 (${finalTenths} 個 0.1)</span>
+                        ${finalTenths > 0 ? createStripsBoxHtml(finalTenths, false) : '<span class="text-xs text-white/40">無</span>'}
+                    </div>
+                    <span class="text-xl text-white/40 font-bold">+</span>
+                    <div class="flex flex-col items-center">
+                        <span class="text-xs text-amber-300 font-bold">百分位 (${finalHundredths} 個 0.01)</span>
+                        ${finalHundredths > 0 ? createCubesBoxHtml(finalHundredths, false) : '<span class="text-xs text-white/40">無</span>'}
+                    </div>
+                </div>
+            `;
+
+            stepsContent.innerHTML = `
+                <div class="p-3 rounded-xl bg-slate-900/60 border-l-4 border-amber-400">
+                    <strong class="text-amber-300">原始輸入數值：</strong> 
+                    ${rawOnes} 個 1、 ${rawTenths} 個 0.1、 ${rawHundredths} 個 0.01
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-900/60 border-l-4 border-pink-400 space-y-2">
+                    <strong class="text-pink-300 text-base">步驟 1：百分位 (0.01) 化聚與圖示進位</strong><br>
+                    <p class="text-xs text-sky-100/90">
+                        ${rawHundredths} 個 0.01 可以化聚為 
+                        <span class="text-amber-300 font-bold">${hundredthsCarry} 個 0.1</span> (進位至十分位) 
+                        與 <span class="text-amber-300 font-bold">${finalHundredths} 個 0.01</span> (保留在百分位)。
+                    </p>
+                    ${step1Visual}
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-900/60 border-l-4 border-cyan-400 space-y-2">
+                    <strong class="text-cyan-300 text-base">步驟 2：十分位 (0.1) 化聚與圖示進位</strong><br>
+                    <p class="text-xs text-sky-100/90">
+                        原本 ${rawTenths} 個 0.1 加上進位的 ${hundredthsCarry} 個 0.1 = <strong>${totalTenths} 個 0.1</strong>。<br>
+                        ${totalTenths} 個 0.1 可以化聚為 
+                        <span class="text-cyan-300 font-bold">${tenthsCarry} 個 1</span> (進位至個位) 
+                        與 <span class="text-pink-300 font-bold">${finalTenths} 個 0.1</span> (保留在十分位)。
+                    </p>
+                    ${step2Visual}
+                </div>
+
+                <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-sky-500/20 border border-emerald-400/40 text-center space-y-2">
+                    <div class="text-xs text-emerald-200">化聚後最終結果圖示 (位值：個位 ${finalOnes} | 十分位 ${finalTenths} | 百分位 ${finalHundredths})</div>
+                    <div class="text-3xl font-black text-emerald-300">${finalDecimal}</div>
+                    ${finalVisual}
+                </div>
+            `;
+        }
+
+        function showSpecial399Case() {
+            const el = document.getElementById('case-399-result');
+            el.classList.toggle('hidden');
+        }
+
+        const answers = {
+            q1: 'A',
+            q2: 'B',
+            q3: 'B',
+            q4: 'B',
+            q5: 'C'
+        };
+
+        const explanations = {
+            q1: "答案為 (A)。2.43 即 2個1、4個0.1與3個0.01。個位為2、十分位為4、百分位為3。",
+            q2: "答案為 (B)。100個0.01是1，200個0.01是2，34個0.01是0.34，合起來是 2.34。",
+            q3: "答案為 (B)。12個0.01可換成1個0.1和2個0.01。故0.1共有 6+1=7個，總合為 8.72。",
+            q4: "答案為 (B)。0.20與0.2都代表2個0.1，百分位為0時可省略不寫，兩者數值完全相等。",
+            q5: "答案為 (C)。3.99是399個0.01，再加1個是400個0.01，即為4 (或4.00)。"
+        };
+
+        function submitQuiz() {
+            let score = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                const feedbackEl = document.getElementById(`q${i}-feedback`);
+                feedbackEl.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-200', 'border-emerald-400/30', 'bg-rose-500/20', 'text-rose-200', 'border-rose-400/30');
+
+                if (selected && selected.value === answers[`q${i}`]) {
+                    score += 20;
+                    feedbackEl.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border', 'border-emerald-400/30');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> <strong>正確！</strong> ${explanations[`q${i}`]}`;
+                } else {
+                    feedbackEl.classList.add('bg-rose-500/20', 'text-rose-200', 'border', 'border-rose-400/30');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> <strong>解答分析：</strong> ${explanations[`q${i}`]}`;
+                }
+            }
+
+            document.getElementById('quiz-score').innerText = `${score} / 100`;
+        }
+
+        function resetQuiz() {
+            for (let i = 1; i <= 5; i++) {
+                const radios = document.getElementsByName(`q${i}`);
+                radios.forEach(r => r.checked = false);
+                const feedbackEl = document.getElementById(`q${i}-feedback`);
+                feedbackEl.classList.add('hidden');
+            }
+            document.getElementById('quiz-score').innerText = `0 / 100`;
+        }
+
+        // On window startup, initialize rendering
+        window.onload = function() {
+            updateExplorer();
+            updateLabLivePreview();
+        };
+    </script>
+</body>
+</html>

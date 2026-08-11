@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公里與公尺的複名數加減法 - 新海誠風互動探索網頁</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Noto Sans TC & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            shinkai: {
+              sky: '#1e3c72',
+              twilight: '#2a5298',
+              sunset: '#ff7e5f',
+              cloud: '#feb47b',
+              azure: '#00c6ff',
+              midnight: '#0f2027',
+              pink: '#f8a5c2'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            math: ['"Outfit"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background: linear-gradient(135deg, #0f2027 0%, #203a43 30%, #2c5364 60%, #ff7e5f 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: #2d3748;
+    }
+    
+    .shinkai-glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .shinkai-header-bg {
+      background: linear-gradient(120deg, rgba(30, 60, 114, 0.9) 0%, rgba(42, 82, 152, 0.85) 50%, rgba(255, 126, 95, 0.8) 100%);
+    }
+
+    .glow-effect {
+      box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+    }
+
+    .highlight-carry {
+      animation: pulse-carry 1.5s infinite alternate;
+    }
+
+    @keyframes pulse-carry {
+      0% { background-color: rgba(254, 243, 199, 0.6); transform: scale(1); }
+      100% { background-color: rgba(253, 230, 138, 0.9); transform: scale(1.03); }
+    }
+
+    /* Custom range slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: #cbd5e1;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #00c6ff;
+      border: 2px solid white;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .cloud-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+      background-image: radial-gradient(circle at 20% 20%, white 0%, transparent 40%),
+                        radial-gradient(circle at 80% 30%, white 0%, transparent 35%);
+    }
+  </style>
+</head>
+<body class="relative pb-16">
+
+  <!-- Background decorative element -->
+  <div class="cloud-bg"></div>
+
+  <header class="relative z-10 shinkai-header-bg text-white py-8 px-4 mb-8 shadow-2xl border-b border-white/20">
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- 閒雲數學小棧 Logo -->
+      <div class="w-full max-w-4xl flex items-center justify-start mb-4 px-2 fade-in">
+        <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
+        <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
+      </div>
+
+      <!-- 原標題與導覽列 -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-center md:text-left">
+          <div class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold tracking-wider text-cyan-200 mb-2">
+            <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學 5-3 探索課程
+          </div>
+          <h1 class="text-3xl md:text-4xl font-black tracking-tight text-shadow">
+            公里與公尺的複名數計算
+          </h1>
+          <p class="text-sky-100 text-sm md:text-base mt-1 font-light">
+            透過動態直式拆解與地圖情境，輕鬆掌握「1000 公尺 = 1 公里」的進借位技巧！
+          </p>
+        </div>
+        
+        <!-- Quick Navigation Tabs -->
+        <div class="flex bg-black/20 p-1.5 rounded-2xl backdrop-blur-md border border-white/10 gap-1 text-sm font-medium">
+          <button onclick="switchTab('calc')" id="tab-btn-calc" class="tab-btn px-4 py-2 rounded-xl transition-all duration-300 bg-white text-indigo-900 shadow-md font-bold">
+            <i class="fa-solid fa-calculator mr-1.5"></i>動態直式演示
+          </button>
+          <button onclick="switchTab('map')" id="tab-btn-map" class="tab-btn px-4 py-2 rounded-xl transition-all duration-300 text-white hover:bg-white/10">
+            <i class="fa-solid fa-map-location-dot mr-1.5"></i>太平山路線探究
+          </button>
+          <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="tab-btn px-4 py-2 rounded-xl transition-all duration-300 text-white hover:bg-white/10">
+            <i class="fa-solid fa-pen-to-square mr-1.5"></i>隨堂歷程評量
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-6xl mx-auto px-4">
+
+    <!-- SECTION 1: DYNAMIC CALCULATOR -->
+    <section id="section-calc" class="space-y-6">
+      
+      <!-- Mode Toggle & Info -->
+      <div class="shinkai-glass rounded-3xl p-6 border border-white/80">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-200/60 pb-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center">
+              <span class="w-3 h-7 bg-cyan-500 rounded-full mr-3"></span>
+              複名數直式加減運算與位值拆解
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">拖動滑桿觀察公尺滿 1000 進位成 1 公里，或不夠減時由 1 公里借位成 1000 公尺</p>
+          </div>
+
+          <!-- Operation Switcher -->
+          <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
+            <button id="op-add-btn" onclick="setOperation('add')" class="px-5 py-2 rounded-xl font-bold text-sm transition-all bg-indigo-600 text-white shadow-md">
+              <i class="fa-solid fa-plus mr-1"></i> 加法 (進位)
+            </button>
+            <button id="op-sub-btn" onclick="setOperation('sub')" class="px-5 py-2 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-900">
+              <i class="fa-solid fa-minus mr-1"></i> 減法 (借位)
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Left Controls (Inputs) -->
+          <div class="lg:col-span-5 bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-6">
+            <h3 class="font-bold text-slate-700 text-sm flex items-center">
+              <i class="fa-solid fa-sliders text-cyan-600 mr-2"></i> 調整長度數據
+            </h3>
+
+            <!-- Distance 1 Slider Group -->
+            <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-center text-sm">
+                <span class="font-semibold text-indigo-900"><i class="fa-solid fa-road text-indigo-500 mr-1"></i> 長度 A：</span>
+                <span id="label-val1" class="font-math font-bold text-base text-indigo-600">4 公里 700 公尺</span>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-xs text-slate-500 mb-1">
+                  <span>公里 (km)</span>
+                  <span id="num-km1">4 km</span>
+                </div>
+                <input type="range" id="slider-km1" min="0" max="25" value="4" class="w-full" oninput="updateCalculations()">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-slate-500 mb-1">
+                  <span>公尺 (m)</span>
+                  <span id="num-m1">700 m</span>
+                </div>
+                <input type="range" id="slider-m1" min="0" max="950" step="50" value="700" class="w-full" oninput="updateCalculations()">
+              </div>
+            </div>
+
+            <!-- Distance 2 Slider Group -->
+            <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex justify-between items-center text-sm">
+                <span class="font-semibold text-amber-900"><i class="fa-solid fa-road text-amber-500 mr-1"></i> 長度 B：</span>
+                <span id="label-val2" class="font-math font-bold text-base text-amber-600">2 公里 500 公尺</span>
+              </div>
+              
+              <div>
+                <div class="flex justify-between text-xs text-slate-500 mb-1">
+                  <span>公里 (km)</span>
+                  <span id="num-km2">2 km</span>
+                </div>
+                <input type="range" id="slider-km2" min="0" max="25" value="2" class="w-full" oninput="updateCalculations()">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs text-slate-500 mb-1">
+                  <span>公尺 (m)</span>
+                  <span id="num-m2">500 m</span>
+                </div>
+                <input type="range" id="slider-m2" min="0" max="950" step="50" value="500" class="w-full" oninput="updateCalculations()">
+              </div>
+            </div>
+
+            <!-- Key Teaching Tip Card -->
+            <div class="p-3.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200/70 text-xs text-amber-900 leading-relaxed">
+              <p class="font-bold flex items-center mb-1 text-amber-800">
+                <i class="fa-solid fa-lightbulb text-amber-500 mr-1.5 text-sm"></i> 教學要點叮嚀
+              </p>
+              <ul class="list-disc list-inside space-y-1 pl-1">
+                <li>公尺位數相加滿 <strong class="text-red-600 font-bold">1000</strong> 時，需進位成 <strong class="text-red-600 font-bold">1 公里</strong>。</li>
+                <li>公尺位數不夠減時，向公里借 <strong class="text-blue-600 font-bold">1 公里</strong> 換成 <strong class="text-blue-600 font-bold">1000 公尺</strong> 合併計算。</li>
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Right Vertical Math & Step Breakdown -->
+          <div class="lg:col-span-7 space-y-6">
+            
+            <!-- Standard Vertical Calculation Paper Simulation -->
+            <div class="bg-white rounded-2xl p-6 border-2 border-indigo-100 shadow-lg relative overflow-hidden">
+              <div class="absolute top-0 right-0 bg-indigo-600 text-white text-xs px-3 py-1 rounded-bl-xl font-medium">
+                標準直式算式
+              </div>
+
+              <!-- Units Header -->
+              <div class="grid grid-cols-2 text-center border-b-2 border-indigo-200 pb-2 mb-4 font-bold text-indigo-900 text-lg tracking-widest">
+                <div>公里</div>
+                <div>公尺</div>
+              </div>
+
+              <!-- Vertical Calculation Layout -->
+              <div class="font-math text-2xl tracking-wider text-slate-800 space-y-3 relative">
+                
+                <!-- Borrowing/Carrying Auxiliary Row (Dynamic) -->
+                <div id="aux-row" class="grid grid-cols-2 text-center text-sm h-6 font-bold text-red-500 transition-all">
+                  <div id="aux-km"></div>
+                  <div id="aux-m"></div>
+                </div>
+
+                <!-- First Row -->
+                <div class="grid grid-cols-2 text-center py-1 rounded-lg transition-colors duration-300" id="row-1">
+                  <div id="disp-km1" class="font-bold">4</div>
+                  <div id="disp-m1" class="font-bold">700</div>
+                </div>
+
+                <!-- Operator and Second Row -->
+                <div class="grid grid-cols-2 text-center py-1 rounded-lg transition-colors duration-300 relative" id="row-2">
+                  <span id="disp-op" class="absolute left-2 top-1/2 -translate-y-1/2 font-bold text-2xl text-indigo-600">+</span>
+                  <div id="disp-km2" class="font-bold">2</div>
+                  <div id="disp-m2" class="font-bold">500</div>
+                </div>
+
+                <!-- Division Line -->
+                <div class="border-b-4 border-slate-800 my-2 rounded-full"></div>
+
+                <!-- Intermediate Row (Hidden in standard view) -->
+                <div id="inter-row" class="grid grid-cols-2 text-center text-xl text-slate-500 hidden py-1">
+                  <div id="inter-km"></div>
+                  <div id="inter-m"></div>
+                </div>
+
+                <!-- Final Answer Row -->
+                <div class="grid grid-cols-2 text-center font-black text-3xl text-indigo-700 py-1 bg-indigo-50/80 rounded-xl border border-indigo-100">
+                  <div id="disp-res-km">7</div>
+                  <div id="disp-res-m">200</div>
+                </div>
+              </div>
+
+              <!-- Result Expression Text -->
+              <div id="expression-box" class="mt-6 p-4 rounded-xl bg-slate-100 text-center text-slate-800 font-bold text-lg border border-slate-200">
+                答：<span id="text-ans-km" class="text-indigo-600 font-black text-2xl mx-1">7</span>公里 <span id="text-ans-m" class="text-indigo-600 font-black text-2xl mx-1">200</span>公尺
+              </div>
+            </div>
+
+            <!-- Dynamic Concept Explanation Box -->
+            <div class="shinkai-glass p-5 rounded-2xl border border-cyan-200 relative overflow-hidden">
+              <div class="flex items-center gap-2 font-bold text-cyan-900 mb-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-cyan-600 text-lg"></i>
+                <span class="text-base">思維解構與輔助說明</span>
+              </div>
+              <p id="explanation-text" class="text-sm text-slate-700 leading-relaxed">
+                <!-- Dynamic text populated by JS -->
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SECTION 2: MAP ROUTE EXPLORER -->
+    <section id="section-map" class="space-y-6 hidden">
+      <div class="shinkai-glass rounded-3xl p-6 border border-white/80">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-200/80 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center">
+              <span class="w-3 h-7 bg-amber-500 rounded-full mr-3"></span>
+              太平山國家森林遊樂區 - 路線距離探究
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">選擇起點與終點，系統將自動標記路線並計算總行駛距離！</p>
+          </div>
+
+          <!-- Start & End Point Selectors -->
+          <div class="flex flex-wrap items-center gap-3 bg-white/90 p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+              <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+              <span>起點：</span>
+              <select id="map-start-select" onchange="updateMapRoute()" class="bg-emerald-50 border border-emerald-300 rounded-lg px-2 py-1 text-xs font-bold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="0" selected>土場</option>
+                <option value="1">鳩之澤</option>
+                <option value="2">白嶺</option>
+                <option value="3">太平山莊</option>
+                <option value="4">翠峰湖</option>
+              </select>
+            </div>
+
+            <i class="fa-solid fa-arrow-right text-slate-400 text-xs"></i>
+
+            <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700">
+              <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+              <span>終點：</span>
+              <select id="map-end-select" onchange="updateMapRoute()" class="bg-rose-50 border border-rose-300 rounded-lg px-2 py-1 text-xs font-bold text-rose-900 focus:outline-none focus:ring-2 focus:ring-rose-500">
+                <option value="0">土場</option>
+                <option value="1">鳩之澤</option>
+                <option value="2" selected>白嶺</option>
+                <option value="3">太平山莊</option>
+                <option value="4">翠峰湖</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Visual SVG Map -->
+        <div class="relative bg-gradient-to-r from-sky-100 via-emerald-50 to-amber-50 rounded-2xl p-6 border border-slate-200 overflow-hidden shadow-inner min-h-[320px]">
+          
+          <div class="absolute top-3 right-4 text-xs font-bold text-slate-400">
+            <i class="fa-solid fa-mountain mr-1"></i> 太平山登山路線示意圖
+          </div>
+
+          <!-- SVG Route Line Visualizer -->
+          <div class="w-full overflow-x-auto py-8">
+            <div class="min-w-[750px] flex items-center justify-between relative px-10">
+              
+              <!-- Connecting Base Line -->
+              <div class="absolute top-1/2 left-12 right-12 h-3 bg-slate-300 -translate-y-1/2 rounded-full -z-0"></div>
+              <!-- Active Highlight Line -->
+              <div id="route-highlight-bar" class="absolute top-1/2 h-3 bg-gradient-to-r from-emerald-500 to-rose-500 -translate-y-1/2 rounded-full transition-all duration-500 -z-0" style="left: 10%; width: 40%;"></div>
+
+              <!-- Station 0: 土場 -->
+              <div class="relative z-10 flex flex-col items-center group cursor-pointer" onclick="setMapStation(0)">
+                <div id="station-badge-0" class="absolute -top-7 hidden animate-bounce"></div>
+                <div id="station-icon-0" class="w-12 h-12 rounded-full bg-white border-4 border-amber-500 flex items-center justify-center text-amber-600 font-bold shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-tree"></i>
+                </div>
+                <span class="mt-2 font-bold text-slate-800 text-sm">土場</span>
+              </div>
+
+              <!-- Segment 0 Info -->
+              <div id="seg-info-0" class="relative z-10 bg-white/90 px-3 py-1.5 rounded-full border border-slate-300 text-xs font-bold text-indigo-900 shadow-sm transition-all">
+                4 km 100 m
+              </div>
+
+              <!-- Station 1: 鳩之澤 -->
+              <div class="relative z-10 flex flex-col items-center group cursor-pointer" onclick="setMapStation(1)">
+                <div id="station-badge-1" class="absolute -top-7 hidden animate-bounce"></div>
+                <div id="station-icon-1" class="w-12 h-12 rounded-full bg-white border-4 border-cyan-500 flex items-center justify-center text-cyan-600 font-bold shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-hot-tub-person"></i>
+                </div>
+                <span class="mt-2 font-bold text-slate-800 text-sm">鳩之澤</span>
+              </div>
+
+              <!-- Segment 1 Info -->
+              <div id="seg-info-1" class="relative z-10 bg-white/90 px-3 py-1.5 rounded-full border border-slate-300 text-xs font-bold text-indigo-900 shadow-sm transition-all">
+                10 km 400 m
+              </div>
+
+              <!-- Station 2: 白嶺 -->
+              <div class="relative z-10 flex flex-col items-center group cursor-pointer" onclick="setMapStation(2)">
+                <div id="station-badge-2" class="absolute -top-7 hidden animate-bounce"></div>
+                <div id="station-icon-2" class="w-12 h-12 rounded-full bg-white border-4 border-emerald-500 flex items-center justify-center text-emerald-600 font-bold shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-campground"></i>
+                </div>
+                <span class="mt-2 font-bold text-slate-800 text-sm">白嶺</span>
+              </div>
+
+              <!-- Segment 2 Info -->
+              <div id="seg-info-2" class="relative z-10 bg-white/90 px-3 py-1.5 rounded-full border border-slate-300 text-xs font-bold text-indigo-900 shadow-sm transition-all">
+                10 km 500 m
+              </div>
+
+              <!-- Station 3: 太平山莊 -->
+              <div class="relative z-10 flex flex-col items-center group cursor-pointer" onclick="setMapStation(3)">
+                <div id="station-badge-3" class="absolute -top-7 hidden animate-bounce"></div>
+                <div id="station-icon-3" class="w-12 h-12 rounded-full bg-white border-4 border-purple-500 flex items-center justify-center text-purple-600 font-bold shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-hotel"></i>
+                </div>
+                <span class="mt-2 font-bold text-slate-800 text-sm">太平山莊</span>
+              </div>
+
+              <!-- Segment 3 Info -->
+              <div id="seg-info-3" class="relative z-10 bg-white/90 px-3 py-1.5 rounded-full border border-slate-300 text-xs font-bold text-indigo-900 shadow-sm transition-all">
+                15 km 500 m
+              </div>
+
+              <!-- Station 4: 翠峰湖 -->
+              <div class="relative z-10 flex flex-col items-center group cursor-pointer" onclick="setMapStation(4)">
+                <div id="station-badge-4" class="absolute -top-7 hidden animate-bounce"></div>
+                <div id="station-icon-4" class="w-12 h-12 rounded-full bg-white border-4 border-purple-500 flex items-center justify-center text-purple-600 font-bold shadow-md group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-hotel"></i>
+                </div>
+                <span class="mt-2 font-bold text-slate-800 text-sm">翠峰湖</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Dynamic Route Calculation Summary Card -->
+          <div class="mt-4 bg-white/95 rounded-2xl p-4 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+            <div>
+              <div class="text-xs font-bold text-slate-500">路線計算結果</div>
+              <div class="text-lg font-bold text-slate-800 flex items-center gap-2 mt-0.5">
+                <span id="route-title-text" class="text-indigo-600">土場 ➔ 白嶺</span>
+                <span>：累積距離</span>
+                <span id="route-dist-text" class="text-2xl font-black font-math text-emerald-600">14 公里 500 公尺</span>
+              </div>
+            </div>
+
+            <button onclick="applyRouteToCalc()" class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-bold rounded-xl shadow hover:opacity-90 transition-all text-sm flex items-center gap-2 shrink-0">
+              <i class="fa-solid fa-calculator"></i> 帶入直式演示算式
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SECTION 3: QUIZ ASSESSMENT -->
+    <section id="section-quiz" class="space-y-6 hidden">
+      <div class="shinkai-glass rounded-3xl p-6 border border-white/80">
+        
+        <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center">
+              <span class="w-3 h-7 bg-pink-500 rounded-full mr-3"></span>
+              課堂小試身手 - 歷程性評量
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">共 5 題，回答後系統將即時給予對錯回饋與詳細直式拆解說明。</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-500">目前得分</span>
+            <div id="quiz-score" class="font-math font-black text-2xl text-indigo-600">0 / 5</div>
+          </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="space-y-6">
+          <!-- Quiz items will be generated dynamically by JS -->
+        </div>
+
+        <!-- Submit & Reset Buttons -->
+        <div class="mt-8 flex justify-center gap-4">
+          <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-sky-500 text-white font-bold rounded-2xl shadow-lg hover:opacity-90 transition-all text-base">
+            <i class="fa-solid fa-paper-plane mr-2"></i> 提交所有答案
+          </button>
+          <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition-all text-base">
+            <i class="fa-solid fa-rotate-right mr-2"></i> 重新測驗
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* Global Application State */
+    let currentOp = 'add'; // 'add' or 'sub'
+    
+    // Quiz Dataset based on Textbook 5-3 Curriculum
+    const quizData = [
+      {
+        id: 1,
+        type: 'multi',
+        question: "1. 【觀念概念】1 公里 (km) 等於多少公尺 (m)？",
+        options: ["10 公尺", "100 公尺", "1000 公尺", "10000 公尺"],
+        answer: 2,
+        explanation: "1 公里 (km) = 1000 公尺 (m)，這是公里與公尺換算的基本單位率。"
+      },
+      {
+        id: 2,
+        type: 'calc',
+        question: "2. 【不進位加法】熊爸爸開車從土場(4km 100m)經鳩之澤到白嶺(10km 400m)，一共行駛了幾公里幾公尺？",
+        correctKm: 14,
+        correctM: 500,
+        explanation: "4公里100公尺 + 10公里400公尺 = 14公里500公尺（公尺部分 100 + 400 = 500，未滿1000不需進位）。"
+      },
+      {
+        id: 3,
+        type: 'calc',
+        question: "3. 【進位加法】美美走三疊瀑布步道來回，去程走了 2 公里 700 公尺，回程走原路，一共走了幾公里幾公尺？",
+        correctKm: 5,
+        correctM: 400,
+        explanation: "2公里700公尺 + 2公里700公尺：公尺相加 700+700=1400公尺 = 1公里400公尺，將 1400 劃掉進位 1 公里，2+2+1 = 5 公里，答：5公里400公尺。"
+      },
+      {
+        id: 4,
+        type: 'calc',
+        question: "4. 【借位減法】鐵杉林步道長 2 公里 200 公尺，檜木原始林步道長 850 公尺，兩步道相差幾公里幾公尺？",
+        correctKm: 1,
+        correctM: 350,
+        explanation: "2公里200公尺 - 850公尺：200公尺不夠減850公尺，向2公里借1公里換成1000公尺，公尺變成1200公尺 - 850公尺 = 350公尺；公里剩 1 公里，答：1公里350公尺。"
+      },
+      {
+        id: 5,
+        type: 'calc',
+        question: "5. 【整公里扣減】丹丹參加 21 公里的路跑比賽，已經跑了 17 公里 95 公尺，還需要跑幾公里幾公尺才能到達終點？",
+        correctKm: 3,
+        correctM: 905,
+        explanation: "21公里 - 17公里95公尺：把 21 公里劃掉看成 20 公里 1000 公尺。1000 - 95 = 905 公尺，20 - 17 = 3 公里，答：3公里905公尺。"
+      }
+    ];
+
+    // Station distances data (in meters from start segment)
+    const segmentsData = [
+      { from: "土場", to: "鳩之澤", km: 4, m: 100 },
+      { from: "鳩之澤", to: "白嶺", km: 10, m: 400 },
+      { from: "白嶺", to: "太平山莊", km: 10, m: 500 },
+      { from: "太平山莊", to: "翠峰湖", km: 15, m: 500 }
+    ];
+
+    const stationNames = ["土場", "鳩之澤", "白嶺", "太平山莊", "翠峰湖"];
+
+    // Initial Values
+    let state = {
+      km1: 4,
+      m1: 700,
+      km2: 2,
+      m2: 500
+    };
+
+    /* Initialization */
+    window.onload = function() {
+      updateCalculations();
+      updateMapRoute();
+      renderQuiz();
+    };
+
+    /* Tab Navigation Switcher */
+    function switchTab(tabId) {
+      document.getElementById('section-calc').classList.add('hidden');
+      document.getElementById('section-map').classList.add('hidden');
+      document.getElementById('section-quiz').classList.add('hidden');
+
+      const btnCalc = document.getElementById('tab-btn-calc');
+      const btnMap = document.getElementById('tab-btn-map');
+      const btnQuiz = document.getElementById('tab-btn-quiz');
+
+      const inactiveClass = "tab-btn px-4 py-2 rounded-xl transition-all duration-300 text-white hover:bg-white/10";
+      const activeClass = "tab-btn px-4 py-2 rounded-xl transition-all duration-300 bg-white text-indigo-900 shadow-md font-bold";
+
+      btnCalc.className = inactiveClass;
+      btnMap.className = inactiveClass;
+      btnQuiz.className = inactiveClass;
+
+      document.getElementById(`section-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tabId}`).className = activeClass;
+    }
+
+    function setOperation(op) {
+      currentOp = op;
+      const addBtn = document.getElementById('op-add-btn');
+      const subBtn = document.getElementById('op-sub-btn');
+
+      if (op === 'add') {
+        addBtn.className = "px-5 py-2 rounded-xl font-bold text-sm transition-all bg-indigo-600 text-white shadow-md";
+        subBtn.className = "px-5 py-2 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-900";
+        
+        // Restore default max for sliders
+        document.getElementById('slider-km2').max = 25;
+        document.getElementById('slider-m2').max = 950;
+      } else {
+        subBtn.className = "px-5 py-2 rounded-xl font-bold text-sm transition-all bg-indigo-600 text-white shadow-md";
+        addBtn.className = "px-5 py-2 rounded-xl font-bold text-sm transition-all text-slate-600 hover:text-slate-900";
+
+        // Reset subtrahend (長度 B) to 0 when switching to subtraction
+        document.getElementById('slider-km2').value = 0;
+        document.getElementById('slider-m2').value = 0;
+      }
+
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      state.km1 = parseInt(document.getElementById('slider-km1').value);
+      state.m1 = parseInt(document.getElementById('slider-m1').value);
+
+      // Enforce Subtrahend (長度 B) <= Minuend (長度 A) in Subtraction
+      if (currentOp === 'sub') {
+        document.getElementById('slider-km2').max = state.km1;
+        
+        let km2Val = parseInt(document.getElementById('slider-km2').value);
+        if (km2Val > state.km1) {
+          km2Val = state.km1;
+          document.getElementById('slider-km2').value = km2Val;
+        }
+
+        if (km2Val === state.km1) {
+          document.getElementById('slider-m2').max = state.m1;
+          let m2Val = parseInt(document.getElementById('slider-m2').value);
+          if (m2Val > state.m1) {
+            document.getElementById('slider-m2').value = state.m1;
+          }
+        } else {
+          document.getElementById('slider-m2').max = 950;
+        }
+      }
+
+      state.km2 = parseInt(document.getElementById('slider-km2').value);
+      state.m2 = parseInt(document.getElementById('slider-m2').value);
+
+      // Update labels
+      document.getElementById('num-km1').innerText = `${state.km1} km`;
+      document.getElementById('num-m1').innerText = `${state.m1} m`;
+      document.getElementById('label-val1').innerText = `${state.km1} 公里 ${state.m1} 公尺`;
+
+      document.getElementById('num-km2').innerText = `${state.km2} km`;
+      document.getElementById('num-m2').innerText = `${state.m2} m`;
+      document.getElementById('label-val2').innerText = `${state.km2} 公里 ${state.m2} 公尺`;
+
+      // Update Vertical Display
+      document.getElementById('disp-km1').innerText = state.km1;
+      document.getElementById('disp-m1').innerText = state.m1;
+      document.getElementById('disp-km2').innerText = state.km2;
+      document.getElementById('disp-m2').innerText = state.m2;
+      document.getElementById('disp-op').innerText = currentOp === 'add' ? '+' : '-';
+
+      const auxKm = document.getElementById('aux-km');
+      const auxM = document.getElementById('aux-m');
+      const interRow = document.getElementById('inter-row');
+      const explanation = document.getElementById('explanation-text');
+
+      if (currentOp === 'add') {
+        let rawM = state.m1 + state.m2;
+        let carryKm = Math.floor(rawM / 1000);
+        let finalM = rawM % 1000;
+        let baseKmSum = state.km1 + state.km2;
+        let finalKm = baseKmSum + carryKm;
+
+        if (carryKm > 0) {
+          auxKm.innerHTML = `<span class="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full border border-amber-400 text-xs font-bold inline-block animate-pulse">+${carryKm}</span>`;
+          auxM.innerHTML = '';
+          
+          interRow.classList.add('hidden');
+
+          // Place final carried km sum directly below crossed out original km sum
+          document.getElementById('disp-res-km').innerHTML = `
+            <div class="flex flex-col items-center leading-tight">
+              <span class="line-through text-slate-400 text-xl font-normal">${baseKmSum}</span>
+              <span class="text-indigo-700 font-black text-3xl">${finalKm}</span>
+            </div>`;
+            
+          document.getElementById('disp-res-m').innerHTML = `
+            <div class="flex flex-col items-center leading-tight">
+              <span class="line-through text-slate-400 text-xl font-normal">${rawM}</span>
+              <span class="text-indigo-700 font-black text-3xl">${finalM}</span>
+              <span class="text-xs text-red-500 font-normal mt-1 whitespace-nowrap">(滿 1000m 進 1km)</span>
+            </div>`;
+
+          explanation.innerHTML = `
+            1. 先計算公尺：<span class="font-bold text-indigo-600">${state.m1} + ${state.m2} = ${rawM} 公尺</span>。<br>
+            2. 因為滿 1000 公尺，將 <span class="font-bold text-red-600">${rawM} 公尺</span> 劃掉，換成 <span class="font-bold text-amber-700">+1 公里</span> 進位，剩餘 <span class="font-bold text-indigo-600">${finalM} 公尺</span>。<br>
+            3. 計算公里：原公里和為 <span class="font-bold line-through text-slate-400">${baseKmSum}</span>，加上進位的 1 公里，劃掉後於下方記為 <span class="font-bold text-indigo-600">${finalKm} 公里</span>。
+          `;
+        } else {
+          auxKm.innerHTML = '';
+          auxM.innerHTML = '';
+          interRow.classList.add('hidden');
+
+          document.getElementById('disp-res-km').innerText = finalKm;
+          document.getElementById('disp-res-m').innerText = finalM;
+
+          explanation.innerHTML = `
+            1. 先計算公尺：<span class="font-bold text-indigo-600">${state.m1} + ${state.m2} = ${finalM} 公尺</span>（未滿 1000 公尺，無須進位）。<br>
+            2. 再計算公里：<span class="font-bold text-indigo-600">${state.km1} + ${state.km2} = ${finalKm} 公里</span>。
+          `;
+        }
+
+        document.getElementById('text-ans-km').innerText = finalKm;
+        document.getElementById('text-ans-m').innerText = finalM;
+
+      } else {
+        if (state.m1 < state.m2) {
+          // BORROWING NEEDED
+          let borrowedM1 = state.m1 + 1000;
+          let borrowedKm1 = state.km1 - 1;
+          let finalM = borrowedM1 - state.m2;
+          let finalKm = borrowedKm1 - state.km2;
+
+          auxKm.innerHTML = `<span class="line-through text-slate-400 font-normal mr-1">${state.km1}</span><span class="text-emerald-600 font-bold">${borrowedKm1}</span>`;
+          // Showing strictly +1000 without equal sign or total sum
+          auxM.innerHTML = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300 text-xs font-bold">+1000</span>`;
+
+          interRow.classList.add('hidden');
+
+          explanation.innerHTML = `
+            1. 公尺部分 <span class="font-bold text-red-500">${state.m1} 公尺</span> 不夠減 <span class="font-bold">${state.m2} 公尺</span>。<br>
+            2. 將被減數公里 <span class="font-bold line-through text-slate-400">${state.km1}</span> 劃掉，向公里借 <span class="font-bold text-emerald-600">1 公里</span>（改為 ${borrowedKm1}），換成 <span class="font-bold text-emerald-600">1000 公尺</span> 標示於公尺上方。<br>
+            3. 計算公尺：<span class="font-bold text-indigo-600">1000 + ${state.m1} - ${state.m2} = ${finalM} 公尺</span>。<br>
+            4. 計算公里：<span class="font-bold text-indigo-600">${borrowedKm1} - ${state.km2} = ${finalKm} 公里</span>。
+          `;
+
+          document.getElementById('disp-res-km').innerText = finalKm;
+          document.getElementById('disp-res-m').innerText = finalM;
+          document.getElementById('text-ans-km').innerText = finalKm;
+          document.getElementById('text-ans-m').innerText = finalM;
+
+        } else {
+          // NO BORROWING NEEDED
+          let finalM = state.m1 - state.m2;
+          let finalKm = state.km1 - state.km2;
+
+          auxKm.innerHTML = '';
+          auxM.innerHTML = '';
+          interRow.classList.add('hidden');
+
+          explanation.innerHTML = `
+            1. 先計算公尺：<span class="font-bold text-indigo-600">${state.m1} - ${state.m2} = ${finalM} 公尺</span>（足夠扣減，不需借位）。<br>
+            2. 再計算公里：<span class="font-bold text-indigo-600">${state.km1} - ${state.km2} = ${finalKm} 公里</span>。
+          `;
+
+          document.getElementById('disp-res-km').innerText = finalKm;
+          document.getElementById('disp-res-m').innerText = finalM;
+          document.getElementById('text-ans-km').innerText = finalKm;
+          document.getElementById('text-ans-m').innerText = finalM;
+        }
+      }
+    }
+
+    function updateMapRoute() {
+      let startIdx = parseInt(document.getElementById('map-start-select').value);
+      let endIdx = parseInt(document.getElementById('map-end-select').value);
+
+      // Ensure start <= end
+      if (startIdx > endIdx) {
+        let temp = startIdx;
+        startIdx = endIdx;
+        endIdx = temp;
+        document.getElementById('map-start-select').value = startIdx;
+        document.getElementById('map-end-select').value = endIdx;
+      }
+
+      // Clear all station badges
+      for (let i = 0; i < 5; i++) {
+        const badge = document.getElementById(`station-badge-${i}`);
+        if (badge) {
+          badge.classList.add('hidden');
+          badge.className = "absolute -top-7 hidden animate-bounce";
+        }
+      }
+
+      // Set Start Badge
+      const startBadge = document.getElementById(`station-badge-${startIdx}`);
+      if (startBadge) {
+        startBadge.classList.remove('hidden');
+        startBadge.className = "absolute -top-7 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md border border-white animate-bounce whitespace-nowrap flex items-center justify-center gap-1";
+        startBadge.innerHTML = `<i class="fa-solid fa-location-dot"></i>起點`;
+      }
+
+      // Set End Badge - Flat oval layout in red with icon & text on one line
+      const endBadge = document.getElementById(`station-badge-${endIdx}`);
+      if (endBadge) {
+        endBadge.classList.remove('hidden');
+        endBadge.className = "absolute -top-7 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md border border-white animate-bounce whitespace-nowrap flex items-center justify-center gap-1";
+        endBadge.innerHTML = `<i class="fa-solid fa-hotel"></i>終點`;
+      }
+
+      if (startIdx === endIdx && startBadge) {
+        startBadge.innerHTML = `<i class="fa-solid fa-map-pin"></i>起點&終點`;
+      }
+
+      // Highlight active path segment
+      const highlightBar = document.getElementById('route-highlight-bar');
+      const startPercent = 10 + startIdx * 20;
+      const endPercent = 10 + endIdx * 20;
+      if (highlightBar) {
+        highlightBar.style.left = `${startPercent}%`;
+        highlightBar.style.width = `${endPercent - startPercent}%`;
+      }
+
+      // Calculate distance between selected stations
+      let totalMeters = 0;
+      for (let i = startIdx; i < endIdx; i++) {
+        totalMeters += segmentsData[i].km * 1000 + segmentsData[i].m;
+      }
+
+      let resKm = Math.floor(totalMeters / 1000);
+      let resM = totalMeters % 1000;
+
+      document.getElementById('route-title-text').innerText = `${stationNames[startIdx]} ➔ ${stationNames[endIdx]}`;
+      document.getElementById('route-dist-text').innerText = `${resKm} 公里 ${resM} 公尺`;
+    }
+
+    function setMapStation(idx) {
+      const startSelect = document.getElementById('map-start-select');
+      const endSelect = document.getElementById('map-end-select');
+      
+      let sVal = parseInt(startSelect.value);
+      if (idx >= sVal) {
+        endSelect.value = idx;
+      } else {
+        startSelect.value = idx;
+      }
+      updateMapRoute();
+    }
+
+    function applyRouteToCalc() {
+      let startIdx = parseInt(document.getElementById('map-start-select').value);
+      let endIdx = parseInt(document.getElementById('map-end-select').value);
+
+      if (startIdx === endIdx) return;
+
+      let seg0 = segmentsData[startIdx];
+      
+      switchTab('calc');
+      setOperation('add');
+
+      document.getElementById('slider-km1').value = seg0.km;
+      document.getElementById('slider-m1').value = seg0.m;
+
+      let remainingMeters = 0;
+      for (let i = startIdx + 1; i < endIdx; i++) {
+        remainingMeters += segmentsData[i].km * 1000 + segmentsData[i].m;
+      }
+
+      let remKm = Math.floor(remainingMeters / 1000);
+      let remM = remainingMeters % 1000;
+
+      document.getElementById('slider-km2').value = remKm;
+      document.getElementById('slider-m2').value = remM;
+
+      updateCalculations();
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      quizData.forEach((q) => {
+        const qCard = document.createElement('div');
+        qCard.className = "bg-white/90 p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3";
+        
+        let contentHTML = `
+          <div class="font-bold text-slate-800 text-base flex items-start justify-between">
+            <span>${q.question}</span>
+            <span id="quiz-status-${q.id}" class="text-xs px-2.5 py-1 rounded-full font-bold hidden"></span>
+          </div>
+        `;
+
+        if (q.type === 'multi') {
+          contentHTML += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">`;
+          q.options.forEach((opt, optIdx) => {
+            contentHTML += `
+              <label class="flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer text-sm font-medium transition-all">
+                <input type="radio" name="quiz-${q.id}" value="${optIdx}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-2.5">
+                <span>${opt}</span>
+              </label>
+            `;
+          });
+          contentHTML += `</div>`;
+        } else {
+          contentHTML += `
+            <div class="flex items-center gap-3 mt-3 bg-slate-50 p-3 rounded-xl border border-slate-200 w-fit">
+              <span class="text-sm font-bold text-slate-700">答：</span>
+              <input type="number" id="quiz-${q.id}-km" placeholder="0" class="w-20 px-3 py-1.5 border border-slate-300 rounded-lg text-center font-bold font-math focus:ring-2 focus:ring-indigo-500">
+              <span class="text-sm font-bold text-slate-700">公里</span>
+              <input type="number" id="quiz-${q.id}-m" placeholder="0" class="w-24 px-3 py-1.5 border border-slate-300 rounded-lg text-center font-bold font-math focus:ring-2 focus:ring-indigo-500">
+              <span class="text-sm font-bold text-slate-700">公尺</span>
+            </div>
+          `;
+        }
+
+        contentHTML += `
+          <div id="quiz-exp-${q.id}" class="hidden p-3 bg-indigo-50/80 rounded-xl border border-indigo-100 text-xs text-indigo-900 leading-relaxed mt-3">
+            <strong class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> 解析：</strong>${q.explanation}
+          </div>
+        `;
+
+        qCard.innerHTML = contentHTML;
+        container.appendChild(qCard);
+      });
+    }
+
+    function checkQuizAnswers() {
+      let score = 0;
+
+      quizData.forEach(q => {
+        const statusEl = document.getElementById(`quiz-status-${q.id}`);
+        const expEl = document.getElementById(`quiz-exp-${q.id}`);
+        let isCorrect = false;
+
+        if (q.type === 'multi') {
+          const selected = document.querySelector(`input[name="quiz-${q.id}"]:checked`);
+          if (selected && parseInt(selected.value) === q.answer) {
+            isCorrect = true;
+          }
+        } else {
+          const userKm = parseInt(document.getElementById(`quiz-${q.id}-km`).value || -1);
+          const userM = parseInt(document.getElementById(`quiz-${q.id}-m`).value || -1);
+          if (userKm === q.correctKm && userM === q.correctM) {
+            isCorrect = true;
+          }
+        }
+
+        statusEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-red-100', 'text-red-700');
+        if (isCorrect) {
+          score++;
+          statusEl.classList.add('bg-emerald-100', 'text-emerald-700');
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 正確`;
+        } else {
+          statusEl.classList.add('bg-red-100', 'text-red-700');
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 需再精進`;
+        }
+
+        expEl.classList.remove('hidden');
+      });
+
+      document.getElementById('quiz-score').innerText = `${score} / ${quizData.length}`;
+    }
+
+    function resetQuiz() {
+      renderQuiz();
+      document.getElementById('quiz-score').innerText = `0 / ${quizData.length}`;
+    }
+  </script>
+</body>
+</html>
