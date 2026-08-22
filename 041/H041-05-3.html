@@ -127,7 +127,7 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="text-center md:text-left">
           <div class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-xs font-semibold tracking-wider text-cyan-200 mb-2">
-            <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學 5-3 探索課程
+            <i class="fa-solid fa-graduation-cap mr-1"></i> 國小四上數學 5-3 互動學習網頁
           </div>
           <h1 class="text-3xl md:text-4xl font-black tracking-tight text-shadow">
             公里與公尺的複名數計算
@@ -146,7 +146,7 @@
             <i class="fa-solid fa-map-location-dot mr-1.5"></i>太平山路線探究
           </button>
           <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="tab-btn px-4 py-2 rounded-xl transition-all duration-300 text-white hover:bg-white/10">
-            <i class="fa-solid fa-pen-to-square mr-1.5"></i>隨堂歷程評量
+            <i class="fa-solid fa-pen-to-square mr-1.5"></i>隨堂測驗
           </button>
         </div>
       </div>
@@ -483,13 +483,13 @@
           <div>
             <h2 class="text-xl font-bold text-slate-800 flex items-center">
               <span class="w-3 h-7 bg-pink-500 rounded-full mr-3"></span>
-              課堂小試身手 - 歷程性評量
+              隨堂測驗
             </h2>
             <p class="text-xs text-slate-500 mt-1">共 5 題，回答後系統將即時給予對錯回饋與詳細直式拆解說明。</p>
           </div>
           <div class="text-right">
             <span class="text-xs text-slate-500">目前得分</span>
-            <div id="quiz-score" class="font-math font-black text-2xl text-indigo-600">0 / 5</div>
+            <div id="quiz-score" class="font-math font-black text-2xl text-indigo-600">0 / 100</div>
           </div>
         </div>
 
@@ -500,10 +500,10 @@
 
         <!-- Submit & Reset Buttons -->
         <div class="mt-8 flex justify-center gap-4">
-          <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-sky-500 text-white font-bold rounded-2xl shadow-lg hover:opacity-90 transition-all text-base">
-            <i class="fa-solid fa-paper-plane mr-2"></i> 提交所有答案
+          <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-sky-500 text-white font-bold rounded-2xl shadow-lg hover:opacity-90 transition-all text-base w-48 flex justify-center items-center">
+            <i class="fa-solid fa-paper-plane mr-2"></i> 提交答案
           </button>
-          <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition-all text-base">
+          <button onclick="resetQuiz()" class="px-8 py-3 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition-all text-base w-48 flex justify-center items-center">
             <i class="fa-solid fa-rotate-right mr-2"></i> 重新測驗
           </button>
         </div>
@@ -737,7 +737,10 @@
           let finalM = borrowedM1 - state.m2;
           let finalKm = borrowedKm1 - state.km2;
 
-          auxKm.innerHTML = `<span class="line-through text-slate-400 font-normal mr-1">${state.km1}</span><span class="text-emerald-600 font-bold">${borrowedKm1}</span>`;
+          // 直接在原本的被減數公里數字上加刪除線
+          document.getElementById('disp-km1').innerHTML = `<span class="line-through text-slate-400">${state.km1}</span>`;
+          // 上方輔助欄僅保留借位後剩餘的綠色數字，不再重複顯示灰色劃線數字
+          auxKm.innerHTML = `<span class="text-emerald-600 font-bold">${borrowedKm1}</span>`;
           // Showing strictly +1000 without equal sign or total sum
           auxM.innerHTML = `<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300 text-xs font-bold">+1000</span>`;
 
@@ -934,44 +937,71 @@
 
     function checkQuizAnswers() {
       let score = 0;
+      const pointsPerQuestion = 20;
 
       quizData.forEach(q => {
         const statusEl = document.getElementById(`quiz-status-${q.id}`);
         const expEl = document.getElementById(`quiz-exp-${q.id}`);
         let isCorrect = false;
+        let isBlank = false;
 
         if (q.type === 'multi') {
           const selected = document.querySelector(`input[name="quiz-${q.id}"]:checked`);
-          if (selected && parseInt(selected.value) === q.answer) {
+          if (!selected) {
+            isBlank = true;
+          } else if (parseInt(selected.value) === q.answer) {
             isCorrect = true;
           }
         } else {
-          const userKm = parseInt(document.getElementById(`quiz-${q.id}-km`).value || -1);
-          const userM = parseInt(document.getElementById(`quiz-${q.id}-m`).value || -1);
-          if (userKm === q.correctKm && userM === q.correctM) {
-            isCorrect = true;
+          const kmInput = document.getElementById(`quiz-${q.id}-km`).value;
+          const mInput = document.getElementById(`quiz-${q.id}-m`).value;
+          
+          if (kmInput === '' && mInput === '') {
+            isBlank = true;
+          } else {
+            const userKm = parseInt(kmInput || -1);
+            const userM = parseInt(mInput || -1);
+            if (userKm === q.correctKm && userM === q.correctM) {
+              isCorrect = true;
+            }
           }
         }
 
-        statusEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-red-100', 'text-red-700');
-        if (isCorrect) {
-          score++;
+        statusEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-700', 'bg-red-100', 'text-red-700', 'bg-amber-100', 'text-amber-700');
+        expEl.classList.remove('hidden', 'bg-indigo-50/80', 'border-indigo-100', 'text-indigo-900', 'bg-amber-50/80', 'border-amber-200', 'text-amber-900');
+
+        if (isBlank) {
+          statusEl.classList.add('bg-amber-100', 'text-amber-700');
+          statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> 未作答`;
+          
+          // Show blank message, hide explanation
+          expEl.classList.add('bg-amber-50/80', 'border-amber-200', 'text-amber-900');
+          expEl.innerHTML = `<strong class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 提示：</strong>未作答。`;
+        } else if (isCorrect) {
+          score += pointsPerQuestion;
           statusEl.classList.add('bg-emerald-100', 'text-emerald-700');
           statusEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 正確`;
+          
+          // Show standard explanation
+          expEl.classList.add('bg-indigo-50/80', 'border-indigo-100', 'text-indigo-900');
+          expEl.innerHTML = `<strong class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> 解析：</strong>${q.explanation}`;
         } else {
           statusEl.classList.add('bg-red-100', 'text-red-700');
           statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 需再精進`;
+          
+          // Show standard explanation (ensure no contradictory wording in the raw data)
+          expEl.classList.add('bg-indigo-50/80', 'border-indigo-100', 'text-indigo-900');
+          expEl.innerHTML = `<strong class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> 正確解析：</strong>${q.explanation}`;
         }
 
-        expEl.classList.remove('hidden');
       });
 
-      document.getElementById('quiz-score').innerText = `${score} / ${quizData.length}`;
+      document.getElementById('quiz-score').innerText = `${score} / 100`;
     }
 
     function resetQuiz() {
       renderQuiz();
-      document.getElementById('quiz-score').innerText = `0 / ${quizData.length}`;
+      document.getElementById('quiz-score').innerText = `0 / 100`;
     }
   </script>
 </body>

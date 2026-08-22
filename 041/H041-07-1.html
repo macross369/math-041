@@ -112,10 +112,10 @@
                     <i class="fa-solid font-bold fa-shapes"></i>
                 </div>
                 <div>
+                    <p class="text-xs text-slate-500 font-medium">國小四上數學 7-1 互動學習網頁</p>
                     <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800">
                         三角形探索家
                     </h1>
-                    <p class="text-xs text-slate-500 font-medium">國小數學 7-1 幾何互動網頁</p>
                 </div>
             </div>
 
@@ -131,7 +131,7 @@
                     <i class="fa-solid fa-gamepad mr-1.5 text-amber-500"></i>分類挑戰賽
                 </button>
                 <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 bg-white/80 text-slate-700 hover:bg-white shadow-sm">
-                    <i class="fa-solid fa-pen-to-square mr-1.5 text-emerald-500"></i>觀念評量測驗
+                    <i class="fa-solid fa-pen-to-square mr-1.5 text-emerald-500"></i>隨堂測驗
                 </button>
             </nav>
         </div>
@@ -420,12 +420,12 @@
             </div>
         </section>
 
-        <!-- TAB 4: 觀念評量測驗 -->
+        <!-- TAB 4: 隨堂測驗 -->
         <section id="tab-quiz" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-6 max-w-3xl mx-auto space-y-6">
                 <div class="border-b pb-4 flex justify-between items-center">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-800">幾何觀念歷程測驗</h2>
+                        <h2 class="text-2xl font-black text-slate-800">隨堂測驗</h2>
                         <p class="text-xs text-slate-500">檢測您對三角形邊角特徵的掌握程度 (共 5 題)</p>
                     </div>
                     <span id="quiz-score-badge" class="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-sm border border-indigo-100">
@@ -437,9 +437,12 @@
                     <!-- 動態渲染 5 題測驗 -->
                 </div>
 
-                <div class="pt-4 flex justify-end">
-                    <button onclick="resetQuiz()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition shadow-md">
-                        重新進行測驗
+                <div class="pt-4 flex justify-center items-center gap-3">
+                    <button onclick="submitQuiz()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center min-w-[120px]">
+                        <i class="fa-solid fa-paper-plane mr-1.5"></i>提交答案
+                    </button>
+                    <button onclick="resetQuiz()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center min-w-[120px]">
+                        <i class="fa-solid fa-rotate-left mr-1.5"></i>重新測驗
                     </button>
                 </div>
             </div>
@@ -1160,38 +1163,64 @@
 
         function selectAnswer(qIdx, optIdx) {
             quizAnswers[qIdx] = optIdx;
-            const q = quizData[qIdx];
 
-            // 按鈕狀態標示
-            q.options.forEach((_, oIdx) => {
+            // 僅更新選項被點選的視覺狀態（不安裝對錯與解析）
+            quizData[qIdx].options.forEach((_, oIdx) => {
                 const btn = document.getElementById(`q-${qIdx}-opt-${oIdx}`);
                 if (oIdx === optIdx) {
-                    if (optIdx === q.ans) {
-                        btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-xs";
-                    } else {
-                        btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-xs";
-                    }
+                    btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-xs shadow-sm";
                 } else {
-                    btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-400 opacity-60";
+                    btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-indigo-50 transition";
+                }
+            });
+        }
+
+        function submitQuiz() {
+            let correctCount = 0;
+
+            quizData.forEach((q, qIdx) => {
+                const selectedOpt = quizAnswers[qIdx];
+                const exp = document.getElementById(`explain-${qIdx}`);
+                exp.classList.remove('hidden');
+
+                if (selectedOpt === null || selectedOpt === undefined) {
+                    // 未作答狀態：僅顯示"未作答。" (黃色系)，不顯示解析與正確答案
+                    q.options.forEach((_, oIdx) => {
+                        const btn = document.getElementById(`q-${qIdx}-opt-${oIdx}`);
+                        btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-400 opacity-60";
+                    });
+                    exp.className = "p-3 rounded-xl bg-amber-50 text-xs text-amber-800 font-medium border border-amber-200";
+                    exp.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 mr-1.5"></i><strong>未作答。</strong>`;
+                } else {
+                    // 已作答狀態判定
+                    q.options.forEach((_, oIdx) => {
+                        const btn = document.getElementById(`q-${qIdx}-opt-${oIdx}`);
+                        if (oIdx === selectedOpt) {
+                            if (selectedOpt === q.ans) {
+                                btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-xs";
+                            } else {
+                                btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-xs";
+                            }
+                        } else if (oIdx === q.ans && selectedOpt !== q.ans) {
+                            // 答錯時醒目標示正確答案
+                            btn.className = "text-left px-4 py-2.5 rounded-xl border-2 border-emerald-400 bg-emerald-50/50 text-emerald-800 font-medium text-xs";
+                        } else {
+                            btn.className = "text-left px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-400 opacity-60";
+                        }
+                    });
+
+                    if (selectedOpt === q.ans) {
+                        correctCount++;
+                        exp.className = "p-3 rounded-xl bg-emerald-50 text-xs text-emerald-800 font-medium border border-emerald-200";
+                        exp.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i><strong>答對了！</strong> ${q.explain}`;
+                    } else {
+                        exp.className = "p-3 rounded-xl bg-rose-50 text-xs text-rose-800 font-medium border border-rose-200";
+                        exp.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1.5"></i><strong>答錯了！再想想看：</strong> ${q.explain}`;
+                    }
                 }
             });
 
-            // 顯示解析
-            const exp = document.getElementById(`explain-${qIdx}`);
-            exp.classList.remove('hidden');
-            if (optIdx === q.ans) {
-                exp.className = "p-3 rounded-xl bg-emerald-50 text-xs text-emerald-800 font-medium border border-emerald-200";
-                exp.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i><strong>答對了！</strong> ${q.explain}`;
-            } else {
-                exp.className = "p-3 rounded-xl bg-rose-50 text-xs text-rose-800 font-medium border border-rose-200";
-                exp.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i><strong>再想想看：</strong> ${q.explain}`;
-            }
-
-            // 更新總分
-            let correctCount = 0;
-            quizAnswers.forEach((ans, i) => {
-                if (ans === quizData[i].ans) correctCount++;
-            });
+            // 計算並更新總得分
             document.getElementById('quiz-score-badge').innerText = `得分: ${correctCount * 20} / 100`;
         }
 

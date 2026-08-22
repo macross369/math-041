@@ -120,7 +120,7 @@
             <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
             
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs md:text-sm font-semibold mb-3">
-                <i class="fa-solid fa-cloud-sun text-amber-300"></i> 國小數學「5-1 認識公里」互動體驗
+                <i class="fa-solid fa-cloud-sun text-amber-300"></i> 國小四上數學 5-1 互動學習網頁
             </div>
             <h1 class="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-200 to-amber-200 mb-2">
                 認識公里 (km) 互動探索學習網
@@ -133,19 +133,19 @@
         <!-- 頁籤選單 -->
         <nav class="flex flex-wrap justify-center gap-2 md:gap-3 p-1.5 glass-card rounded-2xl">
             <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30">
-                <i class="fa-solid fa-car"></i> 1. 國道行車體驗
+                <i class="fa-solid fa-car"></i> 國道行車體驗
             </button>
             <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
-                <i class="fa-solid fa-ruler-horizontal"></i> 2. 1公里有多長
+                <i class="fa-solid fa-ruler-horizontal"></i> 1公里有多長
             </button>
             <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
-                <i class="fa-solid fa-train"></i> 3. 臺鐵里程加減
+                <i class="fa-solid fa-train"></i> 臺鐵里程加減
             </button>
             <button onclick="switchTab(4)" id="tab-btn-4" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
-                <i class="fa-solid fa-cubes"></i> 4. 長度單位選填
+                <i class="fa-solid fa-cubes"></i> 長度單位選填
             </button>
             <button onclick="switchTab(5)" id="tab-btn-5" class="tab-btn px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/10">
-                <i class="fa-solid fa-pen-to-square"></i> 5. 隨堂評量測驗
+                <i class="fa-solid fa-pen-to-square"></i> 隨堂測驗
             </button>
         </nav>
 
@@ -428,21 +428,19 @@
                     請為下列生活生活情境選擇最合適的長度單位，點選選項即可進行即時驗證！
                 </p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="unit-match-container">
-                    <!-- JS 動態填入配對題目 -->
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="unit-match-container"></div>
             </div>
         </section>
 
-        <!-- TAB 5: 隨堂評量測驗 -->
+        <!-- TAB 5: 隨堂測驗 -->
         <section id="tab5" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-3xl p-6 md:p-8">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 mb-6 gap-2">
                     <h2 class="text-xl md:text-2xl font-bold text-cyan-300 flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard-check text-amber-300"></i> 「認識公里」歷程性評量 (5 題)
+                        <i class="fa-solid fa-clipboard-check text-amber-300"></i> 隨堂測驗
                     </h2>
                     <span id="quiz-score-badge" class="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-3 py-1.5 rounded-full w-fit">
-                        答對 0 / 5 題
+                        得分：0 / 100 分
                     </span>
                 </div>
 
@@ -452,11 +450,16 @@
                 </div>
 
                 <!-- 提交與結算 -->
-                <div class="pt-4 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-white/10">
-                    <button onclick="submitQuiz()" class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 font-bold text-white shadow-lg shadow-cyan-500/30 hover:scale-105 transition-all duration-200">
-                        <i class="fa-solid fa-paper-plane mr-2"></i> 提交測驗並查看解答
-                    </button>
-                    <div id="quiz-result-msg" class="text-sm font-bold text-amber-300"></div>
+                <div class="pt-4 flex flex-col items-center gap-4 border-t border-white/10">
+                    <div class="flex flex-wrap justify-center items-center gap-4 w-full">
+                        <button onclick="submitQuiz()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 font-bold text-white shadow-lg shadow-cyan-500/30 hover:scale-105 transition-all duration-200 min-w-[150px]">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> 提交答案
+                        </button>
+                        <button onclick="resetQuiz()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 font-bold text-white shadow-lg shadow-amber-500/30 hover:scale-105 transition-all duration-200 min-w-[150px]">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> 重新測驗
+                        </button>
+                    </div>
+                    <div id="quiz-result-msg" class="text-sm font-bold text-amber-300 text-center"></div>
                 </div>
             </div>
         </section>
@@ -673,6 +676,7 @@
 
         function renderUnitMatching() {
             const container = document.getElementById('unit-match-container');
+            if (!container) return;
             container.innerHTML = unitItems.map(item => `
                 <div class="glass-card-light p-4 rounded-2xl border border-white/10 flex flex-col justify-between">
                     <p class="font-bold text-xs md:text-sm text-slate-200 mb-3">${item.id}. ${item.name} ( ? )</p>
@@ -745,6 +749,7 @@
 
         function renderQuiz() {
             const container = document.getElementById('quiz-container');
+            if (!container) return;
             container.innerHTML = quizData.map(q => `
                 <div class="glass-card-light p-5 rounded-2xl border border-white/10 space-y-3">
                     <p class="font-bold text-xs md:text-sm text-cyan-200">${q.question}</p>
@@ -775,16 +780,27 @@
                 const expEl = document.getElementById(`quiz-explain-${q.id}`);
                 expEl.classList.remove('hidden');
 
-                if (userAns === q.ans) {
+                if (userAns === undefined) {
+                    // 未作答時僅顯示黃色系的「未作答。」，不顯示其他說明或正確答案
+                    expEl.innerHTML = `<span class="text-amber-300 font-bold">未作答。</span>`;
+                } else if (userAns === q.ans) {
                     correctCount++;
                     expEl.innerHTML = `<span class="text-emerald-400 font-bold">✓ 答對了！</span> ${q.explain}`;
                 } else {
-                    expEl.innerHTML = `<span class="text-rose-400 font-bold">✕ 答錯囉！</span> 正確答案是 (${['A','B','C','D'][q.ans]})。${q.explain}`;
+                    expEl.innerHTML = `<span class="text-rose-400 font-bold">✕ 答錯囉！</span> 正確答案為 (${['A','B','C','D'][q.ans]})。${q.explain}`;
                 }
             });
 
-            document.getElementById('quiz-score-badge').innerText = `答對 ${correctCount} / 5 題`;
-            document.getElementById('quiz-result-msg').innerText = `結算：獲得 ${correctCount * 20} 分！`;
+            const totalScore = correctCount * 20;
+            document.getElementById('quiz-score-badge').innerText = `得分：${totalScore} / 100 分`;
+            document.getElementById('quiz-result-msg').innerText = `測驗完成！您答對了 ${correctCount} / 5 題，獲得 ${totalScore} 分（滿分 100 分）。`;
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            renderQuiz();
+            document.getElementById('quiz-score-badge').innerText = `得分：0 / 100 分`;
+            document.getElementById('quiz-result-msg').innerText = ``;
         }
 
         // 7. 網頁初始化

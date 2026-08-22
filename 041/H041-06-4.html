@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>多個 0 的除法問題：單位換算與劃0簡化探究</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
@@ -80,7 +77,6 @@
             box-shadow: 0 0 4px #f87171;
         }
 
-        /* 鈔票閃爍微光特效 */
         @keyframes billPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.03); }
@@ -89,7 +85,6 @@
             animation: billPulse 3s infinite ease-in-out;
         }
 
-        /* 自訂滾動條 */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -109,14 +104,14 @@
 <body class="p-3 sm:p-6 lg:p-8 selection:bg-indigo-500 selection:text-white">
 
     <header class="max-w-6xl mx-auto mb-6 text-center relative">
-        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
+        <!-- 頂部左側 Logo -->
         <div class="w-full flex items-center justify-start mb-4 px-2">
             <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
             <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
         </div>
 
         <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs sm:text-sm font-semibold mb-3 backdrop-blur-md">
-            <i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-300"></i>國小四年級數學 6-4 教學網頁
+            <i class="fa-solid fa-wand-magic-sparkles mr-2 text-amber-300"></i>國小四上數學 6-4 互動學習網頁
         </div>
         <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-indigo-100 to-pink-200 drop-shadow-md">
             多個 0 的除法問題與餘數探究
@@ -125,7 +120,6 @@
             透過位值換算、簡化直式對齊與實體紅包裝載實驗，深入理解「簡化計算」與「餘數代表的實質價值」！
         </p>
 
-        <!-- 新增：標籤頁切換按鈕區域 -->
         <nav class="flex justify-center items-center gap-2 mt-6 flex-wrap">
             <button id="tabBtn1" onclick="switchTab(1)" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center space-x-2 bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg border border-sky-400/50">
                 <i class="fa-solid fa-calculator"></i>
@@ -137,19 +131,21 @@
             </button>
             <button id="tabBtn3" onclick="switchTab(3)" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 flex items-center space-x-2 bg-slate-900/80 text-slate-400 hover:text-emerald-200 border border-slate-700/60">
                 <i class="fa-solid fa-clipboard-question"></i>
-                <span>模組三：隨堂小測驗</span>
+                <span>模組三：隨堂測驗</span>
             </button>
         </nav>
     </header>
 
     <main class="max-w-6xl mx-auto">
 
-        <!-- 模組一：位值換算與劃0簡化實驗室 -->
         <section id="tabContent1" class="shinkai-card rounded-2xl p-5 sm:p-7 relative overflow-hidden transition-all duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- 左側控制區 -->
+                <div class="lg:col-span-5 space-y-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/60">
+                    <h3 class="text-sm sm:text-base font-bold text-sky-300 flex items-center">
                         <i class="fa-solid fa-sliders mr-2"></i> 選擇或輸入課本例題：
                     </h3>
                     
-                    <!-- 預設按鈕 -->
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <button onclick="setPreset(420, 60)" class="px-3 py-2 rounded-lg bg-indigo-900/40 hover:bg-indigo-800/60 border border-indigo-500/30 text-indigo-200 transition font-medium flex flex-col items-center">
                             <span>420 ÷ 60</span>
@@ -169,7 +165,6 @@
                         </button>
                     </div>
 
-                    <!-- 自訂數字輸入 -->
                     <div class="space-y-3 pt-2 border-t border-slate-700/40">
                         <div class="flex items-center justify-between gap-2">
                             <label class="text-xs text-slate-300 font-medium">被除數：</label>
@@ -183,7 +178,6 @@
                         </div>
                     </div>
 
-                    <!-- 操作按鈕 -->
                     <div class="pt-2 flex flex-col gap-2.5">
                         <button onclick="calculateAndRender()" class="w-full py-2.5 rounded-xl shinkai-glow-btn text-white font-bold text-sm flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-calculator"></i>
@@ -196,9 +190,8 @@
                     </div>
                 </div>
 
-                <!-- 右側：直式對照展示區 -->
+                <!-- 右側直式對照區 -->
                 <div class="lg:col-span-7 space-y-4">
-                    <!-- 位值觀念說明卡 -->
                     <div id="unitConceptCard" class="bg-indigo-950/40 border border-indigo-500/30 p-4 rounded-xl space-y-2">
                         <div class="text-xs font-bold text-indigo-300 flex items-center">
                             <i class="fa-solid fa-lightbulb mr-1.5 text-amber-300"></i> 位值轉換與思考模式：
@@ -208,49 +201,34 @@
                         </p>
                     </div>
 
-                    <!-- 直式運算面板 (左右對照) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- 完整直式 -->
                         <div class="bg-slate-950/80 p-4 rounded-xl border border-sky-500/30 flex flex-col items-center justify-start min-h-[220px]">
                             <div class="text-xs font-bold text-sky-400 mb-3 flex items-center">
                                 <i class="fa-solid fa-square-full text-[8px] mr-1.5"></i> 完整傳統直式
                             </div>
-                            <div id="fullVerticalBox" class="w-full flex justify-center items-center my-auto py-2">
-                                <!-- JS 動態渲染完整直式 -->
-                            </div>
+                            <div id="fullVerticalBox" class="w-full flex justify-center items-center my-auto py-2"></div>
                         </div>
 
-                        <!-- 劃0簡化直式 (要求1&3：點選前隱藏，點選後出現且橫線等長) -->
                         <div class="bg-slate-950/80 p-4 rounded-xl border border-pink-500/30 flex flex-col items-center justify-start min-h-[220px] relative">
                             <div class="text-xs font-bold text-pink-400 mb-3 flex items-center">
                                 <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i> 劃 0 簡化直式
                             </div>
 
-                            <!-- 點選前顯示提示 -->
                             <div id="slashPlaceholder" class="flex flex-col items-center justify-center my-auto p-4 text-center space-y-2">
                                 <i class="fa-solid fa-hand-pointer text-2xl text-pink-400/60 animate-bounce"></i>
                                 <span class="text-xs text-slate-400">請點擊左側「<strong class="text-pink-300">執行劃 0 消去</strong>」<br>觀察簡化後的直式結構與對齊</span>
                             </div>
 
-                            <!-- 點選後顯示劃0直式 -->
-                            <div id="simplifiedVerticalBox" class="w-full hidden flex justify-center items-center my-auto py-2">
-                                <!-- JS 動態渲染簡化直式 -->
-                            </div>
+                            <div id="simplifiedVerticalBox" class="w-full hidden flex justify-center items-center my-auto py-2"></div>
                         </div>
                     </div>
 
-                    <!-- 結論卡 -->
-                    <div id="resultSummary" class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-700/60 text-xs sm:text-sm text-slate-300 font-mono flex items-center justify-between">
-                        <!-- JS 動態更新結果摘要 -->
-                    </div>
+                    <div id="resultSummary" class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-700/60 text-xs sm:text-sm text-slate-300 font-mono flex items-center justify-between"></div>
                 </div>
             </div>
         </section>
 
-        <!-- 模組二：思考帽－餘數實質價值探究實驗室 -->
         <section id="tabContent2" class="shinkai-card rounded-2xl p-5 sm:p-7 relative overflow-hidden hidden transition-all duration-300">
-            <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
             <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-6 flex-wrap gap-2">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
@@ -266,10 +244,8 @@
                 </span>
             </div>
 
-            <!-- 兩方案對照卡片 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <!-- 方案甲卡片 -->
+                <!-- 方案甲 -->
                 <div class="bg-slate-900/80 border border-sky-500/40 rounded-xl p-5 space-y-4 flex flex-col justify-between">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center border-b border-sky-500/30 pb-2">
@@ -283,14 +259,12 @@
                         </div>
                     </div>
 
-                    <!-- 要求2：方案甲圖示 (顯示實際 3 張 $1000 鈔票與剩餘 5 張 $1000 鈔票) -->
                     <div class="bg-slate-950/90 p-4 rounded-xl space-y-3 border border-sky-400/30">
                         <div class="text-xs text-sky-300 font-bold flex items-center justify-between">
                             <span><i class="fa-solid fa-eye mr-1"></i> 紅包袋實體內部展示 (15包之一)：</span>
                             <span class="text-emerald-400 font-mono font-bold">$3000 元/包</span>
                         </div>
 
-                        <!-- 實體 3 張千元鈔票圖示 -->
                         <div class="bg-red-950/80 border border-red-500/40 p-3 rounded-xl text-xs space-y-2">
                             <div class="text-red-300 font-bold text-[11px] flex items-center">
                                 <i class="fa-solid fa-envelope mr-1.5 text-red-400 text-sm"></i> 紅包袋內（裝入實際 3 張 $1000 鈔票）：
@@ -309,7 +283,6 @@
                             <div class="text-center text-[10px] text-amber-200">共 3 張 $1000 = 3000 元</div>
                         </div>
 
-                        <!-- 剩餘資金圖示 -->
                         <div class="bg-pink-950/60 p-2.5 rounded-lg border border-pink-500/30 text-xs flex items-center justify-between">
                             <span class="text-pink-300 font-bold flex items-center"><i class="fa-solid fa-box-open mr-1"></i> 老闆剩下資金：</span>
                             <div class="flex items-center space-x-1">
@@ -320,7 +293,7 @@
                     </div>
                 </div>
 
-                <!-- 方案乙卡片 -->
+                <!-- 方案乙 -->
                 <div class="bg-slate-900/80 border border-pink-500/40 rounded-xl p-5 space-y-4 flex flex-col justify-between">
                     <div class="space-y-3">
                         <div class="flex justify-between items-center border-b border-pink-500/30 pb-2">
@@ -334,32 +307,21 @@
                         </div>
                     </div>
 
-                    <!-- 要求2：方案乙圖示 (顯示實際 33 張 $100 鈔票陣列與剩餘 5 張 $100 鈔票) -->
                     <div class="bg-slate-950/90 p-4 rounded-xl space-y-3 border border-pink-400/30">
                         <div class="text-xs text-pink-300 font-bold flex items-center justify-between">
                             <span><i class="fa-solid fa-eye mr-1"></i> 紅包袋實體內部展示 (15包之一)：</span>
                             <span class="text-emerald-400 font-mono font-bold">$3300 元/包</span>
                         </div>
 
-                        <!-- 實體 33 張百元鈔票網格圖示 -->
                         <div class="bg-red-950/80 border border-red-500/40 p-3 rounded-xl text-xs space-y-2">
                             <div class="text-red-300 font-bold text-[11px] flex items-center justify-between">
                                 <span><i class="fa-solid fa-envelope mr-1.5 text-red-400 text-sm"></i> 紅包袋內（裝入實際 33 張 $100 鈔票）：</span>
                                 <span class="text-amber-300 font-mono text-[10px]">整整 33 張</span>
                             </div>
-                            <!-- 33 張百元鈔票視覺磚塊陣列 -->
-                            <div class="grid grid-cols-6 sm:grid-cols-11 gap-1 justify-items-center py-1.5 max-h-36 overflow-y-auto p-1.5 bg-slate-900/80 rounded-lg border border-white/10">
-                                <!-- 33 個 $100 鈔票磚 -->
-                                <script>
-                                    for(let i=1; i<=33; i++) {
-                                        document.write(`<span class="px-1 py-0.5 bg-rose-800/90 text-rose-100 border border-rose-400/50 rounded text-[9px] font-mono font-bold shadow-sm flex items-center hover:scale-110 transition">$100</span>`);
-                                    }
-                                </script>
-                            </div>
+                            <div id="billGridContainer" class="grid grid-cols-6 sm:grid-cols-11 gap-1 justify-items-center py-1.5 max-h-36 overflow-y-auto p-1.5 bg-slate-900/80 rounded-lg border border-white/10"></div>
                             <div class="text-center text-[10px] text-amber-200">共 33 張 $100 = 3300 元</div>
                         </div>
 
-                        <!-- 剩餘資金圖示 -->
                         <div class="bg-amber-950/60 p-2.5 rounded-lg border border-amber-500/30 text-xs flex items-center justify-between">
                             <span class="text-amber-300 font-bold flex items-center"><i class="fa-solid fa-box-open mr-1"></i> 老闆剩下資金：</span>
                             <div class="flex items-center space-x-1">
@@ -369,10 +331,8 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
-            <!-- 兩方案問題回答區 -->
             <div class="mt-6 bg-slate-900/90 p-5 rounded-xl border border-amber-500/30 space-y-3">
                 <h3 class="text-sm font-bold text-amber-300 flex items-center">
                     <i class="fa-solid fa-circle-question mr-2"></i> 思考帽關鍵問題思考：
@@ -406,30 +366,37 @@
             </div>
         </section>
 
-        <!-- 模組三：歷程性評量 (5 題即時測驗) -->
         <section id="tabContent3" class="shinkai-card rounded-2xl p-5 sm:p-7 relative overflow-hidden hidden transition-all duration-300">
-            <div class="flex items-center space-x-3 mb-6 border-b border-slate-700/60 pb-4">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                    3
+            <!-- 標題列：左側標題，右側顯示分數 -->
+            <div class="flex items-center justify-between mb-6 border-b border-slate-700/60 pb-4 flex-wrap gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shrink-0">
+                        3
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-emerald-200">隨堂測驗</h2>
+                        <p class="text-xs sm:text-sm text-slate-400">即時測試你對劃 0 簡化除法與餘數實質價值的理解程度</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-emerald-200">隨堂理解小測驗 (5題)</h2>
-                    <p class="text-xs sm:text-sm text-slate-400">即時測試你對劃 0 簡化除法與餘數實質價值的理解程度</p>
-                </div>
-            </div>
-
-            <div id="quizContainer" class="space-y-6">
-                <!-- JS 動態渲染 5 題測驗 -->
-            </div>
-
-            <!-- 計分與重測 -->
-            <div class="mt-8 p-4 bg-slate-950/80 rounded-xl border border-emerald-500/30 flex items-center justify-between flex-wrap gap-3">
-                <div class="flex items-center space-x-2">
-                    <span class="text-xs sm:text-sm text-slate-300">總分：</span>
+                <!-- 分數顯示於標題最右邊 -->
+                <div class="flex items-center space-x-2 bg-slate-950/80 px-4 py-2 rounded-xl border border-emerald-500/30 shrink-0">
+                    <span class="text-xs sm:text-sm text-slate-300 font-medium">總分：</span>
                     <span id="scoreDisplay" class="text-xl sm:text-2xl font-black text-amber-300 font-mono">0 / 100</span>
                 </div>
-                <button onclick="checkAllQuiz()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition">
-                    提交全部答案
+            </div>
+
+            <!-- 測驗題庫容器 -->
+            <div id="quizContainer" class="space-y-6"></div>
+
+            <!-- 操作按鈕區域：提交答案與重新測驗並排置中 -->
+            <div class="mt-8 flex justify-center items-center gap-4">
+                <button onclick="checkAllQuiz()" class="w-36 sm:w-44 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>提交答案</span>
+                </button>
+                <button onclick="resetQuiz()" class="w-36 sm:w-44 py-2.5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-slate-200 text-xs sm:text-sm font-bold rounded-xl border border-slate-600/50 shadow-lg transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>重新測驗</span>
                 </button>
             </div>
         </section>
@@ -437,17 +404,27 @@
     </main>
 
     <script>
-        // 全域狀態
         let currentDividend = 2700;
         let currentDivisor = 300;
         let isSlashed = false;
         let activeTab = 1;
 
-        // 初始化
         window.onload = function() {
             calculateAndRender();
             renderQuiz();
+            renderBillGrid();
         };
+
+        // 渲染思考帽 33 張百元鈔網格
+        function renderBillGrid() {
+            const container = document.getElementById('billGridContainer');
+            if(!container) return;
+            let html = '';
+            for(let i = 1; i <= 33; i++) {
+                html += `<span class="px-1 py-0.5 bg-rose-800/90 text-rose-100 border border-rose-400/50 rounded text-[9px] font-mono font-bold shadow-sm flex items-center hover:scale-110 transition">$100</span>`;
+            }
+            container.innerHTML = html;
+        }
 
         // 切換劃 0 簡化直式顯示
         function toggleSlashZeros() {
@@ -502,7 +479,6 @@
             }
         }
 
-        // 計算與渲染直式
         function calculateAndRender() {
             const d = parseInt(document.getElementById('inputDividend').value) || 0;
             const r = parseInt(document.getElementById('inputDivisor').value) || 1;
@@ -513,26 +489,19 @@
             const q = Math.floor(d / r);
             const rem = d % r;
 
-            // 計算末尾共同 0 的個數
             const commonZeros = countCommonTrailingZeros(d, r);
 
-            // 更新位值說明
             updateUnitConceptText(d, r, q, rem, commonZeros);
 
-            // 渲染完整傳統直式
             document.getElementById('fullVerticalBox').innerHTML = renderVerticalHTML(d, r, q, rem, 0);
-
-            // 渲染簡化直式 (劃0)
             document.getElementById('simplifiedVerticalBox').innerHTML = renderVerticalHTML(d, r, q, rem, commonZeros);
 
-            // 更新結果摘要
             document.getElementById('resultSummary').innerHTML = `
                 <span>全算式：<strong class="text-amber-300 font-mono">${d} ÷ ${r} = ${q} ... ${rem}</strong></span>
                 <span class="text-xs text-sky-300 font-semibold">商為 ${q}，餘數為 ${rem}</span>
             `;
         }
 
-        // 計算末尾共同 0 的個數
         function countCommonTrailingZeros(a, b) {
             let countA = 0;
             let strA = a.toString();
@@ -551,7 +520,6 @@
             return Math.min(countA, countB);
         }
 
-        // 更新位值說明卡
         function updateUnitConceptText(d, r, q, rem, zeros) {
             const el = document.getElementById('unitConceptText');
             if (zeros === 0) {
@@ -575,34 +543,23 @@
             }
         }
 
-        /**
-         * 核心直式渲染函數（要求 1：減法橫線與除號上方橫線長度 100% 同寬同長且完美的位值對齊）
-         * d: 被除數, r: 除數, q: 商, rem: 餘數, zeroCount: 劃去 0 的數量
-         */
         function renderVerticalHTML(d, r, q, rem, zeroCount) {
             const dStr = d.toString();
             const rStr = r.toString();
-            const nD = dStr.length; // 被除數總位數長度
+            const nD = dStr.length;
             const scale = Math.pow(10, zeroCount);
 
-            // 簡化後的數值
             const simR = r / scale;
             const simD = Math.floor(d / scale);
-            const simDStr = simD.toString();
 
-            // 減法相乘數 (q * simR)
             const prod = q * simR;
             const prodStr = prod.toString();
 
-            // 簡化餘數
             const simRem = Math.floor(rem / scale);
             const simRemStr = simRem.toString();
 
-            // 未被劃掉的有效位數長度
             const activeLen = nD - zeroCount;
 
-            // 構建格式化 HTML 字符串
-            // 1. 劃 0 處的除數與被除數 HTML
             let formattedR_HTML = '';
             for (let i = 0; i < rStr.length; i++) {
                 if (i >= rStr.length - zeroCount) {
@@ -621,7 +578,6 @@
                 }
             }
 
-            // 2. 商 (q) 對齊：嚴格對齊至新被除數 (activeLen) 的個位數
             const qStr = q.toString();
             const qStartIdx = activeLen - qStr.length;
             let qRowHTML = '';
@@ -633,7 +589,6 @@
                 }
             }
 
-            // 3. 減法積 (prod) 對齊：對齊至 activeLen 的個位數
             const prodStartIdx = activeLen - prodStr.length;
             let prodRowHTML = '';
             for (let i = 0; i < nD; i++) {
@@ -644,7 +599,6 @@
                 }
             }
 
-            // 4. 餘數 (rem) 對齊：對齊至 activeLen 的個位數
             const remStartIdx = activeLen - simRemStr.length;
             let remRowHTML = '';
             for (let i = 0; i < nD; i++) {
@@ -655,11 +609,8 @@
                 }
             }
 
-            // 橫線同長解決方案：將被除數 (Row 2) 的頂端橫線 (border-t-2) 與相減數 (Row 3) 的底端橫線 (border-b-2) 
-            // 均設置在具有相同寬度 (w-full min-w-[80px]) 的被除數位數容器上，保證兩線 100% 同長！
             return `
                 <div class="inline-flex flex-col items-end font-mono text-base sm:text-lg tracking-wider select-none leading-tight py-1">
-                    <!-- Row 1: 商 Row -->
                     <div class="flex items-center">
                         <span class="mr-2 invisible">${formattedR_HTML}</span>
                         <span class="text-slate-400 font-light mr-1 invisible">)</span>
@@ -668,7 +619,6 @@
                         </div>
                     </div>
 
-                    <!-- Row 2: 除數 + 除號 + 被除數 (帶頂部橫線 border-t-2) -->
                     <div class="flex items-center my-0.5">
                         <span class="mr-1.5 text-sky-200 font-bold">${formattedR_HTML}</span>
                         <span class="text-slate-300 font-light mr-1">)</span>
@@ -677,7 +627,6 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: 減法積 Row (帶底部橫線 border-b-2，與被除數頂部橫線 100% 同長) -->
                     <div class="flex items-center justify-end w-full">
                         <span class="mr-2 invisible">${formattedR_HTML}</span>
                         <span class="text-slate-400 font-light mr-1 invisible">)</span>
@@ -686,7 +635,6 @@
                         </div>
                     </div>
 
-                    <!-- Row 4: 簡化餘數 Row -->
                     <div class="flex items-center justify-end w-full mt-1">
                         <span class="mr-2 invisible">${formattedR_HTML}</span>
                         <span class="text-slate-400 font-light mr-1 invisible">)</span>
@@ -698,21 +646,20 @@
             `;
         }
 
-        // 歷程性評量題庫
         const quizData = [
             {
                 id: 1,
                 question: "1. 進行算式 420 ÷ 60 時，把 420 看成 42 個十，60 看成 6 個十，計算出來的「商」代表什麼？",
                 options: ["7 個十 (70)", "7 個一 (7)", "70 個一 (70)", "42 個一 (42)"],
                 answer: 1,
-                explanation: "「42個十 ÷ 6個十 = 7」，因為單位相同互相抵消，商 7 表示可裝成 7 包，數值就是 7。"
+                explanation: "42個十 ÷ 6個十 = 7。單位互相抵消，商 7 表示可以裝成 7 包，數值就是 7。"
             },
             {
                 id: 2,
                 question: "2. 算式 2700 ÷ 300 執行劃 0 簡化後變成 27 ÷ 3 = 9，請問餘數 0 代表剩下多少元？",
                 options: ["剩下 9 元", "剩下 300 元", "剩下 0 元", "剩下 27 元"],
                 answer: 2,
-                explanation: "餘數為 0，表示 0 個百，也就是剩下 0 元。"
+                explanation: "餘數為 0，代表 0 個百，也就是剩下 0 元。"
             },
             {
                 id: 3,
@@ -738,13 +685,13 @@
                     "劃 0 簡化後算出來的商會變小 10 倍"
                 ],
                 answer: 1,
-                explanation: "劃 0 簡化本質是「被除數與除數同時除以 10 或 100」，因此必須劃掉相同數量的末尾 0，且商的大小保持不變！"
+                explanation: "劃 0 簡化的本質是被除數與除數同時除以 10 或 100，因此必須劃掉相同數量的末尾 0，且計算出來的商保持不變。"
             }
         ];
 
         function renderQuiz() {
             const container = document.getElementById('quizContainer');
-            container.innerHTML = quizData.map((q, idx) => `
+            container.innerHTML = quizData.map((q) => `
                 <div class="bg-slate-900/80 border border-slate-700/60 p-4 sm:p-5 rounded-xl space-y-3">
                     <div class="font-bold text-sm sm:text-base text-sky-200">
                         ${q.question}
@@ -762,27 +709,50 @@
             `).join('');
         }
 
+        // 送出答案邏輯 (含未作答與正確率判斷)
         function checkAllQuiz() {
             let total = 0;
             quizData.forEach(q => {
                 const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 const feedbackEl = document.getElementById(`feedback_${q.id}`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-950/80', 'border-emerald-500/40', 'text-emerald-200', 'bg-rose-950/80', 'border-rose-500/40', 'text-rose-200');
+                
+                // 重置狀態 class
+                feedbackEl.className = 'p-3 rounded-lg text-xs sm:text-sm mt-2 font-mono';
 
-                if (selected && parseInt(selected.value) === q.answer) {
+                if (!selected) {
+                    // 未作答狀況：僅顯示黃色系 "未作答。"，不顯露正確答案與解析
+                    feedbackEl.classList.add('bg-amber-950/80', 'border', 'border-amber-500/40', 'text-amber-200');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1 text-amber-400"></i> 未作答。`;
+                } else if (parseInt(selected.value) === q.answer) {
+                    // 答對狀況
                     total += 20;
                     feedbackEl.classList.add('bg-emerald-950/80', 'border', 'border-emerald-500/40', 'text-emerald-200');
                     feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> 答對了！ ${q.explanation}`;
                 } else {
+                    // 答錯狀況
                     feedbackEl.classList.add('bg-rose-950/80', 'border', 'border-rose-500/40', 'text-rose-200');
-                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> 答錯囉！正確答案是：<strong>${q.options[q.answer]}</strong>。<br>${q.explanation}`;
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> 答錯囉！正確答案是：<strong>${q.options[q.answer]}</strong>。<br>解析：${q.explanation}`;
                 }
             });
 
             document.getElementById('scoreDisplay').innerText = `${total} / 100`;
         }
 
-        // 切換思考帽解答顯示狀態
+        // 重新測驗邏輯
+        function resetQuiz() {
+            quizData.forEach(q => {
+                const radios = document.getElementsByName(`q_${q.id}`);
+                radios.forEach(r => r.checked = false);
+                
+                const feedbackEl = document.getElementById(`feedback_${q.id}`);
+                if (feedbackEl) {
+                    feedbackEl.className = 'hidden p-3 rounded-lg text-xs sm:text-sm mt-2 font-mono';
+                    feedbackEl.innerHTML = '';
+                }
+            });
+            document.getElementById('scoreDisplay').innerText = `0 / 100`;
+        }
+
         function toggleHatAnswer(num) {
             const ansEl = document.getElementById(`hatAns${num}`);
             const btnEl = document.getElementById(`ansBtn${num}`);

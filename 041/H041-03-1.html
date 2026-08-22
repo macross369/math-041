@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3-1 認識量角器與角度測量 - 互動探究網頁</title>
+    <title>認識量角器與角度測量</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -51,27 +51,27 @@
             box-shadow: 0 6px 20px rgba(255, 8, 68, 0.5);
         }
 
-        /* 頁籤切換樣式 */
+        /* 頁籤切換樣式：高對比清晰文字與明顯底色 */
         .tab-btn {
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.85);
             color: #0f172a;
             font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(8px);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
         }
 
         .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.88);
-            color: #1e3a8a;
+            background: rgba(255, 255, 255, 0.98);
+            color: #1d4ed8;
         }
 
         .tab-btn.active {
-            background: rgba(255, 255, 255, 0.98);
+            background: #ffffff;
             color: #1d4ed8;
             font-weight: 900;
             border-bottom: 3px solid #2563eb;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* 滑桿客製化 styling */
@@ -82,8 +82,8 @@
 </head>
 <body class="p-3 md:p-6 pb-12 text-slate-800">
 
-    <!-- 修改：加入「閒雲數學小棧」與 Logo 於頁面最上方左上角 -->
-    <div class="max-w-5xl mx-auto flex items-center justify-start mb-3 px-2">
+    <!-- 置頂頁面最上方左上角：閒雲數學小棧 Logo 與名稱 -->
+    <div class="w-full max-w-5xl mx-auto flex items-center justify-start mb-3 px-2">
         <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
         <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
     </div>
@@ -95,23 +95,24 @@
                     <i class="fa-solid font-bold fa-compass-drafting"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">3-1 認識量角器與角度測量</h1>
+                    <span class="inline-block px-3 py-1 bg-sky-100 text-sky-700 text-xs rounded-full font-bold mb-1">國小四上數學 3-1 互動學習網頁</span>
+                    <h1 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">認識量角器與角度測量</h1>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto space-y-6">
-        <!-- 頁籤按鈕區 (未被點選前文字清晰辨識) -->
-        <nav class="flex rounded-xl bg-black/20 p-1.5 backdrop-blur-md max-w-xl mx-auto gap-2">
-            <button onclick="switchTab('beak')" id="tab-beak" class="tab-btn active flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all text-center">
+        <!-- 頁籤按鈕區 -->
+        <nav class="flex rounded-xl bg-black/15 p-1.5 backdrop-blur-md max-w-xl mx-auto gap-2">
+            <button onclick="switchTab('beak')" id="tab-beak" class="tab-btn active flex-1 py-2.5 px-3 rounded-lg text-sm transition-all text-center">
                 <i class="fa-solid fa-dove mr-1.5"></i>1. 鳥嘴與角度
             </button>
-            <button onclick="switchTab('protractor')" id="tab-protractor" class="tab-btn flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all text-center">
+            <button onclick="switchTab('protractor')" id="tab-protractor" class="tab-btn flex-1 py-2.5 px-3 rounded-lg text-sm transition-all text-center">
                 <i class="fa-solid fa-shapes mr-1.5"></i>2. 互動量角器
             </button>
-            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn flex-1 py-2.5 px-3 rounded-lg text-sm font-bold transition-all text-center">
-                <i class="fa-solid fa-clipboard-question mr-1.5"></i>3. 隨堂小測驗
+            <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn flex-1 py-2.5 px-3 rounded-lg text-sm transition-all text-center">
+                <i class="fa-solid fa-clipboard-question mr-1.5"></i>3. 隨堂測驗
             </button>
         </nav>
 
@@ -160,7 +161,7 @@
                     </div>
 
                     <div class="p-3.5 bg-blue-50/80 rounded-xl border border-blue-200 text-xs text-slate-600 leading-relaxed">
-                        <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i>重點重點歸納：</p>
+                        <p class="font-bold text-blue-800 mb-1"><i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i>重點歸納：</p>
                         <p>1. 角的頂點在鳥嘴後方結點，兩邊就是鳥嘴的上喙與下喙。</p>
                         <p>2. 量角器上每 1 小格形成的角是 <strong class="text-sky-600">1度 (記作 1°)</strong>。</p>
                         <p>3. 每 1 大格（10小格）形成的角是 <strong class="text-sky-600">10度 (記作 10°)</strong>。</p>
@@ -254,15 +255,15 @@
             </div>
         </section>
 
-        <!-- 區塊三：歷程性評量 5 題測驗 -->
+        <!-- 區塊三：隨堂測驗 -->
         <section id="section-quiz" class="shinkai-card p-6 hidden transition-all">
             <div class="border-b border-slate-200 pb-3 mb-4 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-rose-500 mr-2"></i>歷程性學習小測驗</h2>
-                    <p class="text-xs text-slate-500 mt-1">測試你對量角器構造與測量的理解，點選答案後會獲得即時解析！</p>
+                    <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-pen-to-square text-rose-500 mr-2"></i>隨堂測驗</h2>
+                    <p class="text-xs text-slate-500 mt-1">測試你對量角器構造與測量的理解，點選答案並提交後獲得解析！</p>
                 </div>
-                <div id="quizScoreBadge" class="hidden px-3 py-1.5 bg-amber-100 text-amber-800 font-bold text-xs rounded-full border border-amber-300">
-                    得分：<span id="scoreText">0</span> / 5
+                <div id="quizScoreBadge" class="hidden px-3.5 py-1.5 bg-amber-100 text-amber-800 font-bold text-sm rounded-full border border-amber-300 shadow-sm">
+                    得分：<span id="scoreText">0</span> / 100
                 </div>
             </div>
 
@@ -271,8 +272,11 @@
                 <!-- JS 將動態渲染 5 個題目 -->
             </div>
 
-            <div class="mt-6 flex justify-center">
-                <button onclick="resetQuiz()" class="shinkai-btn text-white font-bold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2">
+            <div class="mt-6 flex justify-center gap-3">
+                <button onclick="submitQuiz()" class="shinkai-btn-accent text-white font-bold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer">
+                    <i class="fa-solid fa-paper-plane"></i>提交答案
+                </button>
+                <button onclick="resetQuiz()" class="shinkai-btn text-white font-bold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all cursor-pointer">
                     <i class="fa-solid fa-rotate-left"></i>重新測驗
                 </button>
             </div>
@@ -440,7 +444,7 @@
 
             // 2. 繪製刻度線與數字
             for (let deg = 0; deg <= 180; deg++) {
-                const rad = (180 - deg) * Math.PI / 180; // 0度在右側（內圈0度線）
+                const rad = (180 - deg) * Math.PI / 180;
 
                 const isBig = deg % 10 === 0;
                 const isMedium = deg % 5 === 0 && !isBig;
@@ -465,21 +469,21 @@
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
 
-                    // 外圈數字 (左起 0, 10, ... 180) -> 對應 deg
+                    // 外圈數字
                     if (chkOuter.checked) {
                         const outerNum = 180 - deg;
                         const nxOuter = cx + (R - 26) * Math.cos(rad);
                         const nyOuter = cy - (R - 26) * Math.sin(rad);
-                        ctx.fillStyle = '#0369A1'; // 藍色外圈
+                        ctx.fillStyle = '#0369A1';
                         ctx.fillText(outerNum.toString(), nxOuter, nyOuter);
                     }
 
-                    // 內圈數字 (右起 0, 10, ... 180) -> 對應 180-deg
+                    // 內圈數字
                     if (chkInner.checked) {
                         const innerNum = deg;
                         const nxInner = cx + (R - 45) * Math.cos(rad);
                         const nyInner = cy - (R - 45) * Math.sin(rad);
-                        ctx.fillStyle = '#C2410C'; // 橘色內圈
+                        ctx.fillStyle = '#C2410C';
                         ctx.fillText(innerNum.toString(), nxInner, nyInner);
                     }
                 }
@@ -551,39 +555,40 @@
                 question: "使用量角器測量角時，角的「頂點」必須對齊量角器的哪一個位置？",
                 options: ["0度線", "中心點", "外圈180度刻度", "邊角頂端"],
                 answer: 1,
-                explanation: "正確答案是【中心點】。測量角度的第一步，就是把角的頂點對齊量角器的中心點。"
+                explanation: "測量角度的第一步，就是把角的頂點對齊量角器的中心點。"
             },
             {
                 id: 2,
                 question: "量角器上的一大格被平分成了 10 個小格，請問量角器上的「1小格」代表幾度？",
                 options: ["1度 (1°)", "5度 (5°)", "10度 (10°)", "100度 (100°)"],
                 answer: 0,
-                explanation: "正確答案是【1度 (1°)】。一大格是10度，分成10小格後，每一小格形成的角就是 1度。"
+                explanation: "一大格為 10度，分成 10小格後，每一小格形成的角就是 1度 (1°)。"
             },
             {
                 id: 3,
                 question: "若角的一邊對齊「外圈刻度0」，另一邊對齊「外圈刻度 30」，這個角是多少度？",
                 options: ["150度", "30度", "120度", "3度"],
                 answer: 1,
-                explanation: "正確答案是【30度】。從外圈刻度 0 開始數 30 個 1度小格，就是 30°。"
+                explanation: "從外圈刻度 0° 開始數 30 個 1度小格，角度即為 30°。"
             },
             {
                 id: 4,
                 question: "若角的一邊對齊「內圈刻度0」，另一邊對齊「內圈刻度 45」，這個角是多少度？",
                 options: ["45度", "135度", "90度", "40度"],
                 answer: 0,
-                explanation: "正確答案是【45度】。從右邊內圈刻度 0 開始算起，對齊內圈 45 就是 45°。"
+                explanation: "從右邊內圈刻度 0° 開始算起，對齊內圈 45° 即為 45°。"
             },
             {
                 id: 5,
                 question: "若角的一邊對齊「外圈刻度 50」，另一邊對齊「外圈刻度 150」，請問這個角是多少度？",
                 options: ["150度", "50度", "100度", "200度"],
                 answer: 2,
-                explanation: "正確答案是【100度】。兩邊都沒有對齊0時，用較大的刻度減去較小的刻度：150° - 50° = 100°。"
+                explanation: "兩邊都沒有對齊 0° 時，用較大的刻度減去較小的刻度：150° - 50° = 100°。"
             }
         ];
 
         let userAnswers = {};
+        let isQuizSubmitted = false;
 
         function renderQuiz() {
             const container = document.getElementById('quizContainer');
@@ -598,7 +603,7 @@
                     optionsHTML += `
                         <button onclick="selectAnswer(${index}, ${optIndex})" 
                                 id="btn-q${index}-opt${optIndex}" 
-                                class="w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-sky-50 text-xs md:text-sm font-medium transition-all flex justify-between items-center">
+                                class="w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-sky-50 text-xs md:text-sm font-medium transition-all flex justify-between items-center cursor-pointer">
                             <span>${String.fromCharCode(65 + optIndex)}. ${opt}</span>
                             <i id="icon-q${index}-opt${optIndex}" class="fa-regular fa-circle text-slate-300"></i>
                         </button>
@@ -622,48 +627,75 @@
         }
 
         function selectAnswer(qIndex, optIndex) {
-            if (userAnswers[qIndex] !== undefined) return; // 避免重複選取
+            if (isQuizSubmitted) return; // 提交後不可更改
 
             userAnswers[qIndex] = optIndex;
-            const q = quizData[qIndex];
-            const isCorrect = optIndex === q.answer;
+
+            // 清除該題所有選項高亮，套用暫存選取樣式
+            quizData[qIndex].options.forEach((_, idx) => {
+                const btn = document.getElementById(`btn-q${qIndex}-opt${idx}`);
+                const icon = document.getElementById(`icon-q${qIndex}-opt${idx}`);
+                btn.className = "w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-sky-50 text-xs md:text-sm font-medium transition-all flex justify-between items-center cursor-pointer";
+                icon.className = "fa-regular fa-circle text-slate-300";
+            });
 
             const selectedBtn = document.getElementById(`btn-q${qIndex}-opt${optIndex}`);
             const selectedIcon = document.getElementById(`icon-q${qIndex}-opt${optIndex}`);
-            const expBox = document.getElementById(`explanation-q${qIndex}`);
-
-            if (isCorrect) {
-                selectedBtn.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-800');
-                selectedIcon.className = 'fa-solid fa-circle-check text-emerald-500';
-                expBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-emerald-50 border border-emerald-200 text-emerald-800";
-                expBox.innerHTML = `<strong><i class="fa-solid fa-circle-check mr-1"></i>回答正確！</strong> ${q.explanation}`;
-            } else {
-                selectedBtn.classList.add('bg-rose-50', 'border-rose-300', 'text-rose-800');
-                selectedIcon.className = 'fa-solid fa-circle-xmark text-rose-500';
-
-                // 顯示正確答案按鈕
-                const correctBtn = document.getElementById(`btn-q${qIndex}-opt${q.answer}`);
-                correctBtn.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-800');
-
-                expBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-rose-50 border border-rose-200 text-rose-800";
-                expBox.innerHTML = `<strong><i class="fa-solid fa-triangle-exclamation mr-1"></i>再想想看！</strong> ${q.explanation}`;
-            }
-
-            expBox.classList.remove('hidden');
-            updateScore();
+            selectedBtn.className = "w-full text-left p-3 rounded-lg border-2 border-sky-500 bg-sky-50 text-sky-900 text-xs md:text-sm font-bold transition-all flex justify-between items-center cursor-pointer";
+            selectedIcon.className = "fa-solid fa-circle-dot text-sky-600";
         }
 
-        function updateScore() {
+        function submitQuiz() {
+            if (isQuizSubmitted) return;
+            isQuizSubmitted = true;
+
             let score = 0;
-            Object.keys(userAnswers).forEach(qIndex => {
-                if (userAnswers[qIndex] === quizData[qIndex].answer) score++;
+
+            quizData.forEach((q, index) => {
+                const userChoice = userAnswers[index];
+                const expBox = document.getElementById(`explanation-q${index}`);
+
+                if (userChoice === undefined) {
+                    // 未作答狀態 (黃色系，不顯示正確答案與說明)
+                    expBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-amber-50 border border-amber-200 text-amber-800 font-bold";
+                    expBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-500"></i>未作答。`;
+                } else if (userChoice === q.answer) {
+                    // 答對 (每題 20 分)
+                    score += 20;
+                    const btn = document.getElementById(`btn-q${index}-opt${userChoice}`);
+                    const icon = document.getElementById(`icon-q${index}-opt${userChoice}`);
+                    btn.className = "w-full text-left p-3 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-emerald-900 text-xs md:text-sm font-bold transition-all flex justify-between items-center";
+                    icon.className = "fa-solid fa-circle-check text-emerald-600";
+
+                    expBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-emerald-50 border border-emerald-200 text-emerald-800";
+                    expBox.innerHTML = `<strong><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>回答正確！</strong> ${q.explanation}`;
+                } else {
+                    // 答錯
+                    const wrongBtn = document.getElementById(`btn-q${index}-opt${userChoice}`);
+                    const wrongIcon = document.getElementById(`icon-q${index}-opt${userChoice}`);
+                    wrongBtn.className = "w-full text-left p-3 rounded-lg border-2 border-rose-300 bg-rose-50 text-rose-900 text-xs md:text-sm font-bold transition-all flex justify-between items-center";
+                    wrongIcon.className = "fa-solid fa-circle-xmark text-rose-500";
+
+                    // 高亮正確答案
+                    const correctBtn = document.getElementById(`btn-q${index}-opt${q.answer}`);
+                    const correctIcon = document.getElementById(`icon-q${index}-opt${q.answer}`);
+                    correctBtn.className = "w-full text-left p-3 rounded-lg border-2 border-emerald-400 bg-emerald-50 text-emerald-900 text-xs md:text-sm font-bold transition-all flex justify-between items-center";
+                    correctIcon.className = "fa-solid fa-circle-check text-emerald-600";
+
+                    expBox.className = "p-3 rounded-lg text-xs leading-relaxed bg-rose-50 border border-rose-200 text-rose-800";
+                    expBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i>回答錯誤！</strong> ${q.explanation}`;
+                }
+
+                expBox.classList.remove('hidden');
             });
+
             document.getElementById('scoreText').innerText = score;
             document.getElementById('quizScoreBadge').classList.remove('hidden');
         }
 
         function resetQuiz() {
             userAnswers = {};
+            isQuizSubmitted = false;
             document.getElementById('quizScoreBadge').classList.add('hidden');
             renderQuiz();
         }

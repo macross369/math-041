@@ -111,7 +111,7 @@
       </div>
 
       <div class="inline-block bg-white/70 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-indigo-600 mb-2 shadow-sm border border-white/60">
-        <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學 3-3 互動探究教材
+        <i class="fa-solid fa-graduation-cap mr-1"></i> 國小四上數學 3-3 互動學習網頁
       </div>
       <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-wide drop-shadow-sm flex items-center justify-center gap-3">
         <i class="fa-solid fa-compass-drafting text-sky-500"></i>
@@ -134,7 +134,7 @@
           <i class="fa-solid fa-car-rear mr-1.5"></i> 生活旋轉模擬 (柵欄/黑膠)
         </button>
         <button id="tab-quiz" onclick="switchTab('quiz')" class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200 text-slate-600 hover:text-sky-600">
-          <i class="fa-solid fa-file-pen mr-1.5"></i> 隨堂小測驗 (5題)
+          <i class="fa-solid fa-file-pen mr-1.5"></i> 隨堂測驗
         </button>
       </div>
     </div>
@@ -178,13 +178,13 @@
                 <!-- 終邊 (Green Line) -->
                 <line id="line-terminal" x1="170" y1="170" x2="280" y2="170" stroke="#16a34a" stroke-width="6" stroke-linecap="round" />
 
-                <!-- 始邊、終邊 文字標籤 -->
+                <!-- 始邊、終邊 文字標籤 (提高底框透明度，文字對齊於方格中心) -->
                 <g id="label-initial" class="text-xs font-bold" fill="#1e40af">
-                  <rect x="0" y="0" width="40" height="20" rx="4" fill="#dbeafe"/>
+                  <rect x="-20" y="-10" width="40" height="20" rx="6" fill="#dbeafe" fill-opacity="0.7" stroke="#93c5fd" stroke-width="1"/>
                   <text x="0" y="0" text-anchor="middle" dominant-baseline="central">始邊</text>
                 </g>
                 <g id="label-terminal" class="text-xs font-bold" fill="#14532d">
-                  <rect x="0" y="0" width="40" height="20" rx="4" fill="#dcfce7"/>
+                  <rect x="-20" y="-10" width="40" height="20" rx="6" fill="#dcfce7" fill-opacity="0.7" stroke="#86efac" stroke-width="1"/>
                   <text x="0" y="0" text-anchor="middle" dominant-baseline="central">終邊</text>
                 </g>
 
@@ -390,13 +390,13 @@
         <div class="flex flex-col md:flex-row justify-between items-center pb-6 border-b border-slate-200 mb-6 gap-4">
           <div>
             <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-clipboard-question text-sky-500"></i> 旋轉角核心觀念隨堂測驗
+              <i class="fa-solid fa-clipboard-question text-sky-500"></i> 隨堂測驗
             </h2>
             <p class="text-xs text-slate-500 mt-1">請回答下列 5 道經典課本延伸題目，考驗你的概念掌握度！</p>
           </div>
           <div class="flex items-center gap-4 bg-sky-50 px-5 py-2.5 rounded-2xl border border-sky-200">
-            <span class="text-xs font-bold text-slate-500">答對題數：</span>
-            <span id="quiz-score" class="text-2xl font-black text-sky-600">0 / 5</span>
+            <span class="text-xs font-bold text-slate-500">測驗得分：</span>
+            <span id="quiz-score" class="text-2xl font-black text-sky-600">0 / 100</span>
           </div>
         </div>
 
@@ -405,10 +405,13 @@
           <!-- 由 JS 動態生成 5 題內容 -->
         </div>
 
-        <!-- 重測按鈕 -->
-        <div class="mt-8 text-center">
-          <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl text-sm shadow-lg transition duration-200">
-            <i class="fa-solid fa-rotate-left mr-2"></i> 重新作答小測驗
+        <!-- 按鈕區：提交答案與重新測驗 -->
+        <div class="mt-8 flex justify-center items-center gap-4">
+          <button id="btn-submit" onclick="submitQuiz()" class="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-2xl text-sm shadow-lg transition duration-200 flex items-center">
+            <i class="fa-solid fa-paper-plane mr-2"></i> 提交答案
+          </button>
+          <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl text-sm shadow-lg transition duration-200 flex items-center">
+            <i class="fa-solid fa-rotate-left mr-2"></i> 重新測驗
           </button>
         </div>
 
@@ -426,35 +429,35 @@
       direction: 'cw' // 'cw' 順時針, 'ccw' 逆時針
     };
 
-    // 評量題目資料庫
+    // 評量題目資料庫（解析內容已清除語氣矛盾字詞）
     const quizData = [
       {
         id: 1,
         question: "1. 鉛筆一端固定在鐘面上轉動，轉動時固定不動的點稱為？",
         options: ["始邊", "終邊", "旋轉中心", "旋轉角"],
         answer: 2,
-        explanation: "正確！轉動時固定不動的中心點稱為「旋轉中心」。"
+        explanation: "轉動時固定不動的中心點稱為「旋轉中心」。"
       },
       {
         id: 2,
         question: "2. 鐘面上的分針從數字 12 沿著順時針方向轉到數字 3，形成的旋轉角是多少度？",
         options: ["30度", "60度", "90度 (直角)", "180度 (平角)"],
         answer: 2,
-        explanation: "正確！轉動 3 大格：3 × 30° = 90°，恰好是一個直角。"
+        explanation: "轉動 3 大格：3 × 30° = 90°，恰好是一個直角。"
       },
       {
         id: 3,
         question: "3. 鉛筆從 12 的位置開始，順時針轉了一圈回到 12 的位置，形成的角稱為什麼？",
         options: ["直角 (90°)", "平角 (180°)", "周角 (360°)", "銳角"],
         answer: 2,
-        explanation: "正確！轉了一整圈包含 12 大格，12 × 30° = 360°，稱為「周角」。"
+        explanation: "轉了一整圈包含 12 大格，12 × 30° = 360°，稱為「周角」。"
       },
       {
         id: 4,
         question: "4. 鐘面上分針從數字 12 開始，逆時針方向轉了 2 大格（轉到 10），旋轉角是多少度？",
         options: ["30度", "60度", "90度", "120度"],
         answer: 1,
-        explanation: "正確！無論順時針或逆時針，每轉 1 大格就是 30°，轉 2 大格為 2 × 30° = 60°。"
+        explanation: "無論順時針或逆時針，每轉 1 大格就是 30°，轉 2 大格為 2 × 30° = 60°。"
       },
       {
         id: 5,
@@ -466,11 +469,12 @@
           "35°、50°、125°"
         ],
         answer: 1,
-        explanation: "正確！60° + 70° + 50° = 180°，三個角的和恰好等於一個平角！"
+        explanation: "60° + 70° + 50° = 180°，三個角的和恰好等於一個平角。"
       }
     ];
 
     let userAnswers = {};
+    let isQuizSubmitted = false;
 
     /* ==========================================================================
        初始化頁面與事件監聽
@@ -646,17 +650,19 @@
       document.getElementById('line-terminal').setAttribute('x2', ex);
       document.getElementById('line-terminal').setAttribute('y2', ey);
 
-      // 設定文字標籤位置
+      // 設定文字標籤位置 (使兩方格與對應指針距離完全相等，且文字精準置中於底框內)
       const labelInit = document.getElementById('label-initial');
       const labelTerm = document.getElementById('label-terminal');
 
-      const lx1 = cx + (r + 22) * Math.cos(startRad);
-      const ly1 = cy + (r + 22) * Math.sin(startRad);
-      labelInit.setAttribute('transform', `translate(${lx1 - 20}, ${ly1 - 10})`);
+      const labelDist = r + 22; // 指針長度 r + 等距延伸距離 22px
 
-      const lx2 = cx + (r + 22) * Math.cos(endRad);
-      const ly2 = cy + (r + 22) * Math.sin(endRad);
-      labelTerm.setAttribute('transform', `translate(${lx2 - 20}, ${ly2 - 10})`);
+      const lx1 = cx + labelDist * Math.cos(startRad);
+      const ly1 = cy + labelDist * Math.sin(startRad);
+      labelInit.setAttribute('transform', `translate(${lx1}, ${ly1})`);
+
+      const lx2 = cx + labelDist * Math.cos(endRad);
+      const ly2 = cy + labelDist * Math.sin(endRad);
+      labelTerm.setAttribute('transform', `translate(${lx2}, ${ly2})`);
 
       // 繪製角度扇形與弧線
       const sectorPath = document.getElementById('angle-sector');
@@ -756,7 +762,7 @@
       const container = document.getElementById('quiz-container');
       container.innerHTML = '';
 
-      quizData.forEach((q, index) => {
+      quizData.forEach((q) => {
         const qBox = document.createElement('div');
         qBox.className = "p-5 bg-white/80 rounded-2xl border border-slate-200 shadow-sm transition-all";
         qBox.id = `quiz-card-${q.id}`;
@@ -784,11 +790,14 @@
       });
     }
 
+    // 點擊選項（尚未提交前僅標記選取）
     function selectAnswer(qId, optIdx) {
+      if (isQuizSubmitted) return; // 提交後鎖定答案
+
       const q = quizData.find(item => item.id === qId);
       userAnswers[qId] = optIdx;
 
-      // 重置按鈕狀態
+      // 重置該題選項按鈕視覺狀態
       q.options.forEach((_, idx) => {
         const btn = document.getElementById(`btn-${qId}-${idx}`);
         const icon = document.getElementById(`icon-${qId}-${idx}`);
@@ -796,42 +805,75 @@
         icon.className = "fa-regular fa-circle text-slate-300 text-base";
       });
 
+      // 標記目前選取的選項
       const selectedBtn = document.getElementById(`btn-${qId}-${optIdx}`);
       const selectedIcon = document.getElementById(`icon-${qId}-${optIdx}`);
-      const explainBox = document.getElementById(`explain-${qId}`);
-
-      if (optIdx === q.answer) {
-        // 答對
-        selectedBtn.className = "w-full text-left p-3 rounded-xl border-2 border-green-500 bg-green-50 font-bold text-green-800 text-sm flex items-center justify-between";
-        selectedIcon.className = "fa-solid fa-circle-check text-green-600 text-base";
-        
-        explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-green-100 text-green-900 border border-green-200 block";
-        explainBox.innerHTML = `<i class="fa-solid fa-face-smile mr-1"></i> ${q.explanation}`;
-      } else {
-        // 答錯
-        selectedBtn.className = "w-full text-left p-3 rounded-xl border-2 border-red-400 bg-red-50 font-bold text-red-800 text-sm flex items-center justify-between";
-        selectedIcon.className = "fa-solid fa-circle-xmark text-red-500 text-base";
-
-        explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-red-100 text-red-900 border border-red-200 block";
-        explainBox.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1"></i> 再試試看！提示：鐘面上每一個大格代表 30°。`;
-      }
-
-      updateQuizScore();
+      selectedBtn.className = "w-full text-left p-3 rounded-xl border-2 border-sky-500 bg-sky-50 font-bold text-sky-800 text-sm flex items-center justify-between shadow-sm";
+      selectedIcon.className = "fa-solid fa-circle-dot text-sky-600 text-base";
     }
 
-    function updateQuizScore() {
-      let correctCount = 0;
+    // 提交答案並進行批改與計算總分（滿分100）
+    function submitQuiz() {
+      if (isQuizSubmitted) return;
+      isQuizSubmitted = true;
+
+      let score = 0;
+      const pointsPerQuestion = 100 / quizData.length; // 每題 20 分
+
       quizData.forEach(q => {
-        if (userAnswers[q.id] === q.answer) {
-          correctCount++;
+        const userChoice = userAnswers[q.id];
+        const explainBox = document.getElementById(`explain-${q.id}`);
+
+        // 1. 未作答情況
+        if (userChoice === undefined || userChoice === null) {
+          explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-300 block";
+          explainBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> 未作答。`;
+          return;
+        }
+
+        // 2. 答對情況
+        if (userChoice === q.answer) {
+          score += pointsPerQuestion;
+          const btn = document.getElementById(`btn-${q.id}-${userChoice}`);
+          const icon = document.getElementById(`icon-${q.id}-${userChoice}`);
+          btn.className = "w-full text-left p-3 rounded-xl border-2 border-green-500 bg-green-50 font-bold text-green-800 text-sm flex items-center justify-between";
+          icon.className = "fa-solid fa-circle-check text-green-600 text-base";
+
+          explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-green-100 text-green-900 border border-green-200 block";
+          explainBox.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 答對了！ ${q.explanation}`;
+        } else {
+          // 3. 答錯情況
+          const btn = document.getElementById(`btn-${q.id}-${userChoice}`);
+          const icon = document.getElementById(`icon-${q.id}-${userChoice}`);
+          btn.className = "w-full text-left p-3 rounded-xl border-2 border-red-400 bg-red-50 font-bold text-red-800 text-sm flex items-center justify-between";
+          icon.className = "fa-solid fa-circle-xmark text-red-500 text-base";
+
+          explainBox.className = "mt-3 p-3 rounded-xl text-xs font-bold bg-red-100 text-red-900 border border-red-200 block";
+          explainBox.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 答錯了！正確答案是「${q.options[q.answer]}」。<div class="mt-1 font-normal">${q.explanation}</div>`;
         }
       });
-      document.getElementById('quiz-score').textContent = `${correctCount} / ${quizData.length}`;
+
+      // 更新得分 (滿分100)
+      document.getElementById('quiz-score').textContent = `${score} / 100`;
+
+      // 禁用「提交答案」按鈕
+      const submitBtn = document.getElementById('btn-submit');
+      submitBtn.disabled = true;
+      submitBtn.className = "px-6 py-3 bg-slate-300 text-slate-500 font-bold rounded-2xl text-sm shadow-none cursor-not-allowed flex items-center";
     }
 
+    // 重新測驗重置函數
     function resetQuiz() {
       userAnswers = {};
-      document.getElementById('quiz-score').textContent = `0 / 5`;
+      isQuizSubmitted = false;
+
+      document.getElementById('quiz-score').textContent = `0 / 100`;
+
+      // 恢復提交按鈕
+      const submitBtn = document.getElementById('btn-submit');
+      submitBtn.disabled = false;
+      submitBtn.className = "px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-2xl text-sm shadow-lg transition duration-200 flex items-center";
+
       renderQuiz();
     }
   </script>

@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Noto Sans TC & Kiwi Maru -->
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -22,7 +22,7 @@
         }
 
         .shinkai-font {
-            font-family: 'Kiwi Maru', 'Noto Sans TC', serif;
+            font-family: 'Noto Sans TC', sans-serif;
         }
 
         /* Ambient glowing overlays */
@@ -106,7 +106,7 @@
             <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-300 rounded-full blur-2xl opacity-40"></div>
             
             <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-2">
-                <i class="fa-solid fa-graduation-cap mr-1"></i> 國小數學互動探究館
+                <i class="fa-solid fa-graduation-cap mr-1"></i> 國小四上數學 6-1 互動學習網頁
             </span>
             <h1 class="text-2xl md:text-4xl font-black text-slate-800 shinkai-font tracking-wide mb-2">
                 四位數除以一位數：位值平分與直式探究
@@ -125,7 +125,7 @@
                 <i class="fa-solid fa-sliders"></i> 自訂數字出題機
             </button>
             <button id="tab-quiz" onclick="switchTab('quiz')" class="bg-white/80 text-slate-700 hover:bg-white px-5 py-2.5 rounded-full font-bold text-sm transition-all flex items-center gap-2">
-                <i class="fa-solid fa-square-check"></i> 歷程性小測驗 (5題)
+                <i class="fa-solid fa-square-check"></i> 隨堂測驗
             </button>
         </div>
 
@@ -362,10 +362,10 @@
             
             <div class="glass-card p-6 text-center">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mb-2">
-                    <i class="fa-solid fa-graduation-cap mr-1"></i> 歷程性自主評量
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> 隨堂小測驗
                 </span>
                 <h2 class="text-2xl font-bold text-slate-800 shinkai-font mb-2">
-                    「四位數除以一位數」學習觀念挑戰
+                    隨堂測驗
                 </h2>
                 <p class="text-sm text-slate-600 max-w-xl mx-auto">
                     請回答下列 5 道精心設計的觀念與計算題，即時獲得解題回饋與導正指引！
@@ -380,10 +380,13 @@
                 <!-- Populated dynamically via JS -->
             </div>
 
-            <!-- Quiz Submit Button -->
-            <div class="text-center py-4">
-                <button onclick="checkAllQuiz()" class="btn-shinkai px-8 py-3 rounded-2xl font-bold text-base shadow-lg hover:scale-105 transition">
-                    <i class="fa-solid fa-paper-plane mr-2"></i> 送出所有答案並核對
+            <!-- Quiz Action Buttons -->
+            <div class="flex flex-wrap justify-center items-center gap-4 py-4">
+                <button onclick="checkAllQuiz()" class="btn-shinkai px-8 py-3 rounded-2xl font-bold text-base shadow-lg hover:scale-105 transition flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> 提交答案
+                </button>
+                <button onclick="resetQuiz()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-8 py-3 rounded-2xl font-bold text-base shadow-md hover:scale-105 transition flex items-center justify-center">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> 重新測驗
                 </button>
             </div>
 
@@ -864,7 +867,7 @@
             quizData.forEach((q) => {
                 const selected = document.querySelector(`input[name="quiz-q-${q.id}"]:checked`);
                 const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+                feedbackEl.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200', 'bg-amber-50', 'text-amber-800', 'border-amber-200');
 
                 if (selected) {
                     const userAns = parseInt(selected.value);
@@ -878,13 +881,32 @@
                     }
                 } else {
                     feedbackEl.classList.add('bg-amber-50', 'text-amber-800', 'border', 'border-amber-200');
-                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-600 mr-1"></i> 請選擇一個答案！`;
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-600 mr-1"></i> 未作答。`;
                 }
             });
 
             const scoreBanner = document.getElementById('quiz-score-banner');
             scoreBanner.classList.remove('hidden');
             document.getElementById('quiz-score-val').innerText = score;
+        }
+
+        function resetQuiz() {
+            quizData.forEach((q) => {
+                const radios = document.querySelectorAll(`input[name="quiz-q-${q.id}"]`);
+                radios.forEach(radio => radio.checked = false);
+
+                const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
+                if (feedbackEl) {
+                    feedbackEl.classList.add('hidden');
+                    feedbackEl.innerHTML = '';
+                }
+            });
+
+            const scoreBanner = document.getElementById('quiz-score-banner');
+            if (scoreBanner) {
+                scoreBanner.classList.add('hidden');
+            }
+            document.getElementById('quiz-score-val').innerText = '0';
         }
 
         window.onload = function() {

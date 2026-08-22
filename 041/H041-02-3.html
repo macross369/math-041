@@ -92,9 +92,9 @@
                     </div>
                     <div>
                         <h1 class="text-xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-pink-200 to-amber-200">
-                            國小數學 2-3 乘法算式的規律
+                            國小四上數學 2-3 互動學習網頁
                         </h1>
-                        <p class="text-xs text-sky-200 opacity-80">一站式觀念探究與即時評量網頁</p>
+                        <p class="text-xs text-sky-200 opacity-80">乘法算式的規律：一站式觀念探究與即時評量網頁</p>
                     </div>
                 </div>
 
@@ -107,7 +107,7 @@
                         <i class="fa-solid fa-diagram-project mr-1.5"></i>前後項與拆解規律
                     </button>
                     <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:text-white transition-all">
-                        <i class="fa-solid fa-pen-to-square mr-1.5"></i>歷程性評量 (5題)
+                        <i class="fa-solid fa-pen-to-square mr-1.5"></i>隨堂測驗
                     </button>
                 </nav>
             </div>
@@ -311,11 +311,11 @@
                 <div class="flex items-center justify-between mb-6">
                     <div>
                         <span class="bg-pink-100 text-pink-700 font-bold px-3 py-1 rounded-full text-sm">自我挑戰</span>
-                        <h2 class="text-2xl font-bold text-slate-800 mt-1">乘法規律隨堂歷程測驗 (課本精選題)</h2>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-1">隨堂測驗</h2>
                     </div>
                     <div class="text-right">
                         <span class="text-xs text-slate-500 block">目前得分</span>
-                        <span id="score-display" class="text-3xl font-black text-purple-600">0 / 5</span>
+                        <span id="score-display" class="text-3xl font-black text-purple-600">0 / 100</span>
                     </div>
                 </div>
 
@@ -327,10 +327,10 @@
                             1. 【末尾0規律】計算 1500 × 600 時，答案末尾總共有幾個「0」？
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="checkQuiz(1, 'A', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 4 個（僅被乘數與乘數末尾的0相加）</button>
-                            <button onclick="checkQuiz(1, 'B', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 5 個（15 × 6 = 90 自帶1個0）</button>
-                            <button onclick="checkQuiz(1, 'C', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 6 個</button>
-                            <button onclick="checkQuiz(1, 'D', this)" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 3 個</button>
+                            <button onclick="selectOption(1, 'A', this)" data-ans="A" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 4 個（僅被乘數與乘數末尾的0相加）</button>
+                            <button onclick="selectOption(1, 'B', this)" data-ans="B" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 5 個（15 × 6 = 90 自帶1個0）</button>
+                            <button onclick="selectOption(1, 'C', this)" data-ans="C" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 6 個</button>
+                            <button onclick="selectOption(1, 'D', this)" data-ans="D" class="quiz-btn-1 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 3 個</button>
                         </div>
                         <div id="quiz-feedback-1" class="hidden text-sm p-3 rounded-xl font-medium"></div>
                     </div>
@@ -341,10 +341,10 @@
                             2. 【生活應用】貨架上有 500 袋紅豆，每袋重 1800 公克，共重多少公克？
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="checkQuiz(2, 'A', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 90000 公克</button>
-                            <button onclick="checkQuiz(2, 'B', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 900000 公克</button>
-                            <button onclick="checkQuiz(2, 'C', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 9000000 公克</button>
-                            <button onclick="checkQuiz(2, 'D', this)" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 18500 公克</button>
+                            <button onclick="selectOption(2, 'A', this)" data-ans="A" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 90000 公克</button>
+                            <button onclick="selectOption(2, 'B', this)" data-ans="B" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 900000 公克</button>
+                            <button onclick="selectOption(2, 'C', this)" data-ans="C" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 9000000 公克</button>
+                            <button onclick="selectOption(2, 'D', this)" data-ans="D" class="quiz-btn-2 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 18500 公克</button>
                         </div>
                         <div id="quiz-feedback-2" class="hidden text-sm p-3 rounded-xl font-medium"></div>
                     </div>
@@ -355,10 +355,10 @@
                             3. 【前後項規律】已知 82 × 100 = 8200，求 82 × 101 可以如何快速計算？
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="checkQuiz(3, 'A', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 8200 + 82 = 8282（多1個82）</button>
-                            <button onclick="checkQuiz(3, 'B', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 8200 − 82 = 8118（少1個82）</button>
-                            <button onclick="checkQuiz(3, 'C', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 8200 + 101 = 8301</button>
-                            <button onclick="checkQuiz(3, 'D', this)" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 8200 × 101 = 828200</button>
+                            <button onclick="selectOption(3, 'A', this)" data-ans="A" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 8200 + 82 = 8282（多1個82）</button>
+                            <button onclick="selectOption(3, 'B', this)" data-ans="B" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 8200 − 82 = 8118（少1個82）</button>
+                            <button onclick="selectOption(3, 'C', this)" data-ans="C" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 8200 + 101 = 8301</button>
+                            <button onclick="selectOption(3, 'D', this)" data-ans="D" class="quiz-btn-3 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 8200 × 101 = 828200</button>
                         </div>
                         <div id="quiz-feedback-3" class="hidden text-sm p-3 rounded-xl font-medium"></div>
                     </div>
@@ -369,10 +369,10 @@
                             4. 【思考帽巧算】香水一瓶 300 元，買 999 瓶共要多少元？下列何者是最快的心算思考步驟？
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="checkQuiz(4, 'A', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 先算 300 × 1000 = 300000，再減去 300 得 299700</button>
-                            <button onclick="checkQuiz(4, 'B', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 先算 300 × 1000 = 300000，再加上 300 得 300300</button>
-                            <button onclick="checkQuiz(4, 'C', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 先算 300 × 900 = 270000，再加 99</button>
-                            <button onclick="checkQuiz(4, 'D', this)" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 用直式慢慢計算 300 × 999 = 299700</button>
+                            <button onclick="selectOption(4, 'A', this)" data-ans="A" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 先算 300 × 1000 = 300000，再減去 300 得 299700</button>
+                            <button onclick="selectOption(4, 'B', this)" data-ans="B" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 先算 300 × 1000 = 300000，再加上 300 得 300300</button>
+                            <button onclick="selectOption(4, 'C', this)" data-ans="C" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 先算 300 × 900 = 270000，再加 99</button>
+                            <button onclick="selectOption(4, 'D', this)" data-ans="D" class="quiz-btn-4 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 用直式慢慢計算 300 × 999 = 299700</button>
                         </div>
                         <div id="quiz-feedback-4" class="hidden text-sm p-3 rounded-xl font-medium"></div>
                     </div>
@@ -383,12 +383,22 @@
                             5. 【素養題】媽媽給皮皮 3000 元買 15 盒點心，皮皮選每盒 198 元的 B 款點心，並說會剩下 30 元。他是怎麼想的？
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <button onclick="checkQuiz(5, 'A', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 把 198 看成 (200 − 2)，每盒省 2 元，15 盒省 30 元</button>
-                            <button onclick="checkQuiz(5, 'B', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 把 3000 直接減掉 198 得 2802，再除以 15</button>
-                            <button onclick="checkQuiz(5, 'C', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 因為 198 × 15 = 3030，所以會多出 30 元</button>
-                            <button onclick="checkQuiz(5, 'D', this)" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 隨機估算出的結果，無法用乘法規律說明</button>
+                            <button onclick="selectOption(5, 'A', this)" data-ans="A" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">A. 把 198 看成 (200 − 2)，每盒省 2 元，15 盒省 30 元</button>
+                            <button onclick="selectOption(5, 'B', this)" data-ans="B" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">B. 把 3000 直接減掉 198 得 2802，再除以 15</button>
+                            <button onclick="selectOption(5, 'C', this)" data-ans="C" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">C. 因為 198 × 15 = 3030，所以會多出 30 元</button>
+                            <button onclick="selectOption(5, 'D', this)" data-ans="D" class="quiz-btn-5 text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-purple-50 hover:border-purple-300 transition-all">D. 隨機估算出的結果，無法用乘法規律說明</button>
                         </div>
                         <div id="quiz-feedback-5" class="hidden text-sm p-3 rounded-xl font-medium"></div>
+                    </div>
+                    
+                    <!-- 送出與重新測驗按鈕 -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-slate-200">
+                        <button onclick="submitQuiz()" class="w-full sm:w-48 px-6 py-3 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all">
+                            <i class="fa-solid fa-paper-plane mr-2"></i>提交答案
+                        </button>
+                        <button onclick="resetQuiz()" class="w-full sm:w-48 px-6 py-3 rounded-xl font-bold bg-slate-200 text-slate-700 hover:bg-slate-300 shadow-sm transition-all">
+                            <i class="fa-solid fa-rotate-right mr-2"></i>重新測驗
+                        </button>
                     </div>
                 </div>
             </div>
@@ -508,47 +518,100 @@
             document.getElementById('desc-plus').innerHTML = `比基準算式多 1 個 ${a}<br><span class="font-mono font-bold text-emerald-700">${baseVal} ＋ ${a} = ${plusVal}</span>`;
         }
 
-        // 模組三：歷程評量答題機制與詳細解析
+        // 模組三：隨堂測驗答題機制與詳細解析
         const quizExplanations = {
-            1: "<b>正確解答：B (5 個 0)</b><br>因為 15 × 6 = 90 本身末尾就帶有 1 個 0，再加上 1500 的 2 個 0 與 600 的 2 個 0，總共是 1 + 2 + 2 = 5 個 0 (1500 × 600 = 900000)。",
-            2: "<b>正確解答：B (900000 公克)</b><br>先算 18 × 5 = 90，補上 1800 的 2 個 0 和 500 的 2 個 0，共補 4 個 0，得 900000 公克。",
-            3: "<b>正確解答：A (8200 + 82 = 8282)</b><br>82 × 101 代表有 101 個 82，比 100 個 82 多了 1 個 82，因此等於 8200 + 82 = 8282。",
-            4: "<b>正確解答：A (先算 300 × 1000，再減 300)</b><br>999 = 1000 − 1，所以 300 × 999 = 300 × 1000 − 300 × 1 = 300000 − 300 = 299700 元。",
-            5: "<b>正確解答：A (將 198 看成 200 − 2)</b><br>每盒比 200 元少 2 元，15 盒共少 2 × 15 = 30 元。若每盒 200 元剛好花完 3000 元（200 × 15 = 3000），因此會剩下 30 元！"
+            1: "因為 15 × 6 = 90 本身末尾就帶有 1 個 0，再加上 1500 的 2 個 0 與 600 的 2 個 0，總共是 1 + 2 + 2 = 5 個 0 (1500 × 600 = 900000)。",
+            2: "先算 18 × 5 = 90，補上 1800 的 2 個 0 和 500 的 2 個 0，共補 4 個 0，得 900000 公克。",
+            3: "82 × 101 代表有 101 個 82，比 100 個 82 多了 1 個 82，因此等於 8200 + 82 = 8282。",
+            4: "999 = 1000 − 1，所以 300 × 999 = 300 × 1000 − 300 × 1 = 300000 − 300 = 299700 元。",
+            5: "每盒比 200 元少 2 元，15 盒共少 2 × 15 = 30 元。若每盒 200 元剛好花完 3000 元（200 × 15 = 3000），因此會剩下 30 元！"
         };
 
         const correctAnswers = { 1: 'B', 2: 'B', 3: 'A', 4: 'A', 5: 'A' };
-        const scoreState = { 1: false, 2: false, 3: false, 4: false, 5: false };
+        let userSelections = { 1: null, 2: null, 3: null, 4: null, 5: null };
 
-        function checkQuiz(qNum, userAns, btn) {
-            const feedbackEl = document.getElementById(`quiz-feedback-${qNum}`);
-            const isCorrect = userAns === correctAnswers[qNum];
-
-            // 停用該題按鈕
+        function selectOption(qNum, ans, btn) {
+            // 清除該題所有按鈕的選取樣式
             document.querySelectorAll(`.quiz-btn-${qNum}`).forEach(b => {
-                b.disabled = true;
-                b.classList.add('opacity-50', 'cursor-not-allowed');
+                b.classList.remove('bg-purple-100', 'border-purple-400', 'ring-2', 'ring-purple-400', 'font-bold');
+                b.classList.add('border-slate-200');
             });
+            // 為點擊的按鈕加上選取樣式
+            btn.classList.remove('border-slate-200');
+            btn.classList.add('bg-purple-100', 'border-purple-400', 'ring-2', 'ring-purple-400', 'font-bold');
+            // 記錄使用者的選擇
+            userSelections[qNum] = ans;
+        }
 
-            feedbackEl.classList.remove('hidden');
+        function submitQuiz() {
+            let score = 0;
+            for (let i = 1; i <= 5; i++) {
+                const feedbackEl = document.getElementById(`quiz-feedback-${i}`);
+                feedbackEl.classList.remove('hidden');
 
-            if (isCorrect) {
-                btn.classList.remove('opacity-50');
-                btn.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-800', 'font-bold');
-                feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-emerald-50 text-emerald-800 border border-emerald-200 space-y-1";
-                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i><b>太棒了，答對了！</b><br>${quizExplanations[qNum]}`;
-                scoreState[qNum] = true;
-            } else {
-                btn.classList.remove('opacity-50');
-                btn.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-800', 'font-bold');
-                feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-rose-50 text-rose-800 border border-rose-200 space-y-1";
-                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i><b>再想想看：</b><br>${quizExplanations[qNum]}`;
-                scoreState[qNum] = false;
+                // 禁用該題所有按鈕
+                document.querySelectorAll(`.quiz-btn-${i}`).forEach(b => {
+                    b.disabled = true;
+                    b.classList.add('opacity-60', 'cursor-not-allowed');
+                });
+
+                if (!userSelections[i]) {
+                    // 未作答狀態 (黃色系)，僅顯示未作答
+                    feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-amber-50 text-amber-800 border border-amber-300";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-600"></i><b>未作答。</b>`;
+                } else if (userSelections[i] === correctAnswers[i]) {
+                    // 答對狀態 (綠色系)
+                    score += 20; // 滿分 100 分，每題 20 分
+                    feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-emerald-50 text-emerald-800 border border-emerald-300 space-y-1";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5 text-emerald-600"></i><b>太棒了，答對了！</b><br>${quizExplanations[i]}`;
+                    
+                    // 將選中的正確選項標示為綠色
+                    document.querySelectorAll(`.quiz-btn-${i}`).forEach(b => {
+                        if (b.getAttribute('data-ans') === userSelections[i]) {
+                            b.classList.remove('bg-purple-100', 'border-purple-400', 'ring-2', 'ring-purple-400');
+                            b.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'ring-2', 'ring-emerald-400');
+                        }
+                    });
+                } else {
+                    // 答錯狀態 (紅色系)，避免矛盾敘述
+                    feedbackEl.className = "text-sm p-3 rounded-xl font-medium bg-rose-50 text-rose-800 border border-rose-300 space-y-1";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1.5 text-rose-600"></i><b>再想想看。</b><br>正確解答為 <b>${correctAnswers[i]}</b>。<br>${quizExplanations[i]}`;
+                    
+                    // 將選錯的選項標示為紅色
+                    document.querySelectorAll(`.quiz-btn-${i}`).forEach(b => {
+                        if (b.getAttribute('data-ans') === userSelections[i]) {
+                            b.classList.remove('bg-purple-100', 'border-purple-400', 'ring-2', 'ring-purple-400');
+                            b.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-900', 'ring-2', 'ring-rose-400');
+                        }
+                    });
+                }
             }
+            // 更新總分 (滿分 100)
+            document.getElementById('score-display').innerText = `${score} / 100`;
+        }
 
-            // 更新總分
-            const currentScore = Object.values(scoreState).filter(Boolean).length;
-            document.getElementById('score-display').innerText = `${currentScore} / 5`;
+        function resetQuiz() {
+            // 重置分數與選擇紀錄
+            userSelections = { 1: null, 2: null, 3: null, 4: null, 5: null };
+            document.getElementById('score-display').innerText = `0 / 100`;
+            
+            for (let i = 1; i <= 5; i++) {
+                const feedbackEl = document.getElementById(`quiz-feedback-${i}`);
+                feedbackEl.classList.add('hidden');
+                feedbackEl.innerHTML = ''; // 清空解析內容
+                
+                // 恢復所有按鈕的初始狀態
+                document.querySelectorAll(`.quiz-btn-${i}`).forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove(
+                        'opacity-60', 'cursor-not-allowed', 
+                        'bg-purple-100', 'border-purple-400', 'ring-2', 'ring-purple-400', 'font-bold',
+                        'bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'ring-emerald-400',
+                        'bg-rose-100', 'border-rose-500', 'text-rose-900', 'ring-rose-400'
+                    );
+                    b.classList.add('border-slate-200');
+                });
+            }
         }
 
         // 初始化執行一次

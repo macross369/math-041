@@ -164,15 +164,15 @@
 
     <!-- 頁首標題 -->
     <header class="text-center glass-card p-6 mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">一億以內的數</h1>
-        <p class="text-gray-700">動手操作，探索大數的世界！</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">國小四上數學 1-2 互動學習網頁</h1>
+        <p class="text-gray-700">一億以內的數：動手操作，探索大數的世界！</p>
     </header>
 
     <!-- 頁籤導覽列 -->
     <div class="flex flex-wrap justify-center gap-1 sm:gap-2 mb-[-1px] px-2 relative z-10">
         <button onclick="switchTab('tab-table')" id="btn-tab-table" class="tab-btn active px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">互動位值表</button>
         <button onclick="switchTab('tab-reading')" id="btn-tab-reading" class="tab-btn px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">大數報讀</button>
-        <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="tab-btn px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">牛刀小試</button>
+        <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="tab-btn px-4 sm:px-6 py-2 sm:py-3 rounded-t-xl font-bold transition-all duration-300">隨堂測驗</button>
     </div>
 
     <!-- 互動區塊一：動態位值表 -->
@@ -288,12 +288,15 @@
     <!-- 互動區塊二：大數報讀練習 -->
     <section id="tab-reading" class="tab-content glass-card p-6 mb-8 hidden relative z-0">
         <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">🔍 大數畫線讀讀看</h2>
-        <p class="text-gray-600 mb-4">輸入一個大數，網頁會自動幫你「由右至左，每四位畫一條底線」，讓你更容易報讀！</p>
+        <p class="text-gray-600 mb-4">輸入一個大數（<span class="text-red-600 font-bold">最多八位數</span>），網頁會自動幫你「由右至左，每四位畫一條底線」，讓你更容易報讀！</p>
         
         <div class="flex flex-col md:flex-row gap-4 items-center">
             <input type="number" id="custom-number-input" class="border-2 border-blue-300 rounded-lg p-3 w-full md:w-64 text-xl focus:outline-none focus:border-blue-500" placeholder="輸入數字 (最高一億)" max="100000000" min="0">
             <button onclick="processCustomNumber()" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow-md w-full md:w-auto">幫我畫線！</button>
         </div>
+
+        <!-- 錯誤提示訊息顯示區塊 -->
+        <p id="reading-error-msg" class="mt-3 text-red-600 font-bold text-base hidden bg-red-50 p-3 rounded-lg border border-red-200"></p>
 
         <div id="formatted-result-area" class="mt-6 hidden">
             <div class="bg-blue-50 p-6 rounded-lg border border-blue-100 text-center">
@@ -307,9 +310,9 @@
         </div>
     </section>
 
-    <!-- 評量區塊：牛刀小試 -->
+    <!-- 評量區塊：隨堂測驗 -->
     <section id="tab-quiz" class="tab-content glass-card p-6 mb-8 hidden relative z-0">
-        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">🏆 牛刀小試</h2>
+        <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2 mb-6">🏆 隨堂測驗</h2>
         <p class="text-gray-600 mb-6">測驗看看你是否已經掌握了一億以內的數！</p>
         
         <div id="quiz-container">
@@ -318,13 +321,12 @@
 
         <div id="quiz-result" class="mt-6 hidden text-center p-4 rounded-lg bg-green-100 border border-green-300">
             <p class="text-xl font-bold text-green-800" id="quiz-score-msg"></p>
-            <button onclick="initQuiz()" class="mt-4 btn-hover bg-green-600 text-white px-6 py-2 rounded-full font-bold">再測驗一次</button>
+            <button onclick="initQuiz()" class="mt-4 btn-hover bg-green-600 text-white px-6 py-2 rounded-full font-bold">重新測驗</button>
         </div>
     </section>
     
     <!-- 頁尾 -->
     <footer class="text-center text-gray-500 text-sm mt-8 pb-4">
-        <p>本互動網頁專為協助理解「一億以內的數」所設計。</p>
     </footer>
 
 </div>
@@ -467,14 +469,38 @@
     // === 大數畫線讀讀看處理 ===
     function processCustomNumber() {
         const inputEle = document.getElementById('custom-number-input');
-        let val = parseInt(inputEle.value);
+        const errorMsg = document.getElementById('reading-error-msg');
+        const resultArea = document.getElementById('formatted-result-area');
         
-        if (isNaN(val) || val < 0 || val > 100000000) {
-            alert('請輸入 0 到 100,000,000 之間的有效整數！');
+        const rawVal = inputEle.value.trim();
+        let val = parseInt(rawVal, 10);
+
+        // 重置錯誤提示與結果畫面
+        errorMsg.classList.add('hidden');
+        errorMsg.innerText = '';
+
+        if (rawVal === '') {
+            errorMsg.innerText = '⚠️ 請輸入數字！';
+            errorMsg.classList.remove('hidden');
+            resultArea.classList.add('hidden');
             return;
         }
 
-        const resultArea = document.getElementById('formatted-result-area');
+        // 檢查首位數字是否為 0
+        if (rawVal.startsWith('0')) {
+            errorMsg.innerText = '⚠️ 首位數字不能為零';
+            errorMsg.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+            return;
+        }
+
+        if (isNaN(val) || val < 0 || val > 100000000) {
+            errorMsg.innerText = '⚠️ 請輸入 1 到 100,000,000 之間的有效整數！';
+            errorMsg.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+            return;
+        }
+
         const underlineDisplay = document.getElementById('underlined-display');
         const chineseDisplay = document.getElementById('custom-chinese-display');
         
@@ -511,27 +537,32 @@
         {
             question: "「10 個一萬」合起來是多少？",
             options: ["十萬", "一百萬", "一千萬", "一萬"],
-            answer: 0
+            answer: 0,
+            explanation: "10 個一萬是 10 萬（100,000）。"
         },
         {
             question: "數字「32013201」中，最左邊的 '3' 代表什麼位值？",
             options: ["三百萬", "三千萬", "三十萬", "三億"],
-            answer: 1
+            answer: 1,
+            explanation: "「32013201」是八位數，最左邊的 '3' 在千萬位，代表 3 個千萬（30,000,000）。"
         },
         {
             question: "請選出正確的讀法：「60054003」",
             options: ["六千萬零五萬四千零三", "六千零五萬四千零三", "六千零五十萬四千零三", "六千萬五萬四千三"],
-            answer: 1
+            answer: 1,
+            explanation: "60054003 切分成 6005 萬與 4003，中間連續的 0 讀作一個「零」，正確讀作「六千零五萬四千零三」。"
         },
         {
             question: "「七百八十萬零四十二」記作什麼？",
             options: ["7800042", "780042", "78000042", "780420"],
-            answer: 0
+            answer: 0,
+            explanation: "七百八十萬是 7800000，加上四十二（42），記作 7800042。"
         },
         {
             question: "1疊有10張千元鈔票，100疊是多少元？",
             options: ["10000元 (1萬)", "100000元 (10萬)", "1000000元 (100萬)", "10000000元 (1000萬)"],
-            answer: 2
+            answer: 2,
+            explanation: "1疊 = 10張千元 = 10,000元 (1萬)。100疊 = 100 × 1萬 = 1,000,000元 (100萬)。"
         }
     ];
 
@@ -546,6 +577,7 @@
         quizData.forEach((q, qIndex) => {
             const qDiv = document.createElement('div');
             qDiv.className = 'mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50';
+            qDiv.id = `q-card-${qIndex}`;
             
             const qTitle = document.createElement('h3');
             qTitle.className = 'font-bold text-lg mb-3 text-gray-800';
@@ -565,14 +597,34 @@
             });
             
             qDiv.appendChild(optionsDiv);
+
+            // 解析放置容器
+            const explanationDiv = document.createElement('div');
+            explanationDiv.id = `q${qIndex}-explanation`;
+            explanationDiv.className = 'mt-3 hidden';
+            qDiv.appendChild(explanationDiv);
+
             container.appendChild(qDiv);
         });
         
+        // 按鈕控制區 (提交答案 + 重新測驗) - 調整為縮小欄寬並並排置中
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'flex justify-center gap-4 mt-6';
+
         const submitBtn = document.createElement('button');
-        submitBtn.className = 'btn-hover w-full bg-blue-600 text-white font-bold py-3 rounded-lg mt-4';
-        submitBtn.innerText = '交卷對答案';
+        submitBtn.id = 'submit-quiz-btn';
+        submitBtn.className = 'btn-hover bg-blue-600 text-white font-bold px-6 sm:px-8 py-2.5 rounded-lg text-base sm:text-lg shadow-md';
+        submitBtn.innerText = '提交答案';
         submitBtn.onclick = checkQuizAnswers;
-        container.appendChild(submitBtn);
+        btnGroup.appendChild(submitBtn);
+
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'btn-hover bg-gray-500 text-white font-bold px-6 sm:px-8 py-2.5 rounded-lg text-base sm:text-lg shadow-md';
+        resetBtn.innerText = '重新測驗';
+        resetBtn.onclick = initQuiz;
+        btnGroup.appendChild(resetBtn);
+
+        container.appendChild(btnGroup);
     }
 
     function selectOption(qIndex, optIndex, btnEle) {
@@ -587,34 +639,53 @@
     }
 
     function checkQuizAnswers() {
-        // 檢查是否全答
-        if (currentQuizAnswers.includes(null)) {
-            alert("請回答完所有問題再交卷喔！");
-            return;
-        }
-
         let score = 0;
+        const totalPossibleScore = 100; // 滿分設定為 100 分
+        const pointsPerQuestion = totalPossibleScore / quizData.length; // 每題 20 分
         
         quizData.forEach((q, qIndex) => {
             const userAns = currentQuizAnswers[qIndex];
             const correctAns = q.answer;
+            const explanationBox = document.getElementById(`q${qIndex}-explanation`);
+            explanationBox.classList.remove('hidden');
             
-            // 標示正確與錯誤
-            const userBtn = document.getElementById(`q${qIndex}-opt${userAns}`);
-            const correctBtn = document.getElementById(`q${qIndex}-opt${correctAns}`);
-            
-            if (userAns === correctAns) {
-                score += 20;
-                userBtn.classList.add('correct');
-            } else {
-                userBtn.classList.add('incorrect');
-                correctBtn.classList.add('correct'); // 顯示正確答案給學生看
-            }
-            
-            // 停用所有按鈕
+            // 停用所有按鈕選項
             for(let i=0; i<q.options.length; i++) {
-                document.getElementById(`q${qIndex}-opt${i}`).disabled = true;
-                document.getElementById(`q${qIndex}-opt${i}`).style.cursor = 'default';
+                const optBtn = document.getElementById(`q${qIndex}-opt${i}`);
+                optBtn.disabled = true;
+                optBtn.style.cursor = 'default';
+            }
+
+            if (userAns === null) {
+                // 未作答狀況：僅顯示 "未作答。" (黃色系)，不顯示其他說明與正確答案
+                explanationBox.innerHTML = `
+                    <div class="p-3 rounded-lg bg-yellow-50 border border-yellow-300 text-yellow-800 font-bold text-sm">
+                        ⚠️ 未作答。
+                    </div>`;
+            } else if (userAns === correctAns) {
+                // 答對狀況
+                score += pointsPerQuestion;
+                const userBtn = document.getElementById(`q${qIndex}-opt${userAns}`);
+                userBtn.classList.add('correct');
+                
+                explanationBox.innerHTML = `
+                    <div class="p-3 rounded-lg bg-green-50 border border-green-300 text-green-800 text-sm">
+                        <p class="font-bold mb-1">✅ 答對了！</p>
+                        <p>${q.explanation}</p>
+                    </div>`;
+            } else {
+                // 答錯狀況
+                const userBtn = document.getElementById(`q${qIndex}-opt${userAns}`);
+                const correctBtn = document.getElementById(`q${qIndex}-opt${correctAns}`);
+                
+                userBtn.classList.add('incorrect');
+                correctBtn.classList.add('correct'); // 顯示正確選項
+
+                explanationBox.innerHTML = `
+                    <div class="p-3 rounded-lg bg-red-50 border border-red-300 text-red-800 text-sm">
+                        <p class="font-bold mb-1">❌ 答錯了！正確答案為：${q.options[correctAns]}</p>
+                        <p>${q.explanation}</p>
+                    </div>`;
             }
         });
         
@@ -623,15 +694,16 @@
         
         resultDiv.classList.remove('hidden');
         if (score === 100) {
-            scoreMsg.innerText = `太棒了！滿分 ${score} 分！你已經完全掌握大數了！`;
+            scoreMsg.innerText = `太棒了！獲得滿分 ${score} / ${totalPossibleScore} 分！你已經完全掌握大數了！`;
         } else if (score >= 60) {
-            scoreMsg.innerText = `不錯喔！得到 ${score} 分。看看錯的地方，再接再厲！`;
+            scoreMsg.innerText = `得分：${score} / ${totalPossibleScore} 分。表現不錯，看看解析繼續加油！`;
         } else {
-            scoreMsg.innerText = `獲得 ${score} 分。沒關係，多練習幾次，你一定會進步的！`;
+            scoreMsg.innerText = `得分：${score} / ${totalPossibleScore} 分。再多練習幾次，你一定會更進步！`;
         }
         
-        // 隱藏交卷按鈕
-        event.target.classList.add('hidden');
+        // 隱藏獨立的提交按鈕
+        const submitBtn = document.getElementById('submit-quiz-btn');
+        if (submitBtn) submitBtn.classList.add('hidden');
     }
 
     // 網頁載入完成後執行初始化

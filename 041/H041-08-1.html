@@ -11,6 +11,10 @@
     <!-- Google Fonts: Noto Sans TC -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        *, input, button, select, textarea {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background: linear-gradient(180deg, #1e3c72 0%, #2a5298 35%, #6dd5ed 70%, #ffffff 100%);
@@ -104,7 +108,7 @@
             <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-blue-900 pointer-events-none">
                 <i class="fa-solid fa-calculator"></i>
             </div>
-            <span class="inline-block px-4 py-1 bg-blue-600 text-white font-bold rounded-full text-xs tracking-wider mb-2 shadow">國小四年級數學 8-1 互動教學網頁</span>
+            <span class="inline-block px-4 py-1 bg-blue-600 text-white font-bold rounded-full text-xs tracking-wider mb-2 shadow">國小四上數學 8-1 互動學習網頁</span>
             <h1 class="text-3xl md:text-4xl font-extrabold text-blue-950 tracking-wide mb-2">
                 ✨ 兩步驟併式與括號魔法教室
             </h1>
@@ -121,7 +125,7 @@
                     <i class="fa-solid fa-store mr-2"></i>情境 2：兩中解法與括號位置
                 </button>
                 <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-5 py-2.5 rounded-2xl font-bold text-sm transition-all bg-white/80 text-slate-700 hover:bg-white shadow">
-                    <i class="fa-solid fa-graduation-cap mr-2"></i>隨堂小測驗 (5題)
+                    <i class="fa-solid fa-graduation-cap mr-2"></i>隨堂測驗
                 </button>
             </div>
         </header>
@@ -285,8 +289,35 @@
                         </div>
 
                         <div class="bg-white/80 rounded-xl p-3 mb-3 text-sm space-y-1 font-mono">
-                            <div>先算：<span id="pipi-s1">48 - 12 = 36</span></div>
-                            <div>再算：<span id="pipi-s2">36 - 8 = 28</span></div>
+                            <div>先算：<span id="pipi-s1">48 － 12 = 36</span></div>
+                            <div>再算：<span id="pipi-s2">36 － 8 = 28</span></div>
+                        </div>
+
+                        <div class="bg-blue-600 text-white p-3 rounded-xl font-mono text-center font-bold text-lg">
+                            併式：<span id="pipi-combined">(48 － 12) － 8 = 28</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">
+                            💡 括號 <span class="font-mono font-bold text-blue-700">(48 － 12)</span> 表示阿姨拿走後剩下的瓶數。
+                        </p>
+                    </div>
+
+                    <!-- Meimei's Method -->
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-5 shadow-sm relative">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <span class="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm">美</span>
+                            <div>
+                                <h3 class="font-bold text-amber-950">美美的解法：先加總再扣</h3>
+                                <div class="text-xs text-amber-700">（先算兩人一共拿走幾瓶，再統一扣除）</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/80 rounded-xl p-3 mb-3 text-sm space-y-1 font-mono">
+                            <div>先算：<span id="meimei-s1">12 + 8 = 20</span></div>
+                            <div>再算：<span id="meimei-s2">48 － 20 = 28</span></div>
+                        </div>
+
+                        <div class="bg-amber-600 text-white p-3 rounded-xl font-mono text-center font-bold text-lg">
+                            併式：<span id="meimei-combined">48 － (12 + 8) = 28</span>
                         </div>
 
                         <div class="bg-blue-600 text-white p-3 rounded-xl font-mono text-center font-bold text-lg">
@@ -342,7 +373,7 @@
                             <i class="fa-solid fa-pen-ruler"></i>
                         </div>
                         <div>
-                            <h2 class="text-xl font-bold text-slate-800">併式學習效果測驗</h2>
+                            <h2 class="text-xl font-bold text-slate-800">隨堂測驗</h2>
                             <p class="text-xs text-slate-500">回答以下 5 道題目，獲得即時學習評量回饋！</p>
                         </div>
                     </div>
@@ -357,12 +388,12 @@
                 </div>
 
                 <!-- Submit & Reset Buttons -->
-                <div class="mt-8 text-center space-x-4">
-                    <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition transform hover:-translate-y-0.5">
-                        <i class="fa-solid fa-paper-plane mr-2"></i>提交答案並評分
+                <div class="mt-8 flex justify-center items-center gap-4 max-w-md mx-auto">
+                    <button onclick="checkQuizAnswers()" class="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition transform hover:-translate-y-0.5 text-center">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>提交答案
                     </button>
-                    <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition">
-                        <i class="fa-solid fa-rotate-right mr-2"></i>重新作答
+                    <button onclick="resetQuiz()" class="flex-1 py-3 px-6 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition text-center">
+                        <i class="fa-solid fa-rotate-right mr-2"></i>重新測驗
                     </button>
                 </div>
 
@@ -453,10 +484,10 @@
                 document.getElementById('step1-expr').innerHTML = `${v1} + ${v2} = <span class="text-amber-400 font-bold">${step1Result}</span>`;
                 document.getElementById('step1-desc').innerText = "放進去之後的總杯數";
 
-                document.getElementById('step2-expr').innerHTML = `<span class="text-amber-400 font-bold">${step1Result}</span> - ${v3} = <span class="text-emerald-400 font-bold">${finalResult}</span>`;
+                document.getElementById('step2-expr').innerHTML = `<span class="text-amber-400 font-bold">${step1Result}</span> － ${v3} = <span class="text-emerald-400 font-bold">${finalResult}</span>`;
                 document.getElementById('step2-desc').innerText = "賣掉後剩下的杯數";
 
-                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} + ${v2}</span>) - ${v3} = <span class="text-amber-300">${finalResult}</span>`;
+                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} + ${v2}</span>) － ${v3} = <span class="text-amber-300">${finalResult}</span>`;
                 document.getElementById('combined-explanation').innerHTML = `因為 <span class="text-amber-300 font-bold font-mono">${step1Result}</span> 是由 <span class="text-cyan-300 font-bold font-mono">(${v1} + ${v2})</span> 算出來的，所以將 ${step1Result} 用 <span class="text-cyan-300 font-bold font-mono">(${v1} + ${v2})</span> 替換！`;
             } else {
                 // SubThenAdd 模式：防負數機制（借出數 v2 不可大於原本書本數 v1）
@@ -472,14 +503,14 @@
                 document.getElementById('disp-val2').innerText = v2;
                 document.getElementById('disp-val3').innerText = v3;
 
-                document.getElementById('step1-expr').innerHTML = `${v1} - ${v2} = <span class="text-amber-400 font-bold">${step1Result}</span>`;
+                document.getElementById('step1-expr').innerHTML = `${v1} － ${v2} = <span class="text-amber-400 font-bold">${step1Result}</span>`;
                 document.getElementById('step1-desc').innerText = "借出之後剩下的書本數";
 
                 document.getElementById('step2-expr').innerHTML = `<span class="text-amber-400 font-bold">${step1Result}</span> + ${v3} = <span class="text-emerald-400 font-bold">${finalResult}</span>`;
                 document.getElementById('step2-desc').innerText = "再放進後現在的書本數";
 
-                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} - ${v2}</span>) + ${v3} = <span class="text-amber-300">${finalResult}</span>`;
-                document.getElementById('combined-explanation').innerHTML = `因為 <span class="text-amber-300 font-bold font-mono">${step1Result}</span> 是由 <span class="text-cyan-300 font-bold font-mono">(${v1} - ${v2})</span> 算出來的，所以將 ${step1Result} 用 <span class="text-cyan-300 font-bold font-mono">(${v1} - ${v2})</span> 替換！`;
+                document.getElementById('combined-expr-text').innerHTML = `(<span class="text-cyan-300">${v1} － ${v2}</span>) + ${v3} = <span class="text-amber-300">${finalResult}</span>`;
+                document.getElementById('combined-explanation').innerHTML = `因為 <span class="text-amber-300 font-bold font-mono">${step1Result}</span> 是由 <span class="text-cyan-300 font-bold font-mono">(${v1} － ${v2})</span> 算出來的，所以將 ${step1Result} 用 <span class="text-cyan-300 font-bold font-mono">(${v1} － ${v2})</span> 替換！`;
             }
         }
 
@@ -508,16 +539,16 @@
             // Pipi: (total - aunt) - mom
             const pipiS1 = total - aunt;
             const pipiFinal = Math.max(0, pipiS1 - mom);
-            document.getElementById('pipi-s1').innerText = `${total} - ${aunt} = ${pipiS1}`;
-            document.getElementById('pipi-s2').innerText = `${pipiS1} - ${mom} = ${pipiFinal}`;
-            document.getElementById('pipi-combined').innerText = `(${total} - ${aunt}) - ${mom} = ${pipiFinal}`;
+            document.getElementById('pipi-s1').innerText = `${total} － ${aunt} = ${pipiS1}`;
+            document.getElementById('pipi-s2').innerText = `${pipiS1} － ${mom} = ${pipiFinal}`;
+            document.getElementById('pipi-combined').innerText = `(${total} － ${aunt}) － ${mom} = ${pipiFinal}`;
 
             // Meimei: total - (aunt + mom)
             const meimeiS1 = aunt + mom;
             const meimeiFinal = Math.max(0, total - meimeiS1);
             document.getElementById('meimei-s1').innerText = `${aunt} + ${mom} = ${meimeiS1}`;
-            document.getElementById('meimei-s2').innerText = `${total} - ${meimeiS1} = ${meimeiFinal}`;
-            document.getElementById('meimei-combined').innerText = `${total} - (${aunt} + ${mom}) = ${meimeiFinal}`;
+            document.getElementById('meimei-s2').innerText = `${total} － ${meimeiS1} = ${meimeiFinal}`;
+            document.getElementById('meimei-combined').innerText = `${total} － (${aunt} + ${mom}) = ${meimeiFinal}`;
 
             document.getElementById('final-result-sync').innerText = pipiFinal;
         }
@@ -527,10 +558,10 @@
                 id: 1,
                 question: "冰箱裡原本有 75 杯綠豆沙，又放進 25 杯，賣掉 70 杯後，還剩下幾杯？下列哪一個併式最正確？",
                 options: [
-                    "( 75 + 25 ) - 70 = 30",
-                    "75 + ( 25 - 70 ) = 30",
-                    "( 75 - 70 ) + 25 = 30",
-                    "75 + 25 - 70"
+                    "( 75 + 25 ) － 70 = 30",
+                    "75 + ( 25 － 70 ) = 30",
+                    "( 75 － 70 ) + 25 = 30",
+                    "75 + 25 － 70"
                 ],
                 answer: 0,
                 explanation: "題目要先算『放進去後的總數』(75 + 25)，所以需要將 (75 + 25) 加括號先算，再減去 70。"
@@ -539,49 +570,49 @@
                 id: 2,
                 question: "書架上原有 128 本書，借出 24 本後，又放進 15 本。將兩步驟合在一起寫成併式，應該記作什麼？",
                 options: [
-                    "128 - ( 24 + 15 ) = 119",
-                    "( 128 - 24 ) + 15 = 119",
-                    "( 128 + 15 ) - 24 = 119",
-                    "128 - 24 + 15 = 119"
+                    "128 － ( 24 + 15 ) = 119",
+                    "( 128 － 24 ) + 15 = 119",
+                    "( 128 + 15 ) － 24 = 119",
+                    "128 － 24 + 15 = 119"
                 ],
                 answer: 1,
-                explanation: "先算借出後的數量為 (128 - 24)，再加上又放進的 15 本，故併式為 ( 128 - 24 ) + 15 = 119。"
+                explanation: "先算借出後的數量為 (128 － 24)，再加上又放進的 15 本，故併式為 ( 128 － 24 ) + 15 = 119。"
             },
             {
                 id: 3,
                 question: "一個湯鍋原價 1250 元，打折後比原價便宜了 125 元。媽媽付了 1500 元，會找回多少元？併式應為？",
                 options: [
-                    "( 1500 - 1250 ) - 125 = 125",
-                    "1500 - ( 1250 - 125 ) = 375",
-                    "1250 - ( 1500 - 125 ) = 375",
-                    "( 1250 - 125 ) - 1500 = 375"
+                    "( 1500 － 1250 ) － 125 = 125",
+                    "1500 － ( 1250 － 125 ) = 375",
+                    "1250 － ( 1500 － 125 ) = 375",
+                    "( 1250 － 125 ) － 1500 = 375"
                 ],
                 answer: 1,
-                explanation: "要算出找回的錢，必須先算出折價後的售價 (1250 - 125)，再用付的 1500 元去減，即 1500 - ( 1250 - 125 ) = 375。"
+                explanation: "要算出找回的錢，必須先算出折價後的售價 (1250 － 125)，再用付的 1500 元去減，即 1500 － ( 1250 － 125 ) = 375。"
             },
             {
                 id: 4,
                 question: "一箱果汁 48 瓶，阿姨拿走 12 瓶，媽媽拿走 8 瓶。若美美想『先算出兩人一共拿走幾瓶』，她的併式應為？",
                 options: [
-                    "( 48 - 12 ) - 8 = 28",
-                    "48 - 12 + 8 = 44",
-                    "48 - ( 12 + 8 ) = 28",
-                    "( 48 - 8 ) - 12 = 28"
+                    "( 48 － 12 ) － 8 = 28",
+                    "48 － 12 + 8 = 44",
+                    "48 － ( 12 + 8 ) = 28",
+                    "( 48 － 8 ) － 12 = 28"
                 ],
                 answer: 2,
-                explanation: "先算兩人拿走總數 (12 + 8)，再從 48 瓶扣除，併式記為 48 - ( 12 + 8 ) = 28。"
+                explanation: "先算兩人拿走總數 (12 + 8)，再從 48 瓶扣除，併式記為 48 － ( 12 + 8 ) = 28。"
             },
             {
                 id: 5,
                 question: "哥哥原有 130 元，買早餐花掉 65 元，媽媽又給哥哥 100 元，現在哥哥有幾元？併式應寫成？",
                 options: [
-                    "( 130 - 65 ) + 100 = 165",
-                    "130 - ( 65 + 100 ) = 165",
-                    "( 130 + 100 ) - 65 = 165",
-                    "130 - 65 = 65"
+                    "( 130 － 65 ) + 100 = 165",
+                    "130 － ( 65 + 100 ) = 165",
+                    "( 130 + 100 ) － 65 = 165",
+                    "130 － 65 = 65"
                 ],
                 answer: 0,
-                explanation: "先算花掉早餐後的錢 (130 - 65)，再加上媽媽給的 100 元，併式為 ( 130 - 65 ) + 100 = 165。"
+                explanation: "先算花掉早餐後的錢 (130 － 65)，再加上媽媽給的 100 元，併式為 ( 130 － 65 ) + 100 = 165。"
             }
         ];
 
@@ -597,7 +628,7 @@
                         ${q.options.map((opt, oIdx) => `
                             <label class="flex items-center p-3 rounded-xl border border-slate-200 bg-white hover:bg-purple-50 cursor-pointer transition">
                                 <input type="radio" name="q_${q.id}" value="${oIdx}" class="w-4 h-4 text-purple-600 focus:ring-purple-500">
-                                <span class="ml-3 text-sm font-mono text-slate-700 font-medium">${opt}</span>
+                                <span class="ml-3 text-sm text-slate-700 font-medium">${opt}</span>
                             </label>
                         `).join('')}
                     </div>
@@ -613,12 +644,12 @@
             quizData.forEach(q => {
                 const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 const fb = document.getElementById(`feedback-${q.id}`);
-                fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+                fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
 
                 if (!selected) {
                     answeredAll = false;
                     fb.classList.add('bg-amber-100', 'text-amber-800');
-                    fb.innerHTML = `⚠️ 請選擇此題答案。`;
+                    fb.innerHTML = `未作答。`;
                     fb.classList.remove('hidden');
                     return;
                 }

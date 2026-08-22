@@ -106,7 +106,7 @@
         <!-- 頂部標題區 -->
         <header class="shinkai-glass rounded-3xl p-6 md:p-8 text-center relative overflow-hidden">
             <div class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-bold mb-3 tracking-wide shadow-sm">
-                <i class="fa-solid font-sparkles mr-1"></i> 國小數學互動探究實驗室
+                <i class="fa-solid fa-sparkles mr-1"></i> 國小四上數學 2-2 互動學習網頁
             </div>
             <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight mb-2">
                 乘以三位數 <span class="text-shinkai-gradient">& 整百倍拆解</span>
@@ -125,7 +125,7 @@
                 <i class="fa-solid fa-puzzle-piece text-pink-500"></i> 觀念動態挑戰
             </button>
             <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="px-5 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 bg-white/80 text-slate-700 hover:bg-white hover:shadow-md">
-                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 歷程性小試身手
+                <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 隨堂測驗
             </button>
         </div>
 
@@ -317,7 +317,7 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200/80 pb-4 gap-2">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 歷程性小試身手（5 題）
+                        <i class="fa-solid fa-graduation-cap text-indigo-600"></i> 隨堂測驗
                     </h2>
                     <p class="text-xs text-slate-500 mt-1">即時檢測你的學習成效，答題後可獲得精準解析！</p>
                 </div>
@@ -332,9 +332,12 @@
                 <!-- 測驗題目由 JavaScript 動態渲染 -->
             </div>
 
-            <div class="text-center pt-4">
+            <div class="text-center pt-4 flex justify-center gap-3">
+                <button onclick="submitQuiz()" class="btn-shinkai px-6 py-2.5 font-bold text-sm rounded-xl">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> 提交答案
+                </button>
                 <button onclick="resetQuiz()" class="px-6 py-2.5 bg-slate-200 text-slate-700 font-bold text-sm rounded-xl hover:bg-slate-300 transition">
-                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新作答所有題目
+                    <i class="fa-solid fa-rotate-right mr-1"></i> 重新測驗
                 </button>
             </div>
         </section>
@@ -481,20 +484,20 @@
             document.getElementById('row-step1').innerHTML = formatDigitRow(p1, '', 'text-emerald-600');
             document.getElementById('step1-desc').innerText = `${currentA} × ${digitOnes} = ${p1} (${p1} 個一)`;
 
-            // 第二層（十位）
+            // 第二層（十位：個位 0 改為灰色）
             const step2Card = document.getElementById('step2-card');
             if (digitTens === 0) {
                 document.getElementById('row-step2').innerHTML = formatDigitRow('000', '', 'text-slate-300 line-through');
                 document.getElementById('step2-desc').innerText = `${currentA} × 0 = 0 (十位為 0 可簡略)`;
                 step2Card.classList.add('opacity-50');
             } else {
-                document.getElementById('row-step2').innerHTML = formatDigitRow(p2, '', 'text-amber-600');
+                document.getElementById('row-step2').innerHTML = formatDigitRow(p2, '', 'text-amber-600', 1);
                 document.getElementById('step2-desc').innerText = `${currentA} × ${digitTens * 10} = ${p2} (${p2 / 10} 個十)`;
                 step2Card.classList.remove('opacity-50');
             }
 
-            // 第三層（百位）
-            document.getElementById('row-step3').innerHTML = formatDigitRow(p3, '', 'text-sky-600');
+            // 第三層（百位：個位與十位 00 改為灰色）
+            document.getElementById('row-step3').innerHTML = formatDigitRow(p3, '', 'text-sky-600', 2);
             document.getElementById('step3-desc').innerText = `${currentA} × ${digitHundreds * 100} = ${p3} (${p3 / 100} 個百)`;
 
             // 總計
@@ -511,7 +514,7 @@
         }
 
         // 將數字格式化為 6 格對齊的 HTML 數字格
-        function formatDigitRow(value, operator = '', customColor = '') {
+        function formatDigitRow(value, operator = '', customColor = '', mutedTailCount = 0) {
             const strVal = String(value);
             const maxLen = 6;
             const padLen = maxLen - strVal.length;
@@ -530,9 +533,14 @@
                 html += `<div class="digit-cell"></div>`;
             }
 
-            // 填入數字字元
-            for (let char of strVal) {
-                html += `<div class="digit-cell ${customColor}">${char}</div>`;
+            // 填入數字字元，末尾 mutedTailCount 個 0 顯示為灰色
+            for (let i = 0; i < strVal.length; i++) {
+                const char = strVal[i];
+                if (mutedTailCount > 0 && i >= strVal.length - mutedTailCount) {
+                    html += `<div class="digit-cell text-slate-400 font-bold">${char}</div>`;
+                } else {
+                    html += `<div class="digit-cell ${customColor}">${char}</div>`;
+                }
             }
 
             return html;
@@ -566,7 +574,7 @@
                 q.options.forEach((opt, optIndex) => {
                     optionsHTML += `
                         <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-indigo-50/50 cursor-pointer transition">
-                            <input type="radio" name="quiz-${q.id}" value="${optIndex}" onchange="selectAnswer(${q.id}, ${optIndex})" class="w-4 h-4 text-indigo-600 accent-indigo-600">
+                            <input type="radio" name="quiz-${q.id}" value="${optIndex}" onchange="recordAnswer(${q.id}, ${optIndex})" class="w-4 h-4 text-indigo-600 accent-indigo-600">
                             <span class="text-sm text-slate-700 font-medium">${opt}</span>
                         </label>
                     `;
@@ -584,31 +592,34 @@
             });
         }
 
-        // 選擇答案與即時對錯評量
-        function selectAnswer(qId, selectedIdx) {
+        // 記錄選擇的答案
+        function recordAnswer(qId, selectedIdx) {
             userQuizAnswers[qId] = selectedIdx;
-            const q = quizData.find(item => item.id === qId);
-            const explainElem = document.getElementById(`explain-${qId}`);
-
-            explainElem.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'bg-rose-50', 'text-rose-800');
-
-            if (selectedIdx === q.answer) {
-                explainElem.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
-                explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-check text-emerald-600"></i> 回答正確！</span> ${q.explanation}`;
-            } else {
-                explainElem.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
-                explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-xmark text-rose-500"></i> 答案不對喔！</span> ${q.explanation}`;
-            }
-
-            calculateScore();
         }
 
-        // 計算總分
-        function calculateScore() {
+        // 提交答案與對錯評量
+        function submitQuiz() {
             let score = 0;
             quizData.forEach(q => {
-                if (userQuizAnswers[q.id] === q.answer) {
+                const explainElem = document.getElementById(`explain-${q.id}`);
+                const selectedIdx = userQuizAnswers[q.id];
+
+                // 先重置 class 並顯示元素
+                explainElem.className = 'p-3 rounded-xl text-xs leading-relaxed mt-2 block';
+
+                if (selectedIdx === undefined) {
+                    // 未作答
+                    explainElem.classList.add('bg-amber-50', 'text-amber-800', 'border', 'border-amber-200');
+                    explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 未作答。</span>`;
+                } else if (selectedIdx === q.answer) {
+                    // 答對
+                    explainElem.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+                    explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-check text-emerald-600"></i> 回答正確！</span> ${q.explanation}`;
                     score += 20;
+                } else {
+                    // 答錯
+                    explainElem.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+                    explainElem.innerHTML = `<span class="font-bold"><i class="fa-solid fa-circle-xmark text-rose-500"></i> 答案不對喔！</span> ${q.explanation}`;
                 }
             });
             document.getElementById('quiz-score').innerText = score;

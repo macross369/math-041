@@ -113,7 +113,7 @@
         <!-- Header Section -->
         <header class="text-center py-6 px-4 shinkai-card bg-opacity-90">
             <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 font-bold rounded-full text-xs sm:text-sm mb-2 shadow-inner">
-                國小四年級數學 10-3 互動學習網頁
+                國小四上數學 10-3 互動學習網頁
             </span>
             <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2">
                 <span class="shinkai-header-title">折線圖報讀與觀察</span>
@@ -137,7 +137,7 @@
                     探究三：省略符號波浪線 (軸線縮放)
                 </button>
                 <button id="tab-quiz-btn" onclick="switchTab('quiz')" class="tab-btn px-4 py-2.5 rounded-xl font-bold text-sm sm:text-base bg-amber-500 text-white hover:bg-amber-600">
-                    🎯 歷程性小測驗 (5題)
+                    🎯 隨堂測驗
                 </button>
             </div>
         </header>
@@ -503,7 +503,7 @@
         <section id="tab-quiz" class="shinkai-card p-4 sm:p-8 hidden">
             <div class="max-w-3xl mx-auto space-y-6">
                 <div class="text-center space-y-2 border-b pb-4 border-gray-200">
-                    <h2 class="text-2xl sm:text-3xl font-black text-indigo-900">🎯 折線圖核心素養測驗</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-indigo-900">🎯 隨堂測驗</h2>
                     <p class="text-xs sm:text-sm text-gray-500">共 5 題，測試你對折線圖報讀、趨勢與省略符號的理解！</p>
                 </div>
 
@@ -512,13 +512,16 @@
                     <!-- Questions will be dynamically rendered -->
                 </div>
 
-                <!-- Quiz Submit and Results -->
-                <div class="text-center pt-4 border-t border-gray-200">
+                <!-- Quiz Submit and Reset Buttons -->
+                <div class="flex flex-wrap justify-center gap-4 pt-4 border-t border-gray-200">
                     <button onclick="checkQuizAnswers()" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black rounded-xl text-base shadow-lg hover:opacity-90 transform hover:-translate-y-0.5 transition">
-                        提交答案並評分
+                        提交答案
                     </button>
-                    <div id="quiz-result" class="mt-4 p-4 rounded-xl text-center hidden"></div>
+                    <button onclick="resetQuiz()" class="px-8 py-3 bg-slate-600 text-white font-black rounded-xl text-base shadow-lg hover:bg-slate-700 transform hover:-translate-y-0.5 transition">
+                        重新測驗
+                    </button>
                 </div>
+                <div id="quiz-result" class="mt-4 p-4 rounded-xl text-center hidden"></div>
             </div>
         </section>
 
@@ -566,35 +569,35 @@
                 question: "1. 在「阿里山6月15日8時到17時氣溫折線圖」中，縱軸每一小格代表多少氣溫？",
                 options: ["1 度", "2 度", "5 度", "10 度"],
                 answer: 0,
-                explanation: "正確！觀察縱軸刻度標記（15、16、17...25），每 1 小格代表 1 度。"
+                explanation: "觀察縱軸刻度標記（15、16、17...25），每 1 小格代表 1 度。"
             },
             {
                 id: 2,
                 question: "2. 阿里山氣溫折線圖中，哪兩個相鄰時刻氣溫「上升最多」？",
                 options: ["8時到9時", "9時到10時", "11時到12時", "12時到13時"],
                 answer: 2,
-                explanation: "正確！11時為21度，12時升至23度，相差2度，折線右斜上升最陡峭。"
+                explanation: "11時為21度，12時升至23度，相差2度，折線右斜上升最陡峭。"
             },
             {
                 id: 3,
                 question: "3. 觀察黑面琵鷺統計折線圖，民國107年哪兩個縣市的黑面琵鷺數量最接近？",
                 options: ["臺南市與嘉義縣", "嘉義縣與高雄市", "臺南市與高雄市", "三縣市數量都一樣"],
                 answer: 0,
-                explanation: "正確！107年臺南市(1265)與嘉義縣(559)在圖表上的折線距離最接近。"
+                explanation: "107年臺南市(1265)與嘉義縣(559)在圖表上的折線距離最接近。"
             },
             {
                 id: 4,
                 question: "4. 在妹妹身高折線圖中，為什麼縱軸 0~45cm 之間可以使用波浪省略符號？",
                 options: ["因為妹妹的身高只有45cm", "因為出生時身高為50cm，0~45cm之間完全沒有資料", "因為波浪線看起來比較漂亮", "為了把數據隱藏起來"],
                 answer: 1,
-                explanation: "正確！因為0~45cm之間沒有任何數據點，使用波浪省略符號可放大45cm以上的起伏。"
+                explanation: "因為0~45cm之間沒有任何數據點，使用波浪省略符號可放大45cm以上的起伏。"
             },
             {
                 id: 5,
                 question: "5. 當長條圖縱軸使用省略符號（從20開始）時，丹丹看到綠色長條高度是橘色的2倍，直接說人數也是2倍，這樣說對嗎？",
                 options: ["對，視覺高度多大倍數就是幾倍", "不對，因為省略了下方區域，使高度比例被放大，真實比例需看數據（30與20人為1.5倍）", "對，長條圖不需要從0開始看", "不一定，要看顏色決定"],
                 answer: 1,
-                explanation: "正確！當縱軸省略下方部分時，長條高度不代表實際數值的倍數關係，這是常見的視覺高度陷阱。"
+                explanation: "當縱軸省略下方部分時，長條高度不代表實際數值的倍數關係，這是常見的視覺高度陷阱。"
             }
         ];
 
@@ -1352,13 +1355,19 @@
             quizData.forEach(q => {
                 const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
                 const feedbackEl = document.getElementById(`feedback-${q.id}`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
 
-                if (selected && parseInt(selected.value) === q.answer) {
+                if (!selected) {
+                    // Blank answer handling
+                    feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+                    feedbackEl.innerHTML = `⚠️ 未作答。`;
+                } else if (parseInt(selected.value) === q.answer) {
+                    // Correct answer
                     score += 20;
                     feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
-                    feedbackEl.innerHTML = `✅ ${q.explanation}`;
+                    feedbackEl.innerHTML = `✅ 正確！${q.explanation}`;
                 } else {
+                    // Wrong answer
                     feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
                     feedbackEl.innerHTML = `❌ 解答說明：${q.explanation}`;
                 }
@@ -1368,6 +1377,29 @@
             resultDiv.classList.remove('hidden');
             resultDiv.className = `mt-4 p-4 rounded-xl text-center font-bold text-lg ${score >= 80 ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`;
             resultDiv.innerHTML = `🏆 您的總得分：${score} 分 / 100 分！ ${score === 100 ? '太棒了，完全掌握折線圖！' : '繼續加油，點擊上面的探究頁面再試試看吧！'}`;
+        }
+
+        function resetQuiz() {
+            // Uncheck all radio buttons
+            document.querySelectorAll('#quiz-container input[type="radio"]').forEach(el => {
+                el.checked = false;
+            });
+
+            // Hide and clear feedback messages
+            quizData.forEach(q => {
+                const feedbackEl = document.getElementById(`feedback-${q.id}`);
+                if (feedbackEl) {
+                    feedbackEl.classList.add('hidden');
+                    feedbackEl.innerHTML = '';
+                }
+            });
+
+            // Hide overall score box
+            const resultDiv = document.getElementById('quiz-result');
+            if (resultDiv) {
+                resultDiv.classList.add('hidden');
+                resultDiv.innerHTML = '';
+            }
         }
 
         function updateAlishanCustomChart(val) {

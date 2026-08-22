@@ -114,7 +114,7 @@
         <header class="text-center mb-6">
             <div class="inline-flex items-center gap-2 bg-indigo-900/60 text-indigo-100 px-4 py-1.5 rounded-full text-sm backdrop-blur-md border border-indigo-300/30 mb-3">
                 <i class="fa-solid fa-graduation-cap text-pink-400"></i>
-                <span>國小數學 7-2 畫三角形 互動探究教材</span>
+                <span>國小四上數學 7-2 互動學習網頁</span>
             </div>
             <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-wide drop-shadow-md">
                 畫三角形與幾何性質探究
@@ -140,7 +140,7 @@
             </button>
             <button onclick="switchTab('tab-quiz')" id="btn-tab-quiz" class="glass-tab px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm md:text-base">
                 <i class="fa-solid fa-circle-question"></i>
-                <span>4. 隨堂觀念診斷測驗</span>
+                <span>4. 隨堂測驗</span>
             </button>
         </nav>
 
@@ -225,7 +225,7 @@
                             <h2 class="text-xl font-bold text-indigo-950">夾角與兩腰 (邊長) 動態探究器</h2>
                         </div>
                         <p class="text-slate-600 text-sm">
-                            調整 <b class="text-indigo-600">頂角 ∠A</b> 與兩邊長 <b class="text-pink-600">AB、AC</b>，即時觀察三角形形狀變化！
+                            調整 <b class="text-indigo-600">頂角 ∠A</b> 與兩邊長 <b class="text-pink-600"><span style="text-decoration:overline">AB</span>、<span style="text-decoration:overline">AC</span></b>，即時觀察三角形形狀變化！
                         </p>
 
                         <!-- Slider 1: Angle A -->
@@ -248,7 +248,7 @@
                         <div class="bg-white/80 p-4 rounded-xl border border-indigo-100 shadow-sm">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-ruler-horizontal text-pink-500"></i> 邊長 AB (腰/鄰邊)：
+                                    <i class="fa-solid fa-ruler-horizontal text-pink-500"></i> 邊長 <span style="text-decoration:overline">AB</span> (腰/鄰邊)：
                                 </label>
                                 <span id="val-sideAB" class="font-black text-pink-600 text-lg">3.0 cm</span>
                             </div>
@@ -259,7 +259,7 @@
                         <div class="bg-white/80 p-4 rounded-xl border border-indigo-100 shadow-sm">
                             <div class="flex justify-between items-center mb-2">
                                 <label class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-ruler-horizontal text-emerald-500"></i> 邊長 AC (腰/鄰邊)：
+                                    <i class="fa-solid fa-ruler-horizontal text-emerald-500"></i> 邊長 <span style="text-decoration:overline">AC</span> (腰/鄰邊)：
                                 </label>
                                 <span id="val-sideAC" class="font-black text-emerald-600 text-lg">3.0 cm</span>
                             </div>
@@ -286,7 +286,7 @@
                                     等腰直角三角形
                                 </span>
                                 <span id="exp-badge-isosceles" class="px-3 py-1 bg-pink-500 text-white rounded-full text-xs font-bold shadow-md">
-                                    腰長 AB = AC (等腰)
+                                    腰長 <span style="text-decoration:overline">AB</span> = <span style="text-decoration:overline">AC</span> (等腰)
                                 </span>
                             </div>
 
@@ -297,7 +297,7 @@
 
                             <!-- Bottom Statistics -->
                             <div class="w-full bg-white/90 backdrop-blur p-3 rounded-xl border border-white flex justify-around text-xs md:text-sm font-medium">
-                                <div>底邊長 BC: <span id="exp-bc-val" class="font-bold text-indigo-600">4.24 cm</span></div>
+                                <div>底邊長 <span style="text-decoration:overline">BC</span>: <span id="exp-bc-val" class="font-bold text-indigo-600">4.24 cm</span></div>
                                 <div>底角 ∠B: <span id="exp-angB-val" class="font-bold text-indigo-600">45°</span></div>
                                 <div>底角 ∠C: <span id="exp-angC-val" class="font-bold text-indigo-600">45°</span></div>
                             </div>
@@ -317,13 +317,13 @@
 
                 <!-- Scenario Selector Buttons -->
                 <div class="flex flex-wrap gap-2 mb-6">
-                    <button onclick="selectConstructionScenario(1)" id="scenario-btn-1" class="scen-btn active px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
-                        示例 1：畫 ∠A 為頂角，兩腰 2cm 的等腰三角形
+                    <button onclick="selectConstructionScenario(1)" id="scenario-btn-1" class="scen-btn bg-purple-600 text-white border-purple-600 px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                        示例 1：以 A 為頂點，畫出 ∠A 為頂角，兩腰為 2公分的等腰三角形
                     </button>
-                    <button onclick="selectConstructionScenario(2)" id="scenario-btn-2" class="scen-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                    <button onclick="selectConstructionScenario(2)" id="scenario-btn-2" class="scen-btn bg-white text-purple-700 border-purple-200 px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
                         示例 2：畫 ∠A 為直角，兩腰 3cm 的等腰直角三角形
                     </button>
-                    <button onclick="selectConstructionScenario(3)" id="scenario-btn-3" class="scen-btn px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
+                    <button onclick="selectConstructionScenario(3)" id="scenario-btn-3" class="scen-btn bg-white text-purple-700 border-purple-200 px-4 py-2 rounded-xl text-xs md:text-sm font-bold border transition">
                         示例 3：畫 ∠A 為 120°，兩邊 3cm 與 4cm 的鈍角三角形
                     </button>
                 </div>
@@ -366,7 +366,7 @@
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <span class="bg-rose-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm">4</span>
-                        <h2 class="text-xl font-bold text-indigo-950">學習成效隨堂診斷測驗</h2>
+                        <h2 class="text-xl font-bold text-indigo-950">隨堂測驗</h2>
                     </div>
                     <div class="bg-rose-100 text-rose-800 px-3 py-1 rounded-full font-bold text-xs">
                         共 5 題觀念挑戰
@@ -378,11 +378,16 @@
                 </div>
 
                 <!-- Quiz Submit & Result Area -->
-                <div class="mt-8 pt-4 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <button onclick="checkQuizResults()" class="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-700 hover:to-rose-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95">
-                        <i class="fa-solid fa-paper-plane mr-2"></i> 提交測驗解答
-                    </button>
-                    <div id="quiz-score-banner" class="hidden text-center md:text-right">
+                <div class="mt-8 pt-4 border-t border-slate-200 flex flex-col items-center justify-center gap-4">
+                    <div class="flex flex-row items-center justify-center gap-3 md:gap-4 w-full">
+                        <button onclick="checkQuizResults()" class="px-5 md:px-8 py-3 bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-700 hover:to-rose-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base">
+                            <i class="fa-solid fa-paper-plane"></i> 提交答案
+                        </button>
+                        <button onclick="resetQuiz()" class="px-5 md:px-8 py-3 bg-slate-600 hover:bg-slate-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base">
+                            <i class="fa-solid fa-rotate-right"></i> 重新測驗
+                        </button>
+                    </div>
+                    <div id="quiz-score-banner" class="hidden text-center">
                         <span class="text-sm text-slate-600">總成績得分：</span>
                         <span id="quiz-score" class="text-3xl font-black text-indigo-600 ml-2">0</span>
                         <span class="text-slate-600">/ 100 分</span>
@@ -590,8 +595,8 @@
             // Isosceles check
             const isIsosceles = (Math.abs(sideAB - sideBC) < 0.01) || (Math.abs(sideBC - sideCA) < 0.01) || (Math.abs(sideCA - sideAB) < 0.01);
 
-            let sidesText = `AB=${sideAB.toFixed(1)}, BC=${sideBC.toFixed(1)}, CA=${sideCA.toFixed(1)}`;
-            document.getElementById('geo-sides-info').innerText = isIsosceles ? `${sidesText} (有等腰)` : sidesText;
+            let sidesText = `<span style="text-decoration:overline">AB</span>=${sideAB.toFixed(1)}, <span style="text-decoration:overline">BC</span>=${sideBC.toFixed(1)}, <span style="text-decoration:overline">CA</span>=${sideCA.toFixed(1)}`;
+            document.getElementById('geo-sides-info').innerHTML = isIsosceles ? `${sidesText} (有等腰)` : sidesText;
             document.getElementById('geo-angle-info').innerText = `${maxAngle}° (${maxAngle === 90 ? '直角' : maxAngle > 90 ? '鈍角' : '銳角'})`;
 
             let badge = document.getElementById('geo-type-badge');
@@ -691,7 +696,7 @@
 
             if (isIso) {
                 badgeIso.classList.remove('hidden');
-                badgeIso.innerText = '兩腰 AB = AC (等腰三角形)';
+                badgeIso.innerHTML = '兩腰 <span style="text-decoration:overline">AB</span> = <span style="text-decoration:overline">AC</span> (等腰三角形)';
             } else {
                 badgeIso.classList.add('hidden');
             }
@@ -752,52 +757,62 @@
         let activeScenario = 1;
         let currentStepIndex = 0;
 
-        const scenarios = {
-            1: [
-                { title: "步驟 1：畫出頂角 ∠A 的兩條射線", desc: "先確定頂點 A 的位置，利用直尺與量角器畫出指定頂角 ∠A 的兩條射線邊。", svgType: "step1-iso" },
-                { title: "步驟 2：在兩射線上量出長 2 公分的兩腰", desc: "以直尺在兩條射線上自 A 點分別量出 2 公分，標示出端點 B 與端點 C（使 AB = 2cm, AC = 2cm）。", svgType: "step2-iso" },
-                { title: "步驟 3：連接點 B、C 完成等腰三角形", desc: "用直尺連接點 B 與點 C，劃出底邊 BC，即完成以 ∠A 為頂角的等腰三角形 ABC！", svgType: "step3-iso" }
-            ],
-            2: [
-                { title: "步驟 1：用直角三角板畫出直角 ∠A", desc: "拿取直角三角板，沿著直角兩邊畫出直角頂點 A。", svgType: "step1-right" },
-                { title: "步驟 2：在直角兩邊量出 3 公分腰長", desc: "沿著兩邊分別量出長度 3 公分的點 B 與點 C (線段 AB = 3cm, AC = 3cm)。", svgType: "step2-right" },
-                { title: "步驟 3：連接點 B、點 C", desc: "連接端點 B 和 C，構成斜邊，完成「等腰直角三角形 ABC」。", svgType: "step3-right" }
-            ],
-            3: [
-                { title: "步驟 1：用量角器量出 120° 鈍角", desc: "對準頂點 A 與基準線，在量角器上找到 120° 刻度並畫出夾角線段。", svgType: "step1-obtuse" },
-                { title: "步驟 2：畫出長度 3cm 與 4cm 的兩邊", desc: "在兩邊分別截取 AB = 3 公分、AC = 4 公分。", svgType: "step2-obtuse" },
-                { title: "步驟 3：連接 B、C 完成鈍角三角形", desc: "將 B、C 兩點連起來，線段 BC 即為對應鈍角的長邊，即完成 120° 鈍角三角形繪製。", svgType: "step3-obtuse" }
-            ]
-        };
-
         function selectConstructionScenario(scenNum) {
             activeScenario = scenNum;
             currentStepIndex = 0;
 
-            document.querySelectorAll('.scen-btn').forEach((btn, idx) => {
-                if (idx + 1 === scenNum) {
+            document.querySelectorAll('.scen-btn').forEach((btn, index) => {
+                if (index + 1 === scenNum) {
                     btn.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
-                    btn.classList.remove('bg-white', 'text-slate-700');
+                    btn.classList.remove('bg-white', 'text-purple-700', 'border-purple-200');
                 } else {
                     btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
-                    btn.classList.add('bg-white', 'text-slate-700');
+                    btn.classList.add('bg-white', 'text-purple-700', 'border-purple-200');
                 }
             });
 
             renderConstructionStep();
         }
 
+        const scenarios = {
+            1: [
+                { 
+                    title: "步驟 1：以 A 為頂點用直尺畫出兩條長 2公分的 AB、AC", 
+                    desc: "以 A 為頂點用直尺畫出兩條長 2公分的 <span style=\"text-decoration:overline\">AB</span>、<span style=\"text-decoration:overline\">AC</span>。<br><div class=\"mt-3 p-2.5 bg-amber-50 text-amber-900 text-xs rounded-lg border border-amber-200 flex items-center gap-1.5\"><i class=\"fa-solid fa-lightbulb text-amber-500 text-sm\"></i><span>觀念提示：等腰三角形頂角兩邊就是等腰三角形的腰。</span></div>", 
+                    svgType: "step1-iso" 
+                },
+                { 
+                    title: "步驟 2：連接點 B、C，三角形 ABC 就是等腰三角形", 
+                    desc: "連接點 B、C，三角形 ABC 就是等腰三角形。<br><div class=\"mt-3 p-2.5 bg-indigo-50 text-indigo-900 text-xs rounded-lg border border-indigo-200 flex items-center gap-1.5\"><i class=\"fa-solid fa-circle-info text-indigo-500 text-sm\"></i><span>標記提示：上圖三角形中，邊 AB 記作 <span style=\"text-decoration:overline\">AB</span>，邊 AC 記作 <span style=\"text-decoration:overline\">AC</span>，邊 BC 記作 <span style=\"text-decoration:overline\">BC</span>。</span></div>", 
+                    svgType: "step2-iso" 
+                }
+            ],
+            2: [
+                { title: "步驟 1：用直角三角板畫出直角 ∠A", desc: "拿取直角三角板，沿著直角兩邊畫出直角頂點 A。", svgType: "step1-right" },
+                { title: "步驟 2：在直角兩邊量出 3 公分腰長", desc: "沿著兩邊分別量出長度 3 公分的點 B 與點 C (線段 <span style=\"text-decoration:overline\">AB</span> = 3cm, <span style=\"text-decoration:overline\">AC</span> = 3cm)。", svgType: "step2-right" },
+                { title: "步驟 3：連接點 B、點 C", desc: "連接端點 B 和 C，構成斜邊，完成「等腰直角三角形 ABC」。", svgType: "step3-right" }
+            ],
+            3: [
+                { title: "步驟 1：用量角器量出 120° 鈍角", desc: "對準頂點 A 與基準線，在量角器上找到 120° 刻度並畫出夾角線段。", svgType: "step1-obtuse" },
+                { title: "步驟 2：畫出長度 3cm 與 4cm 的兩邊", desc: "在兩邊分別截取 <span style=\"text-decoration:overline\">AB</span> = 3 公分、<span style=\"text-decoration:overline\">AC</span> = 4 公分。", svgType: "step2-obtuse" },
+                { title: "步驟 3：連接 B、C 完成鈍角三角形", desc: "將 B、C 兩點連起來，線段 <span style=\"text-decoration:overline\">BC</span> 即為對應鈍角的長邊，即完成 120° 鈍角三角形繪製。", svgType: "step3-obtuse" }
+            ]
+        };
+
         function renderConstructionStep() {
-            const data = scenarios[activeScenario][currentStepIndex];
-            document.getElementById('step-number-tag').innerText = `步驟 ${currentStepIndex + 1} / 3`;
+            const currentScenarioSteps = scenarios[activeScenario];
+            const maxSteps = currentScenarioSteps.length;
+            const data = currentScenarioSteps[currentStepIndex];
+
+            document.getElementById('step-number-tag').innerText = `步驟 ${currentStepIndex + 1} / ${maxSteps}`;
             document.getElementById('step-title-text').innerText = data.title;
-            document.getElementById('step-desc-text').innerText = data.desc;
+            document.getElementById('step-desc-text').innerHTML = data.desc;
 
             document.getElementById('btn-prev-step').disabled = (currentStepIndex === 0);
             
             // Toggle Next / Finish button state and style
             const btnNext = document.getElementById('btn-next-step');
-            if (currentStepIndex === 2) {
+            if (currentStepIndex === maxSteps - 1) {
                 btnNext.innerHTML = '完成 <i class="fa-solid fa-check ml-1"></i>';
                 btnNext.className = 'flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow-md flex items-center justify-center';
             } else {
@@ -811,39 +826,29 @@
             if (activeScenario === 1) { // Isosceles
                 if (currentStepIndex === 0) {
                     svg.innerHTML = `
-                        <line x1="150" y1="200" x2="250" y2="200" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="4,4" />
-                        <line x1="150" y1="200" x2="200" y2="100" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="4,4" />
-                        <path d="M 180 200 A 30 30 0 0 0 168 164" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
-                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
-                        <text x="130" y="218" font-weight="bold" fill="#1e293b">頂點 A</text>
-                        <text x="175" y="180" font-weight="bold" fill="#f59e0b" font-size="13">頂角 ∠A</text>
-                    `;
-                } else if (currentStepIndex === 1) {
-                    svg.innerHTML = `
-                        <line x1="150" y1="200" x2="230" y2="200" stroke="#8b5cf6" stroke-width="4" />
-                        <line x1="150" y1="200" x2="190" y2="120" stroke="#8b5cf6" stroke-width="4" />
-                        <path d="M 175 200 A 25 25 0 0 0 165 170" fill="none" stroke="#f59e0b" stroke-width="2"/>
-                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
-                        <circle cx="230" cy="200" r="6" fill="#ec4899"/>
-                        <circle cx="190" cy="120" r="6" fill="#10b981"/>
-                        <line x1="187" y1="195" x2="193" y2="205" stroke="#ec4899" stroke-width="2" />
-                        <line x1="167" y1="157" x2="173" y2="163" stroke="#10b981" stroke-width="2" />
-                        <text x="130" y="218" font-weight="bold" fill="#1e293b">A</text>
-                        <text x="238" y="205" font-weight="bold" fill="#ec4899">B (2cm)</text>
-                        <text x="195" y="115" font-weight="bold" fill="#10b981">C (2cm)</text>
+                        <!-- Step 1: Draw AB and AC of length 2cm -->
+                        <line x1="200" y1="60" x2="140" y2="190" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                        <line x1="200" y1="60" x2="260" y2="190" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                        <circle cx="200" cy="60" r="6" fill="#1e293b"/>
+                        <circle cx="140" cy="190" r="6" fill="#1e293b"/>
+                        <circle cx="260" cy="190" r="6" fill="#1e293b"/>
+                        <text x="200" y="42" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="16">A</text>
+                        <text x="120" y="200" text-anchor="end" font-weight="bold" fill="#1e293b" font-size="16">B</text>
+                        <text x="280" y="200" text-anchor="start" font-weight="bold" fill="#1e293b" font-size="16">C</text>
                     `;
                 } else {
                     svg.innerHTML = `
-                        <polygon points="150,200 230,200 190,120" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="4" />
-                        <circle cx="150" cy="200" r="6" fill="#8b5cf6"/>
-                        <circle cx="230" cy="200" r="6" fill="#ec4899"/>
-                        <circle cx="190" cy="120" r="6" fill="#10b981"/>
-                        <line x1="187" y1="195" x2="193" y2="205" stroke="#ec4899" stroke-width="2" />
-                        <line x1="167" y1="157" x2="173" y2="163" stroke="#10b981" stroke-width="2" />
-                        <text x="130" y="218" font-weight="bold" fill="#1e293b">A</text>
-                        <text x="238" y="205" font-weight="bold" fill="#ec4899">B</text>
-                        <text x="195" y="115" font-weight="bold" fill="#10b981">C</text>
-                        <text x="215" y="165" font-weight="bold" fill="#6366f1" font-size="12">底邊 BC</text>
+                        <!-- Step 2: Connect B and C -->
+                        <polygon points="200,60 140,190 260,190" fill="rgba(16, 185, 129, 0.12)" />
+                        <line x1="200" y1="60" x2="140" y2="190" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                        <line x1="200" y1="60" x2="260" y2="190" stroke="#10b981" stroke-width="4" stroke-linecap="round" />
+                        <line x1="140" y1="190" x2="260" y2="190" stroke="#ef4444" stroke-width="4" stroke-linecap="round" />
+                        <circle cx="200" cy="60" r="6" fill="#1e293b"/>
+                        <circle cx="140" cy="190" r="6" fill="#1e293b"/>
+                        <circle cx="260" cy="190" r="6" fill="#1e293b"/>
+                        <text x="200" y="42" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="16">A</text>
+                        <text x="120" y="200" text-anchor="end" font-weight="bold" fill="#1e293b" font-size="16">B</text>
+                        <text x="280" y="200" text-anchor="start" font-weight="bold" fill="#1e293b" font-size="16">C</text>
                     `;
                 }
             } else if (activeScenario === 2) { // Isosceles Right Triangle
@@ -875,7 +880,7 @@
                         <text x="105" y="235" font-weight="bold">A</text>
                         <text x="225" y="235" font-weight="bold" fill="#3b82f6">B</text>
                         <text x="100" y="115" font-weight="bold" fill="#10b981">C</text>
-                        <text x="180" y="165" font-weight="bold" fill="#ef4444" font-size="12">斜邊 BC</text>
+                        <text x="180" y="165" font-weight="bold" fill="#ef4444" font-size="12">斜邊 <tspan style="text-decoration:overline">BC</tspan></text>
                     `;
                 }
             } else { // 120 deg Obtuse
@@ -907,7 +912,7 @@
                         <text x="175" y="220" font-weight="bold">A</text>
                         <text x="275" y="215" font-weight="bold" fill="#3b82f6">B</text>
                         <text x="85" y="125" font-weight="bold" fill="#10b981">C</text>
-                        <text x="190" y="150" font-weight="bold" fill="#f43f5e" font-size="12">最長邊 BC</text>
+                        <text x="190" y="150" font-weight="bold" fill="#f43f5e" font-size="12">最長邊 <tspan style="text-decoration:overline">BC</tspan></text>
                     `;
                 }
             }
@@ -921,11 +926,11 @@
         }
 
         function nextStep() {
-            if (currentStepIndex < 2) {
+            const maxSteps = scenarios[activeScenario].length;
+            if (currentStepIndex < maxSteps - 1) {
                 currentStepIndex++;
                 renderConstructionStep();
             }
-            // 進行至第三步時點擊「完成」按鈕不執行任何動作
         }
 
         /* -------------------------------------------------------------
@@ -941,7 +946,7 @@
             },
             {
                 id: 2,
-                question: "2. 已知繪製三角形時，兩邊長分別為 AB = 3cm、AC = 4cm，且其夾角 ∠A = 120°。請問這個三角形屬於哪一種分類？",
+                question: "2. 已知繪製三角形時，兩邊長分別為 <span style=\"text-decoration:overline\">AB</span> = 3cm、<span style=\"text-decoration:overline\">AC</span> = 4cm，且其夾角 ∠A = 120°。請問這個三角形屬於哪一種分類？",
                 options: ["銳角三角形", "直角三角形", "鈍角三角形", "正三角形"],
                 answer: 2,
                 explanation: "因為有一個內角 ∠A = 120° 大於 90°，所以此圖形為「鈍角三角形」。"
@@ -955,7 +960,7 @@
             },
             {
                 id: 4,
-                question: "4. 小明畫了一個以 A 為頂點的等腰三角形 ABC，其中 AB = 3.5cm、AC = 3.5cm。請問 AB 與 AC 在數學用語中稱為什麼？",
+                question: "4. 小明畫了一個以 A 為頂點的等腰三角形 ABC，其中 <span style=\"text-decoration:overline\">AB</span> = 3.5cm、<span style=\"text-decoration:overline\">AC</span> = 3.5cm。請問 <span style=\"text-decoration:overline\">AB</span> 與 <span style=\"text-decoration:overline\">AC</span> 在數學用語中稱為什麼？",
                 options: ["底邊", "斜邊", "腰", "高"],
                 answer: 2,
                 explanation: "在等腰三角形中，長度相等的兩條邊稱為「腰」，連接兩腰的第三條邊稱為「底邊」。"
@@ -993,9 +998,12 @@
             quizQuestions.forEach(q => {
                 const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
 
-                if (selected && parseInt(selected.value) === q.answer) {
+                if (!selected) {
+                    feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> <b>未作答。</b>`;
+                } else if (parseInt(selected.value) === q.answer) {
                     score += 20;
                     feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
                     feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> <b>回答正確！</b> ${q.explanation}`;
@@ -1007,6 +1015,22 @@
 
             document.getElementById('quiz-score-banner').classList.remove('hidden');
             document.getElementById('quiz-score').innerText = score;
+        }
+
+        function resetQuiz() {
+            quizQuestions.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (checked) checked.checked = false;
+
+                const feedbackEl = document.getElementById(`quiz-feedback-${q.id}`);
+                if (feedbackEl) {
+                    feedbackEl.classList.add('hidden');
+                    feedbackEl.innerHTML = '';
+                }
+            });
+
+            document.getElementById('quiz-score-banner').classList.add('hidden');
+            document.getElementById('quiz-score').innerText = '0';
         }
 
         /* -------------------------------------------------------------

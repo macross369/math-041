@@ -113,7 +113,7 @@
         <!-- 頂部標題列 -->
         <header class="py-4 px-4 text-center">
             <div class="inline-block px-4 py-1 rounded-full bg-white/30 backdrop-blur-md border border-white/40 text-xs text-blue-900 font-bold mb-2 tracking-widest uppercase">
-                <i class="fa-solid fa-cloud-sun mr-1"></i> 國小數學 4-2 互動教學模組
+                <i class="fa-solid fa-cloud-sun mr-1"></i> 國小四上數學 4-2 互動學習網頁
             </div>
             <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white drop-shadow-md">
                 假分數與帶分數雙向轉換
@@ -133,7 +133,7 @@
                     <i class="fa-solid fa-cubes"></i> 帶分數 ➔ 假分數
                 </button>
                 <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 py-3 px-2 rounded-xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 text-white hover:bg-white/20">
-                    <i class="fa-solid fa-graduation-cap"></i> 觀念大考驗 (5題)
+                    <i class="fa-solid fa-graduation-cap"></i> 隨堂測驗
                 </button>
             </div>
         </div>
@@ -361,7 +361,7 @@
                     <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                         <div>
                             <h2 class="text-2xl font-black text-gray-800 flex items-center gap-2">
-                                <i class="fa-solid fa-clipboard-question text-blue-500"></i> 分數概念學習小檢測
+                                <i class="fa-solid fa-clipboard-question text-blue-500"></i> 隨堂測驗
                             </h2>
                             <p class="text-xs sm:text-sm text-gray-500 mt-1">即時評量，答錯可看提示自我修正哦！</p>
                         </div>
@@ -376,10 +376,13 @@
                         <!-- 由 JavaScript 動態生成 5 題測驗 -->
                     </div>
 
-                    <!-- 重置按鈕 -->
-                    <div class="mt-8 text-center pt-4 border-t border-gray-200">
-                        <button onclick="resetQuiz()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition duration-200 text-sm">
-                            <i class="fa-solid fa-rotate-right mr-1"></i> 重新挑戰測驗
+                    <!-- 提交與重置按鈕區塊 -->
+                    <div class="mt-8 text-center pt-4 border-t border-gray-200 flex flex-wrap justify-center gap-4">
+                        <button onclick="submitQuiz()" class="w-36 sm:w-44 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition duration-200 text-sm flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-paper-plane"></i> 提交答案
+                        </button>
+                        <button onclick="resetQuiz()" class="w-36 sm:w-44 py-2.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition duration-200 text-sm flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-rotate-right"></i> 重新測驗
                         </button>
                     </div>
                 </div>
@@ -649,6 +652,7 @@
         ];
 
         let userAnswers = Array(5).fill(null);
+        let isSubmitted = false;
 
         function renderQuiz() {
             const container = document.getElementById('quiz-container');
@@ -663,30 +667,56 @@
                     const isSelected = userAnswers[index] === optIndex;
                     let btnClass = "w-full text-left p-3 rounded-xl border text-sm font-medium transition duration-200 flex items-center justify-between ";
                     
-                    if (isSelected) {
-                        if (optIndex === q.answer) {
-                            btnClass += "bg-emerald-50 border-emerald-500 text-emerald-800 font-bold";
+                    if (isSubmitted) {
+                        if (isSelected) {
+                            if (optIndex === q.answer) {
+                                btnClass += "bg-emerald-50 border-emerald-500 text-emerald-800 font-bold";
+                            } else {
+                                btnClass += "bg-rose-50 border-rose-500 text-rose-800 font-bold";
+                            }
+                        } else if (optIndex === q.answer && userAnswers[index] !== null) {
+                            btnClass += "bg-emerald-50/50 border-emerald-300 text-emerald-700";
                         } else {
-                            btnClass += "bg-rose-50 border-rose-500 text-rose-800 font-bold";
+                            btnClass += "bg-gray-50/50 border-gray-200 text-gray-500 opacity-70";
                         }
                     } else {
-                        btnClass += "bg-gray-50/50 border-gray-200 text-gray-700 hover:bg-sky-50 hover:border-sky-300";
+                        if (isSelected) {
+                            btnClass += "bg-blue-100 border-blue-500 text-blue-900 font-bold shadow-sm";
+                        } else {
+                            btnClass += "bg-gray-50/50 border-gray-200 text-gray-700 hover:bg-sky-50 hover:border-sky-300";
+                        }
+                    }
+
+                    let badgeHTML = '';
+                    if (isSubmitted) {
+                        if (isSelected) {
+                            badgeHTML = (optIndex === q.answer) 
+                                ? '<i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>' 
+                                : '<i class="fa-solid fa-circle-xmark text-rose-500 text-base"></i>';
+                        } else if (optIndex === q.answer && userAnswers[index] !== null) {
+                            badgeHTML = '<span class="text-xs text-emerald-600 font-bold">(正確答案)</span>';
+                        }
+                    } else if (isSelected) {
+                        badgeHTML = '<i class="fa-solid fa-check text-blue-600 text-base"></i>';
                     }
 
                     optionsHTML += `
-                        <button onclick="checkAnswer(${index}, ${optIndex})" class="${btnClass}">
+                        <button onclick="selectOption(${index}, ${optIndex})" class="${btnClass}">
                             <span>${opt}</span>
-                            ${isSelected ? (optIndex === q.answer ? '<i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>' : '<i class="fa-solid fa-circle-xmark text-rose-500 text-base"></i>') : ''}
+                            ${badgeHTML}
                         </button>
                     `;
                 });
 
                 let feedbackHTML = '';
-                if (userAnswers[index] !== null) {
-                    if (userAnswers[index] === q.answer) {
-                        feedbackHTML = `<div class="mt-3 p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-thumbs-up"></i> 答對了！ ${q.explanation}</div>`;
+                if (isSubmitted) {
+                    if (userAnswers[index] === null) {
+                        // 未作答：僅顯示黃色系「未作答。」，不提示正確答案與解析
+                        feedbackHTML = `<div class="mt-3 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 未作答。</div>`;
+                    } else if (userAnswers[index] === q.answer) {
+                        feedbackHTML = `<div class="mt-3 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-thumbs-up text-emerald-600"></i> 答對了！ ${q.explanation}</div>`;
                     } else {
-                        feedbackHTML = `<div class="mt-3 p-3 bg-rose-50 text-rose-800 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-circle-exclamation"></i> 差一點點！ ${q.explanation}</div>`;
+                        feedbackHTML = `<div class="mt-3 p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-bold flex items-center gap-2"><i class="fa-solid fa-circle-xmark text-rose-500"></i> 答錯了！ ${q.explanation}</div>`;
                     }
                 }
 
@@ -699,11 +729,21 @@
                 container.appendChild(qBox);
             });
 
-            calculateScore();
+            if (isSubmitted) {
+                calculateScore();
+            } else {
+                document.getElementById('quiz-score').innerText = '0';
+            }
         }
 
-        function checkAnswer(qIndex, optIndex) {
+        function selectOption(qIndex, optIndex) {
+            if (isSubmitted) return;
             userAnswers[qIndex] = optIndex;
+            renderQuiz();
+        }
+
+        function submitQuiz() {
+            isSubmitted = true;
             renderQuiz();
         }
 
@@ -720,6 +760,7 @@
 
         function resetQuiz() {
             userAnswers = Array(5).fill(null);
+            isSubmitted = false;
             renderQuiz();
         }
 

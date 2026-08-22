@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3-2 測量與畫角 — 互動探究實驗室</title>
+    <title>國小四上數學 3-2 互動學習網頁</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
@@ -112,7 +112,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-sky-600 via-indigo-600 to-pink-600">
-                        3-2 測量與畫角 — 互動探究實驗室
+                        國小四上數學 3-2 互動學習網頁
                     </h1>
                     <p class="text-xs md:text-sm text-slate-600 mt-1 font-medium">
                         ✨ 觀察內外圈刻度、認識銳角/直角/鈍角、學習畫角與邊長延伸
@@ -126,7 +126,7 @@
                     <i class="fa-solid fa-shapes"></i> 互動實驗室
                 </button>
                 <button id="tab-quiz-btn" onclick="switchTab('quiz')" class="tab-btn flex-1 md:flex-none px-5 py-2.5 rounded-xl transition-all duration-300 text-slate-700 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-pen-ruler"></i> 隨堂測驗 (5題)
+                    <i class="fa-solid fa-pen-ruler"></i> 隨堂測驗
                 </button>
             </div>
         </header>
@@ -265,7 +265,7 @@
             <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-4xl mx-auto">
                 <div class="flex items-center justify-between border-b pb-4 mb-6">
                     <div>
-                        <h2 class="text-xl md:text-2xl font-black text-slate-800">3-2 概念自我檢測測驗</h2>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800">隨堂測驗</h2>
                         <p class="text-xs md:text-sm text-slate-500 mt-1">選出正確答案，完成後系統將為您進行即時批改與解析。</p>
                     </div>
                     <div class="text-right">
@@ -280,12 +280,12 @@
                 </div>
 
                 <!-- Submit & Feedback Button -->
-                <div class="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
-                    <button onclick="resetQuiz()" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 transition">
-                        <i class="fa-solid fa-arrow-rotate-left mr-1"></i> 重新測驗
+                <div class="mt-8 pt-6 border-t border-slate-200 flex flex-row justify-center items-center gap-4">
+                    <button onclick="submitQuiz()" class="w-44 py-3 rounded-xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> 提交答案
                     </button>
-                    <button onclick="submitQuiz()" class="px-8 py-3 rounded-xl font-black text-white bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-lg transition transform active:scale-95">
-                        提交答案並對答案 <i class="fa-solid fa-check mr-1"></i>
+                    <button onclick="resetQuiz()" class="w-44 py-3 rounded-xl font-bold text-slate-600 bg-white border border-slate-300 hover:bg-slate-100 shadow-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> 重新測驗
                     </button>
                 </div>
             </div>
@@ -757,7 +757,7 @@
             quizData.forEach((q) => {
                 const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
                 const feedbackEl = document.getElementById(`feedback_${q.id}`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+                feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
 
                 if (selected) {
                     const userAns = parseInt(selected.value);
@@ -767,11 +767,11 @@
                         feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> 正確！ ${q.explanation}`;
                     } else {
                         feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
-                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 答案不正確喔。 ${q.explanation}`;
+                        feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> 不正確！ ${q.explanation}`;
                     }
                 } else {
                     feedbackEl.classList.add('bg-amber-100', 'text-amber-800');
-                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> 尚未作答！ ${q.explanation}`;
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> 未作答。`;
                 }
             });
 

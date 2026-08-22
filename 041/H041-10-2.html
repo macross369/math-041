@@ -65,7 +65,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-black bg-clip-text text transparent bg-gradient-to-r from-sky-600 to-indigo-700">
-                        國小四年級數學 10-2 互動學習網頁
+                        國小四上數學 10-2 互動學習網頁
                     </h1>
                     <p class="text-xs text-sky-700 font-medium">製作長條圖：一格代表的數量、項目順序與省略符號應用</p>
                 </div>
@@ -83,7 +83,7 @@
                     🌊 3. 省略符號解密
                 </button>
                 <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-sky-600 transition-all">
-                    🏆 4. 隨堂測驗 (5題)
+                    🏆 4. 隨堂測驗
                 </button>
             </nav>
         </div>
@@ -298,19 +298,23 @@
                 <div class="flex justify-between items-center border-b pb-4 border-sky-200 mb-6">
                     <div>
                         <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">自我檢驗</span>
-                        <h2 class="text-xl font-black text-slate-800 mt-1">長條圖觀念隨堂大挑戰 (共 5 題)</h2>
+                        <h2 class="text-xl font-black text-slate-800 mt-1">隨堂測驗</h2>
                     </div>
                     <div id="quiz-score-badge" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-indigo-500 text-white rounded-2xl font-black text-sm shadow-sm">
-                        目前得分：0 / 500
+                        目前得分：0 / 100
                     </div>
                 </div>
 
                 <!-- 測驗題目容器 -->
                 <div id="quiz-container" class="space-y-6"></div>
 
-                <div class="mt-8 text-center">
-                    <button onclick="submitQuiz()" class="shinkai-btn text-white px-8 py-3 rounded-2xl font-black text-base shadow-lg">
-                        🚀 完成並提交測驗
+                <!-- 測驗按鈕列 -->
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                    <button onclick="submitQuiz()" class="shinkai-btn text-white px-8 py-3 rounded-2xl font-black text-base shadow-lg min-w-[160px]">
+                        🚀 提交答案
+                    </button>
+                    <button onclick="resetQuiz()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-8 py-3 rounded-2xl font-black text-base shadow-md transition-all min-w-[160px]">
+                        🔄 重新測驗
                     </button>
                 </div>
             </div>
@@ -805,10 +809,14 @@
                 const feedback = document.getElementById(`ans-feedback-${q.id}`);
                 if(!feedback) return;
 
-                feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800');
+                feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-red-100', 'text-red-800', 'bg-amber-100', 'text-amber-800');
 
-                if(selected && parseInt(selected.value) === q.answer) {
-                    score += 100;
+                if(!selected) {
+                    // 未作答：顯示黃色警告提示，不包含解析與答案
+                    feedback.classList.add('bg-amber-100', 'text-amber-800');
+                    feedback.innerHTML = `⚠️ 未作答。`;
+                } else if(parseInt(selected.value) === q.answer) {
+                    score += 20;
                     feedback.classList.add('bg-emerald-100', 'text-emerald-800');
                     feedback.innerHTML = `✅ 答對了！ ${q.explain}`;
                 } else {
@@ -817,7 +825,21 @@
                 }
             });
 
-            document.getElementById('quiz-score-badge').innerText = `目前得分：${score} / 500`;
+            document.getElementById('quiz-score-badge').innerText = `目前得分：${score} / 100`;
+        }
+
+        function resetQuiz() {
+            quizQuestions.forEach(q => {
+                const radios = document.getElementsByName(`q-${q.id}`);
+                radios.forEach(r => r.checked = false);
+                
+                const feedback = document.getElementById(`ans-feedback-${q.id}`);
+                if(feedback) {
+                    feedback.className = "hidden p-3 rounded-xl text-xs font-bold";
+                    feedback.innerHTML = "";
+                }
+            });
+            document.getElementById('quiz-score-badge').innerText = "目前得分：0 / 100";
         }
 
         window.onload = function() {

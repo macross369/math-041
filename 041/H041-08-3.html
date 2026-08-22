@@ -152,8 +152,14 @@
             <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
         </div>
 
+        <!-- 依需求新增：圖樣風格膠囊標籤 -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-950/60 border border-sky-300/30 text-sky-300 text-xs md:text-sm font-semibold mb-3 backdrop-blur-md shadow-inner">
+            <i class="fa-solid fa-shapes text-amber-400 text-sm"></i>
+            <span>國小四上數學 8-3 互動學習網頁</span>
+        </div>
+
         <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-pink-200 to-amber-100 tracking-tight drop-shadow-md mb-3">
-            四年級數學 8-3 乘與除兩步驟併式與括號
+            乘與除兩步驟併式與括號
         </h1>
         <p class="text-sky-100/80 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
             拉動滑桿觀察「算式順序」與「括號應用」的奧秘，體驗皮皮與小甲不同的思考視角！
@@ -171,7 +177,7 @@
                 <i class="fa-solid fa-box-open mr-1.5"></i> 3. 衛生紙連除 (連除與括號)
             </button>
             <button onclick="switchTab('quizTab')" id="btn-quizTab" class="tab-btn px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md bg-sky-100/70 text-sky-950 border border-sky-200 opacity-80 hover:opacity-100">
-                <i class="fa-solid fa-circle-question mr-1.5"></i> 4. 歷程性小評量 (5題)
+                <i class="fa-solid fa-circle-question mr-1.5"></i> 4. 隨堂測驗
             </button>
         </div>
     </header>
@@ -458,16 +464,16 @@
             </div>
         </section>
 
-        <!-- 模組 4: 歷程性小評量 (5 題) -->
+        <!-- 模組 4: 隨堂測驗 (5 題) -->
         <section id="quizTab" class="tab-content hidden transition-opacity duration-300">
             <div class="glass-card rounded-2xl p-6 md:p-8 shadow-2xl">
                 <!-- 評量標頭與分數 -->
                 <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-200 pb-4 mb-6 gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-indigo-950 flex items-center gap-2">
-                            <i class="fa-solid fa-graduation-cap text-amber-500"></i> 乘除併式與括號 ‧ 概念理解測驗
+                            <i class="fa-solid fa-graduation-cap text-amber-500"></i> 隨堂測驗
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">選出正確答案並觀察即時詳細解析，挑戰獲得 100 分！</p>
+                        <p class="text-xs text-slate-500 mt-1">選出正確答案並點擊提交，挑戰獲得 100 分！</p>
                     </div>
                     <div class="bg-indigo-900 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-3 shadow-md">
                         <span class="text-xs text-indigo-200">目前得分</span>
@@ -480,10 +486,13 @@
                     <!-- JS 動態生成 5 題測驗 -->
                 </div>
 
-                <!-- 重測按鈕 -->
-                <div class="mt-8 text-center border-t border-slate-200 pt-6">
+                <!-- 提交與重測按鈕區 -->
+                <div class="mt-8 text-center border-t border-slate-200 pt-6 flex flex-wrap justify-center gap-4">
+                    <button onclick="submitQuiz()" class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> 提交答案
+                    </button>
                     <button onclick="resetQuiz()" class="px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:scale-105 transition-all">
-                        <i class="fa-solid fa-rotate-right mr-2"></i> 重新作答所有題目
+                        <i class="fa-solid fa-rotate-right mr-2"></i> 重新測驗
                     </button>
                 </div>
             </div>
@@ -770,6 +779,8 @@
         // ==========================================
         // 模組 4: 歷程性評量 (5 題)
         // ==========================================
+        // 模組 4: 隨堂測驗邏輯
+        // ==========================================
         const quizData = [
             {
                 id: 1,
@@ -781,7 +792,7 @@
                     "D. (18 + 4) × 6"
                 ],
                 answer: 0,
-                explanation: "正確！先算1組牛奶要 18 × 4 = 72元，再買6組即 (18 × 4) × 6 = 432元。或先算總瓶數 18 × (4 × 6) 亦可。"
+                explanation: "先算1組牛奶要 18 × 4 = 72元，再買6組即 (18 × 4) × 6 = 432元。或先算總瓶數 18 × (4 × 6) 亦可。"
             },
             {
                 id: 2,
@@ -793,7 +804,7 @@
                     "D. 120 × (5 ÷ 3)"
                 ],
                 answer: 1,
-                explanation: "正確！先算出 1 段彩帶長度 (120 ÷ 5)，再乘以 3 段，合併為 (120 ÷ 5) × 3 = 72 公分。"
+                explanation: "先算出 1 段彩帶長度 (120 ÷ 5)，再乘以 3 段，合併為 (120 ÷ 5) × 3 = 72 公分。"
             },
             {
                 id: 3,
@@ -805,7 +816,7 @@
                     "D. (224 ÷ 2) × 8 與 224 × (8 × 2)"
                 ],
                 answer: 0,
-                explanation: "正確！連除法 224 ÷ 2 ÷ 8 = 14；先算總包數法 224 ÷ (8 × 2) = 14。兩者皆可正確求得一包價格。"
+                explanation: "連除法 224 ÷ 2 ÷ 8 = 14；先算總包數法 224 ÷ (8 × 2) = 14。兩者皆可正確求得一包價格。"
             },
             {
                 id: 4,
@@ -817,7 +828,7 @@
                     "D. 600 × 30 × 5"
                 ],
                 answer: 1,
-                explanation: "正確！先算 1 個紙箱裝了幾本 (600 ÷ 5 = 120本)，再乘以每本重量 30 公克，併式為 30 × (600 ÷ 5) = 3600 公克。"
+                explanation: "先算 1 個紙箱裝了幾本 (600 ÷ 5 = 120本)，再乘以每本重量 30 公克，併式為 30 × (600 ÷ 5) = 3600 公克。"
             },
             {
                 id: 5,
@@ -829,7 +840,7 @@
                     "D. 以上問題皆不適用"
                 ],
                 answer: 1,
-                explanation: "正確！乙問題中，先算全班分成幾組 (20 ÷ 5 = 4組)，再算每組分得幾棵 (100 ÷ 4 = 25棵)，符合算式 100 ÷ (20 ÷ 5)。"
+                explanation: "乙問題中，先算全班分成幾組 (20 ÷ 5 = 4組)，再算每組分得幾棵 (100 ÷ 4 = 25棵)，符合算式 100 ÷ (20 ÷ 5)。"
             }
         ];
 
@@ -839,7 +850,7 @@
             const container = document.getElementById('quizContainer');
             container.innerHTML = '';
 
-            quizData.forEach((q, idx) => {
+            quizData.forEach((q) => {
                 const qDiv = document.createElement('div');
                 qDiv.className = "bg-slate-50/80 p-5 rounded-2xl border border-slate-200 space-y-3";
 
@@ -867,44 +878,97 @@
 
         function selectOption(qId, optIdx) {
             const q = quizData.find(item => item.id === qId);
+            if (!q) return;
             userAnswers[qId] = optIdx;
 
-            // 清除該題按鈕狀態
-            for(let i=0; i<q.options.length; i++) {
+            // 僅高亮使用者當前選取的選項，不立即進行對錯判定與顯示解析
+            for (let i = 0; i < q.options.length; i++) {
                 const btn = document.getElementById(`btn-q${qId}-opt${i}`);
-                btn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border border-slate-300 bg-white font-medium text-sm transition-all flex items-center justify-between opacity-70";
-                btn.querySelector('.check-icon').className = "fa-regular fa-circle text-slate-300";
+                if (!btn) continue;
+                const icon = btn.querySelector('.check-icon');
+                if (i === optIdx) {
+                    btn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-900 font-bold text-sm transition-all flex items-center justify-between shadow-sm";
+                    if (icon) icon.className = "fa-solid fa-circle-dot text-indigo-600 text-base";
+                } else {
+                    btn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border border-slate-300 bg-white font-medium text-sm transition-all flex items-center justify-between opacity-80";
+                    if (icon) icon.className = "fa-regular fa-circle text-slate-300";
+                }
             }
-
-            const selectedBtn = document.getElementById(`btn-q${qId}-opt${optIdx}`);
-            const explainBox = document.getElementById(`explain-q${qId}`);
-            explainBox.classList.remove('hidden');
-
-            if (optIdx === q.answer) {
-                selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-sm transition-all flex items-center justify-between";
-                selectedBtn.querySelector('.check-icon').className = "fa-solid fa-circle-check text-emerald-600 text-base";
-                
-                explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-100/80 text-emerald-900 border border-emerald-300";
-                explainBox.innerHTML = `<strong>✨ 正確答案！</strong> ${q.explanation}`;
-            } else {
-                selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-sm transition-all flex items-center justify-between";
-                selectedBtn.querySelector('.check-icon').className = "fa-solid fa-circle-xmark text-rose-600 text-base";
-
-                explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-100/80 text-rose-900 border border-rose-300";
-                explainBox.innerHTML = `<strong>❌ 再想想看喔！</strong> ${q.explanation}`;
-            }
-
-            calculateScore();
         }
 
-        function calculateScore() {
+        function submitQuiz() {
             let score = 0;
+
             quizData.forEach(q => {
-                if (userAnswers[q.id] === q.answer) {
+                const explainBox = document.getElementById(`explain-q${q.id}`);
+                if (explainBox) {
+                    explainBox.classList.remove('hidden');
+                }
+
+                const selectedOptIdx = userAnswers[q.id];
+
+                // 情況 1: 未作答
+                if (selectedOptIdx === undefined) {
+                    if (explainBox) {
+                        explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-amber-100/90 text-amber-900 border border-amber-300 font-bold";
+                        explainBox.innerHTML = `⚠️ 未作答。`;
+                    }
+                    return;
+                }
+
+                // 清理所有選項樣式
+                for (let i = 0; i < q.options.length; i++) {
+                    const btn = document.getElementById(`btn-q${q.id}-opt${i}`);
+                    if (btn) {
+                        btn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border border-slate-300 bg-white font-medium text-sm transition-all flex items-center justify-between opacity-60";
+                        const icon = btn.querySelector('.check-icon');
+                        if (icon) icon.className = "fa-regular fa-circle text-slate-300";
+                    }
+                }
+
+                const selectedBtn = document.getElementById(`btn-q${q.id}-opt${selectedOptIdx}`);
+
+                // 情況 2: 答對
+                if (selectedOptIdx === q.answer) {
                     score += 20;
+                    if (selectedBtn) {
+                        selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-sm transition-all flex items-center justify-between";
+                        const icon = selectedBtn.querySelector('.check-icon');
+                        if (icon) icon.className = "fa-solid fa-circle-check text-emerald-600 text-base";
+                    }
+
+                    if (explainBox) {
+                        explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-emerald-100/90 text-emerald-950 border border-emerald-300";
+                        explainBox.innerHTML = `<strong>✨ 回答正確！</strong> ${q.explanation}`;
+                    }
+                } 
+                // 情況 3: 答錯
+                else {
+                    if (selectedBtn) {
+                        selectedBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold text-sm transition-all flex items-center justify-between";
+                        const icon = selectedBtn.querySelector('.check-icon');
+                        if (icon) icon.className = "fa-solid fa-circle-xmark text-rose-600 text-base";
+                    }
+
+                    // 標示出正確答案選項
+                    const correctBtn = document.getElementById(`btn-q${q.id}-opt${q.answer}`);
+                    if (correctBtn) {
+                        correctBtn.className = "quiz-opt-btn w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 text-emerald-900 font-bold text-sm transition-all flex items-center justify-between";
+                        const icon = correctBtn.querySelector('.check-icon');
+                        if (icon) icon.className = "fa-solid fa-circle-check text-emerald-600 text-base";
+                    }
+
+                    if (explainBox) {
+                        explainBox.className = "mt-3 p-3.5 rounded-xl text-xs leading-relaxed bg-rose-100/90 text-rose-950 border border-rose-300";
+                        explainBox.innerHTML = `<strong>❌ 答案不正確！</strong> ${q.explanation}`;
+                    }
                 }
             });
-            document.getElementById('quizScore').innerText = `${score} / 100`;
+
+            const quizScoreEl = document.getElementById('quizScore');
+            if (quizScoreEl) {
+                quizScoreEl.innerText = `${score} / 100`;
+            }
         }
 
         function resetQuiz() {

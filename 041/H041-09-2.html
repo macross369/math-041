@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>夢幻星空小數實驗室 - 認識二位小數與百分位</title>
+    <title>閒雲數學小棧 - 認識二位小數與百分位</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -19,7 +19,6 @@
             overflow-x: hidden;
         }
 
-        /* Shinkai Sky Effect Overlay */
         .shinkai-bg {
             background: linear-gradient(180deg, 
                 rgba(15, 23, 42, 0.85) 0%, 
@@ -50,7 +49,7 @@
             box-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
         }
 
-        /* Hundred Grid Styles - Standardized 10px Cell Basis */
+        /* Standardized Grid Cells Basis (10px x 10px for 0.01 equivalent) */
         .hundred-grid {
             display: grid;
             grid-template-columns: repeat(10, 10px);
@@ -93,7 +92,6 @@
             box-shadow: 0 0 4px #facc15;
         }
 
-        /* Regrouping Merge Glow Effect */
         @keyframes mergeGlow {
             0% { transform: scale(1); box-shadow: 0 0 5px rgba(250, 204, 21, 0.5); }
             50% { transform: scale(1.05); box-shadow: 0 0 18px rgba(244, 114, 182, 0.9); }
@@ -107,7 +105,6 @@
             background: rgba(244, 114, 182, 0.15);
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -122,20 +119,19 @@
 </head>
 <body class="shinkai-bg min-h-screen pb-12 relative">
 
-    <!-- Decorative Glowing Stars / Clouds -->
     <div class="absolute top-10 left-10 w-72 h-72 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute top-40 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
     <header class="relative z-10 pt-6 pb-6 text-center px-4 max-w-6xl mx-auto">
-        <!-- 修改：使用轉換後的 Google Drive 直接連結 -->
-        <div class="w-full flex items-center justify-start mb-4 px-2 fade-in">
+        <!-- Top Left Brand Badge -->
+        <div class="w-full flex items-center justify-start mb-4 px-2">
             <img src="https://lh3.googleusercontent.com/d/1qUdM3yxfDP9U8S1PAlYScLXLG9riPxMt" alt="閒雲數學小棧Logo" class="h-8 w-auto mr-3 object-contain drop-shadow-md rounded-full bg-white/30 p-1" onerror="this.src='https://placehold.co/40x40/ffffff/333333?text=Logo'">
             <span class="text-xl md:text-2xl font-bold text-white drop-shadow-lg tracking-wider" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">閒雲數學小棧</span>
         </div>
 
         <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sky-200 text-sm mb-3 shadow-lg">
             <i class="fa-solid fa-cloud-moon text-pink-300"></i>
-            <span>國小數學 9-2 二位小數與百分位</span>
+            <span>國小四上數學 9-2 互動學習網頁</span>
         </div>
         <h1 class="text-3xl md:text-5xl font-black tracking-tight glow-text text-white">
             星空下的小數化聚實驗室
@@ -147,7 +143,6 @@
 
     <main class="max-w-6xl mx-auto px-4 relative z-10">
 
-        <!-- Navigation Tabs -->
         <div class="flex justify-center mb-8">
             <div class="glass-card p-1.5 rounded-2xl flex gap-2 w-full max-w-md">
                 <button onclick="switchTab('explorer')" id="tab-explorer" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 to-indigo-500 text-white shadow-md">
@@ -157,7 +152,7 @@
                     <i class="fa-solid fa-bolt text-amber-300"></i> 進位與化聚實驗
                 </button>
                 <button onclick="switchTab('quiz')" id="tab-quiz" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 text-sky-100 hover:text-white">
-                    <i class="fa-solid fa-graduation-cap text-pink-300"></i> 歷程性評量
+                    <i class="fa-solid fa-graduation-cap text-pink-300"></i> 隨堂測驗
                 </button>
             </div>
         </div>
@@ -255,14 +250,13 @@
                 <!-- Right Visual Area & Place Value Chart -->
                 <div class="lg:col-span-7 space-y-6">
 
-                    <!-- Place Value Table (位值表) -->
+                    <!-- Place Value Table -->
                     <div class="glass-card rounded-3xl p-6">
                         <h3 class="text-lg font-bold text-sky-200 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-table-cells text-indigo-300"></i> 位值表 (Place Value Chart)
                         </h3>
 
                         <div class="grid grid-cols-3 text-center border-2 border-white/20 rounded-2xl overflow-hidden bg-slate-900/50 backdrop-blur-md">
-                            <!-- Table Headers -->
                             <div class="bg-gradient-to-b from-sky-600/50 to-sky-800/50 p-3 font-bold text-sky-100 border-r border-b border-white/20">
                                 個 位
                             </div>
@@ -273,7 +267,6 @@
                                 百分位 (0.01)
                             </div>
 
-                            <!-- Values -->
                             <div class="p-4 text-3xl font-black text-cyan-300 border-r border-white/20 flex items-center justify-center min-h-[70px]" id="chart-ones">
                                 2
                             </div>
@@ -285,7 +278,7 @@
                             </div>
                         </div>
 
-                        <!-- Special Proof Alert for 0.20 = 0.2 -->
+                        <!-- Equivalence Alert -->
                         <div id="equivalence-alert" class="mt-4 p-3 rounded-xl bg-pink-500/20 border border-pink-400/30 text-pink-100 text-xs flex items-center gap-3 hidden">
                             <i class="fa-solid fa-lightbulb text-amber-300 text-xl"></i>
                             <div>
@@ -324,7 +317,7 @@
                     </p>
                 </div>
 
-                <!-- Input Controls for Over-capacity -->
+                <!-- Input Controls -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 max-w-4xl mx-auto">
                     <div class="glass-card-subtle p-5 rounded-2xl text-center">
                         <label class="block text-sm font-bold text-cyan-200 mb-2">個位 (幾個 1)</label>
@@ -356,7 +349,7 @@
                     </div>
                 </div>
 
-                <!-- Synchronized Visual Preview Area BEFORE regrouping -->
+                <!-- Synchronized Visual Preview Area -->
                 <div class="max-w-4xl mx-auto glass-card-subtle p-4 rounded-2xl mb-8 border border-white/10">
                     <div class="text-xs font-bold text-sky-200 mb-2 flex items-center gap-2">
                         <i class="fa-solid fa-eye text-cyan-300"></i> 當前未進位原始圖示狀態：
@@ -373,7 +366,7 @@
                     </button>
                 </div>
 
-                <!-- Dynamic Transformation Explanation Area with Visual Steps -->
+                <!-- Dynamic Transformation Explanation Area -->
                 <div id="regroup-result-area" class="max-w-4xl mx-auto glass-card-subtle p-6 rounded-3xl border border-white/20 hidden">
                     <h3 class="text-lg font-bold text-sky-200 mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-arrows-split-up-and-left text-amber-300"></i> 圖示動態化聚推導步驟與解答
@@ -384,7 +377,7 @@
                     </div>
                 </div>
 
-                <!-- Special Interactive Challenge: 3.99 + 0.01 Case -->
+                <!-- Interactive Challenge Case -->
                 <div class="mt-8 max-w-4xl mx-auto glass-card p-6 rounded-3xl border border-pink-400/30">
                     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div>
@@ -409,13 +402,13 @@
             </div>
         </div>
 
-        <!-- ================= SECTION 3: QUIZ (歷程性評量 5題) ================= -->
+        <!-- ================= SECTION 3: QUIZ ================= -->
         <div id="section-quiz" class="space-y-6 hidden">
             <div class="glass-card rounded-3xl p-6 md:p-8">
                 <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 border-b border-white/10 pb-6">
                     <div>
                         <h2 class="text-2xl font-black text-pink-300 flex items-center gap-2 glow-text">
-                            <i class="fa-solid fa-clipboard-question"></i> 小數學習評量 (5 題)
+                            <i class="fa-solid fa-clipboard-question"></i> 隨堂測驗
                         </h2>
                         <p class="text-xs text-sky-100/80 mt-1">回答題目驗證學習成果，完成後可查看得分與詳細解析！</p>
                     </div>
@@ -424,9 +417,6 @@
                             <div class="text-xs text-sky-200/70">目前得分</div>
                             <div class="text-2xl font-black text-amber-300" id="quiz-score">0 / 100</div>
                         </div>
-                        <button onclick="resetQuiz()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-sky-200 transition">
-                            <i class="fa-solid fa-arrow-rotate-left"></i> 重測
-                        </button>
                     </div>
                 </div>
 
@@ -548,10 +538,13 @@
                     </div>
                 </div>
 
-                <!-- Submit Quiz Button -->
-                <div class="text-center mt-8">
-                    <button onclick="submitQuiz()" class="px-8 py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-pink-400 text-slate-950 font-black text-base hover:scale-105 transition shadow-lg">
-                        <i class="fa-solid fa-paper-plane mr-2"></i> 送出答案並檢視對錯回饋
+                <!-- Submit & Reset Quiz Buttons -->
+                <div class="flex flex-wrap justify-center items-center gap-4 mt-8">
+                    <button onclick="submitQuiz()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-sky-400 to-pink-400 text-slate-950 font-black text-base hover:scale-105 transition shadow-lg flex items-center justify-center gap-2 min-w-[160px]">
+                        <i class="fa-solid fa-paper-plane"></i> 提交答案
+                    </button>
+                    <button onclick="resetQuiz()" class="px-8 py-3.5 rounded-2xl bg-slate-700/80 hover:bg-slate-600 border border-white/20 text-white font-black text-base hover:scale-105 transition shadow-lg flex items-center justify-center gap-2 min-w-[160px]">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> 重新測驗
                     </button>
                 </div>
 
@@ -560,7 +553,6 @@
 
     </main>
 
-    <!-- Footer -->
     <footer class="text-center text-xs text-sky-100/60 py-8">
     </footer>
 
@@ -785,7 +777,6 @@
             }
         }
 
-        // Helper Functions to Render Blocks Box for Step Derivation
         function createCubesBoxHtml(count, highlighted = false, label = '') {
             let cubes = '';
             for (let i = 0; i < count; i++) {
@@ -839,7 +830,6 @@
             const stepsContent = document.getElementById('regroup-steps-content');
             area.classList.remove('hidden');
 
-            // Calculation logic
             const hundredthsCarry = Math.floor(rawHundredths / 10);
             const finalHundredths = rawHundredths % 10;
 
@@ -850,7 +840,7 @@
             const finalOnes = rawOnes + tenthsCarry;
             const finalDecimal = (finalOnes + (finalTenths * 0.1) + (finalHundredths * 0.01)).toFixed(2);
 
-            // Build Step 1 Visual (Hundredths Carry)
+            // Step 1 Visual
             let step1Visual = '';
             if (hundredthsCarry > 0) {
                 let conversionRows = '';
@@ -893,7 +883,7 @@
                 `;
             }
 
-            // Build Step 2 Visual (Tenths Carry)
+            // Step 2 Visual
             let step2Visual = '';
             if (tenthsCarry > 0) {
                 let conversionRows = '';
@@ -938,7 +928,7 @@
                 `;
             }
 
-            // Build Final Visual
+            // Final Visual
             let finalVisual = `
                 <div class="flex flex-wrap items-center justify-center gap-4 mt-2 p-3 bg-slate-900/80 rounded-xl">
                     <div class="flex flex-col items-center">
@@ -1006,12 +996,12 @@
             q5: 'C'
         };
 
-        const explanations = {
-            q1: "答案為 (A)。2.43 即 2個1、4個0.1與3個0.01。個位為2、十分位為4、百分位為3。",
-            q2: "答案為 (B)。100個0.01是1，200個0.01是2，34個0.01是0.34，合起來是 2.34。",
-            q3: "答案為 (B)。12個0.01可換成1個0.1和2個0.01。故0.1共有 6+1=7個，總合為 8.72。",
-            q4: "答案為 (B)。0.20與0.2都代表2個0.1，百分位為0時可省略不寫，兩者數值完全相等。",
-            q5: "答案為 (C)。3.99是399個0.01，再加1個是400個0.01，即為4 (或4.00)。"
+        const explanationsDetail = {
+            q1: "2.43 即 2 個 1、4 個 0.1 與 3 個 0.01。個位為 2、十分位為 4、百分位為 3。",
+            q2: "100 個 0.01 是 1，200 個 0.01 是 2，34 個 0.01 是 0.34，合起來是 2.34。",
+            q3: "12 個 0.01 可換成 1 個 0.1 和 2 個 0.01。故 0.1 共有 6 + 1 = 7 個，總合為 8.72。",
+            q4: "0.20 與 0.2 都代表 2 個 0.1，百分位為 0 時可省略不寫，兩者數值完全相等。",
+            q5: "3.99 是 399 個 0.01，再加 1 個是 400 個 0.01，即為 4 (或 4.00)。"
         };
 
         function submitQuiz() {
@@ -1020,15 +1010,21 @@
             for (let i = 1; i <= 5; i++) {
                 const selected = document.querySelector(`input[name="q${i}"]:checked`);
                 const feedbackEl = document.getElementById(`q${i}-feedback`);
-                feedbackEl.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-200', 'border-emerald-400/30', 'bg-rose-500/20', 'text-rose-200', 'border-rose-400/30');
+                feedbackEl.className = 'mt-3 text-xs p-3 rounded-xl border';
 
-                if (selected && selected.value === answers[`q${i}`]) {
+                if (!selected) {
+                    // Blank (unanswered): Show only "未作答。"
+                    feedbackEl.classList.add('bg-amber-500/20', 'text-amber-200', 'border-amber-400/40');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-300"></i> <strong>未作答。</strong>`;
+                } else if (selected.value === answers[`q${i}`]) {
+                    // Correct answer
                     score += 20;
-                    feedbackEl.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border', 'border-emerald-400/30');
-                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> <strong>正確！</strong> ${explanations[`q${i}`]}`;
+                    feedbackEl.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border-emerald-400/30');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> <strong>回答正確！</strong> ${explanationsDetail[`q${i}`]}`;
                 } else {
-                    feedbackEl.classList.add('bg-rose-500/20', 'text-rose-200', 'border', 'border-rose-400/30');
-                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> <strong>解答分析：</strong> ${explanations[`q${i}`]}`;
+                    // Incorrect answer
+                    feedbackEl.classList.add('bg-rose-500/20', 'text-rose-200', 'border-rose-400/30');
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-400"></i> <strong>回答錯誤。</strong> 正確答案為 (${answers[`q${i}`]})：${explanationsDetail[`q${i}`]}`;
                 }
             }
 
@@ -1040,12 +1036,11 @@
                 const radios = document.getElementsByName(`q${i}`);
                 radios.forEach(r => r.checked = false);
                 const feedbackEl = document.getElementById(`q${i}-feedback`);
-                feedbackEl.classList.add('hidden');
+                feedbackEl.className = 'mt-3 text-xs p-3 rounded-xl hidden';
             }
             document.getElementById('quiz-score').innerText = `0 / 100`;
         }
 
-        // On window startup, initialize rendering
         window.onload = function() {
             updateExplorer();
             updateLabLivePreview();

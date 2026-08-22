@@ -152,7 +152,7 @@
                 <i class="fa-solid fa-calculator text-9xl text-indigo-900"></i>
             </div>
             <div class="inline-block px-4 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold tracking-widest mb-2 shadow-sm">
-                <i class="fa-solid fa-cloud-sun mr-1"></i> 國小數學 2-1 乘法探究
+                <i class="fa-solid fa-cloud-sun mr-1"></i> 國小四上數學 2-1 互動學習網頁
             </div>
             <h1 class="text-3xl md:text-4xl font-black shinkai-text-gradient tracking-wide mb-2">
                 多位數與二位數乘法互動實驗室
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-compass text-amber-500"></i> 2. 估算與數感觀察
                 </button>
                 <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn bg-white/70 hover:bg-white text-slate-700 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-graduation-cap text-emerald-500"></i> 3. 歷程性小測驗 (5題)
+                    <i class="fa-solid fa-graduation-cap text-emerald-500"></i> 3. 隨堂測驗
                 </button>
             </div>
         </header>
@@ -409,30 +409,29 @@
                         <!-- 實驗室動態分析 -->
                     </div>
                 </div>
-
             </div>
         </main>
 
-        <!-- Tab 3: 歷程性評量測驗 (5題) -->
+        <!-- Tab 3: 隨堂測驗 -->
         <main id="tab3" class="tab-content hidden space-y-6">
             <div class="shinkai-glass rounded-3xl p-6 shadow-xl">
                 
                 <div class="flex flex-col md:flex-row items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-award text-amber-500"></i> 多位數乘法隨堂測驗
+                            <i class="fa-solid fa-award text-amber-500"></i> 隨堂測驗
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">共 5 題，測試你對乘法位值拆解與計算的掌握度！</p>
+                        <p class="text-xs text-slate-500 mt-1">共 5 題，每題 20 分，滿分 100 分！</p>
                     </div>
                     <!-- 得分與進度 -->
                     <div class="flex items-center gap-4 bg-white/80 px-4 py-2 rounded-2xl border border-slate-200">
                         <div class="text-center">
-                            <span class="text-xs font-bold text-slate-400 block">答對題數</span>
-                            <span id="quiz-score" class="text-lg font-black text-emerald-600">0 / 5</span>
+                            <span class="text-xs font-bold text-slate-400 block">測驗得分</span>
+                            <span id="quiz-score" class="text-lg font-black text-emerald-600">0 / 100</span>
                         </div>
                         <div class="h-8 w-px bg-slate-200"></div>
                         <div id="quiz-badge" class="text-xs font-bold text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg">
-                            <i class="fa-solid fa-star mr-1"></i> 挑戰開始
+                            <i class="fa-solid fa-star mr-1"></i> 準備作答
                         </div>
                     </div>
                 </div>
@@ -443,9 +442,12 @@
                 </div>
 
                 <!-- 送出與重新挑戰按鈕 -->
-                <div class="mt-8 text-center">
-                    <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl text-sm transition shadow-lg">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> 重新作答小測驗
+                <div class="mt-8 text-center flex flex-wrap justify-center gap-4">
+                    <button onclick="submitQuiz()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm transition shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> 提交答案
+                    </button>
+                    <button onclick="resetQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl text-sm transition shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> 重新測驗
                     </button>
                 </div>
 
@@ -467,6 +469,7 @@
         let multiplier = 23;
         let currentStep = 1;
         let maxSteps = 3;
+        let isSubmitted = false;
 
         // 測驗題庫定義
         const quizQuestions = [
@@ -726,8 +729,9 @@
                 gridHtml += `<tr>`;
                 for (let i = 0; i < COLS; i++) {
                     if (i >= p1Offset) {
+                        let digitIdx = i - p1Offset;
                         let hl = (currentStep === 1) ? 'bg-blue-100 text-blue-700 font-bold border border-blue-400' : 'text-slate-700';
-                        gridHtml += `<td class="p-1"><span class="digit-box ${hl}">${p1Str[i - p1Offset]}</span></td>`;
+                        gridHtml += `<td class="p-1"><span class="digit-box ${hl}">${p1Str[digitIdx]}</span></td>`;
                     } else {
                         gridHtml += `<td class="p-1"></td>`;
                     }
@@ -735,15 +739,24 @@
                 gridHtml += `</tr>`;
             }
 
-            // 6. 第四列：被乘數 × 十位結果 (步驟 2 顯示，含個位 0 對齊)
+            // 6. 第四列：被乘數 × 十位結果 (步驟 2 顯示，含個位 0 對齊，個位 0 以灰色顯示)
             if (multiplier >= 10 && currentStep >= 2) {
                 const p2Str = (prod2 * 10).toString();
                 let p2Offset = COLS - p2Str.length;
                 gridHtml += `<tr class="${currentStep === 2 ? 'border-b-2 border-slate-800' : ''}">`;
                 for (let i = 0; i < COLS; i++) {
                     if (i >= p2Offset) {
-                        let hl = (currentStep === 2) ? 'bg-purple-100 text-purple-700 font-bold border border-purple-400' : 'text-slate-700';
-                        gridHtml += `<td class="p-1"><span class="digit-box ${hl}">${p2Str[i - p2Offset]}</span></td>`;
+                        let digitIdx = i - p2Offset;
+                        let digitChar = p2Str[digitIdx];
+                        // 個位數字 "0" (即 i === COLS - 1) 以灰色顯示
+                        let isLastZero = (i === COLS - 1 && digitChar === '0');
+                        let hl = '';
+                        if (isLastZero) {
+                            hl = (currentStep === 2) ? 'bg-purple-50 text-slate-400 border border-purple-200 font-bold' : 'text-slate-400 font-bold';
+                        } else {
+                            hl = (currentStep === 2) ? 'bg-purple-100 text-purple-700 font-bold border border-purple-400' : 'text-slate-700';
+                        }
+                        gridHtml += `<td class="p-1"><span class="digit-box ${hl}">${digitChar}</span></td>`;
                     } else {
                         gridHtml += `<td class="p-1"></td>`;
                     }
@@ -771,7 +784,7 @@
 
             // 步驟文字解釋更新
             if (multiplier < 10) {
-                explanation.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i> <strong>計算說明：</strong> ${multiplicand} × ${multiplier} = <span class="text-base text-indigo-700 font-black">${total.toLocaleString()}</span>。依「個位 $\\rightarrow$ 十位 $\\rightarrow$ 百位 $\\rightarrow$ 千位」依序相乘，如有進位顯示於上方紅字。`;
+                explanation.innerHTML = `<i class="fa-solid fa-circle-info mr-1"></i> <strong>計算說明：</strong> ${multiplicand} × ${multiplier} = <span class="text-base text-indigo-700 font-black">${total.toLocaleString()}</span>。依「個位 → 十位 → 百位 → 千位」依序相乘，如有進位顯示於上方紅字。`;
             } else {
                 if (currentStep === 1) {
                     explanation.innerHTML = `<i class="fa-solid fa-circle-1 mr-1 text-blue-600"></i> <strong>步驟 1：</strong> 先算 ${multiplicand} × ${mpOnes} (個位) = <span class="text-blue-700 font-bold">${prod1.toLocaleString()}</span> (紅字為對應進位)。`;
@@ -883,7 +896,7 @@
                         <button onclick="selectAnswer(${q.id}, ${optIdx})" id="q${q.id}-opt${optIdx}" 
                                 class="quiz-opt-btn text-left p-3 rounded-xl border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 text-xs md:text-sm font-medium transition flex items-center justify-between">
                             <span>${opt}</span>
-                            <i class="fa-regular fa-circle text-slate-300"></i>
+                            <i id="q${q.id}-icon${optIdx}" class="fa-regular fa-circle text-slate-300"></i>
                         </button>
                     `;
                 });
@@ -897,53 +910,70 @@
         }
 
         function selectAnswer(qId, optIdx) {
-            const q = quizQuestions.find(item => item.id === qId);
-            if (!q) return;
+            if (isSubmitted) return; // 提交後鎖定選擇，若需修改可先重置
 
             quizUserAnswers[qId] = optIdx;
 
-            // 重置選項樣式
+            const q = quizQuestions.find(item => item.id === qId);
+            if (!q) return;
+
+            // 標示選取狀態（不立刻顯示對錯）
             q.options.forEach((_, i) => {
                 const btn = document.getElementById(`q${qId}-opt${i}`);
-                btn.className = "quiz-opt-btn text-left p-3 rounded-xl border border-slate-200 hover:bg-indigo-50 text-xs md:text-sm font-medium transition flex items-center justify-between";
+                const icon = document.getElementById(`q${qId}-icon${i}`);
+                if (i === optIdx) {
+                    btn.className = "quiz-opt-btn text-left p-3 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-900 text-xs md:text-sm font-bold transition flex items-center justify-between";
+                    if (icon) icon.className = "fa-solid fa-circle-dot text-indigo-600 text-base";
+                } else {
+                    btn.className = "quiz-opt-btn text-left p-3 rounded-xl border border-slate-200 hover:bg-indigo-50 text-xs md:text-sm font-medium transition flex items-center justify-between";
+                    if (icon) icon.className = "fa-regular fa-circle text-slate-300";
+                }
             });
-
-            const selectedBtn = document.getElementById(`q${qId}-opt${optIdx}`);
-            const fb = document.getElementById(`q${qId}-fb`);
-            fb.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-200', 'bg-rose-50', 'text-rose-900', 'border-rose-200');
-
-            if (optIdx === q.answer) {
-                selectedBtn.className = "quiz-opt-btn text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-xs md:text-sm font-bold transition flex items-center justify-between";
-                selectedBtn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-600 text-base";
-                
-                fb.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
-                fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <strong>答對了！</strong> ${q.explanation}`;
-            } else {
-                selectedBtn.className = "quiz-opt-btn text-left p-3 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs md:text-sm font-bold transition flex items-center justify-between";
-                selectedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-base";
-                
-                fb.classList.add('bg-rose-50', 'text-rose-900', 'border', 'border-rose-200');
-                fb.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-500 mr-1"></i> <strong>再想想看：</strong> ${q.explanation}`;
-            }
-
-            updateScore();
         }
 
-        function updateScore() {
-            let correctCount = 0;
+        function submitQuiz() {
+            isSubmitted = true;
+            let score = 0;
+
             quizQuestions.forEach(q => {
-                if (quizUserAnswers[q.id] === q.answer) {
-                    correctCount++;
+                const userChoice = quizUserAnswers[q.id];
+                const fb = document.getElementById(`q${q.id}-fb`);
+                fb.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-200', 'bg-rose-50', 'text-rose-900', 'border-rose-200', 'bg-amber-50', 'text-amber-900', 'border-amber-200');
+
+                if (userChoice === undefined || userChoice === null) {
+                    // 3. 未作答：黃色系，僅顯示「未作答。」，不顯示其他說明或正確答案
+                    fb.classList.add('bg-amber-50', 'text-amber-900', 'border', 'border-amber-200');
+                    fb.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i> 未作答。`;
+                } else if (userChoice === q.answer) {
+                    // 答對：得 20 分 (滿分 100)
+                    score += 20;
+                    const btn = document.getElementById(`q${q.id}-opt${userChoice}`);
+                    const icon = document.getElementById(`q${q.id}-icon${userChoice}`);
+                    if (btn) btn.className = "quiz-opt-btn text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-xs md:text-sm font-bold transition flex items-center justify-between";
+                    if (icon) icon.className = "fa-solid fa-circle-check text-emerald-600 text-base";
+
+                    fb.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
+                    fb.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <strong>答對了！</strong> ${q.explanation}`;
+                } else {
+                    // 4. 答錯：明確提示再想想，無矛盾敘述
+                    const btn = document.getElementById(`q${q.id}-opt${userChoice}`);
+                    const icon = document.getElementById(`q${q.id}-icon${userChoice}`);
+                    if (btn) btn.className = "quiz-opt-btn text-left p-3 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-xs md:text-sm font-bold transition flex items-center justify-between";
+                    if (icon) icon.className = "fa-solid fa-circle-xmark text-rose-500 text-base";
+
+                    fb.classList.add('bg-rose-50', 'text-rose-900', 'border', 'border-rose-200');
+                    fb.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-500 mr-1"></i> <strong>再想想看：</strong> ${q.explanation}`;
                 }
             });
 
-            document.getElementById('quiz-score').innerText = `${correctCount} / ${quizQuestions.length}`;
-            
+            // 5. 滿分設定為 100 分
+            document.getElementById('quiz-score').innerText = `${score} / 100`;
+
             const badge = document.getElementById('quiz-badge');
-            if (correctCount === 5) {
+            if (score === 100) {
                 badge.className = "text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg animate-bounce";
-                badge.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> 滿分乘法大師！`;
-            } else if (correctCount >= 3) {
+                badge.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> 滿分！乘法大師！`;
+            } else if (score >= 60) {
                 badge.className = "text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-lg";
                 badge.innerHTML = `<i class="fa-solid fa-thumbs-up mr-1"></i> 表現優異！`;
             } else {
@@ -954,8 +984,12 @@
 
         function resetQuiz() {
             quizUserAnswers = {};
+            isSubmitted = false;
             renderQuiz();
-            updateScore();
+            document.getElementById('quiz-score').innerText = `0 / 100`;
+            const badge = document.getElementById('quiz-badge');
+            badge.className = "text-xs font-bold text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg";
+            badge.innerHTML = `<i class="fa-solid fa-star mr-1"></i> 準備作答`;
         }
     </script>
 </body>
